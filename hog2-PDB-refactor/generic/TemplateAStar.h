@@ -36,6 +36,7 @@
 #include "GenericSearchAlgorithm.h"
 //static double lastF = 0;
 
+
 //typedef double (*phi)(double, double);
 // note, this should be consteval when C++20 is widespread
 //constexpr auto phi_astar = [](double h, double g) -> double { return g+h; };
@@ -181,6 +182,9 @@ private:
 	environment *radEnv;
 	Heuristic<state> *theHeuristic;
 	Constraint<state> *theConstraint;
+
+	double lastF = 0;
+	uint64_t nodesExpandedInThisF = 0;
 };
 
 /**
@@ -222,7 +226,9 @@ void TemplateAStar<state,action,environment,openList>::GetPath(environment *_env
 //		if (0 == nodesExpanded%100000)
 //			printf("%llu nodes expanded, %llu generated\n", nodesExpanded, nodesTouched);
 	}
-	//printf("max states in memory: %d\n",maxNum);
+	printf("\t\tNodes expanded with F=%1.1f: %llu(%llu)\n", lastF, nodesExpanded - nodesExpandedInThisF, nodesExpanded);
+	nodesExpandedInThisF = nodesExpanded;
+	printf("\t\tmax states in memory: %d\n",maxNum);
 }
 
 template <class state, class action, class environment, class openList>
@@ -325,9 +331,14 @@ bool TemplateAStar<state,action,environment,openList>::DoSingleSearchStep(std::v
 //	{ lastF = openClosedList.Lookup(nodeid).g+openClosedList.Lookup(nodeid).h;
 //		//printf("Updated limit to %f\n", lastF);
 //	}
-	if (!openClosedList.Lookup(nodeid).reopened)
-		uniqueNodesExpanded++;
-	nodesExpanded++;
+
+	if (lastF < phi(openClosedList.Lookup(nodeid).g, openClosedList.Lookup(nodeid).h)){	
+		if(lastF!=0)
+			printf("\t\tNodes expanded with F=%1.1f: %llu(%llu)\n", lastF, nodesExpanded - nodesExpandedInThisF, nodesExpanded);
+		nodesExpandedInThisF = nodesExpanded;
+		lastF = phi(openClosedList.Lookup(nodeid).g, openClosedList.Lookup(nodeid).h);
+	}
+
 
 	if ((stopAfterGoal) && (env->GoalTest(openClosedList.Lookup(nodeid).data, goal)))
 	{
@@ -337,6 +348,10 @@ bool TemplateAStar<state,action,environment,openList>::DoSingleSearchStep(std::v
 		goalFCost = openClosedList.Lookup(nodeid).f;// + openClosedList.Lookup(nodeid).h;
 		return true;
 	}
+	
+	if (!openClosedList.Lookup(nodeid).reopened)
+		uniqueNodesExpanded++;
+	nodesExpanded++;
 	
  	neighbors.resize(0);
 	edgeCosts.resize(0);
@@ -372,8 +387,8 @@ bool TemplateAStar<state,action,environment,openList>::DoSingleSearchStep(std::v
 			}
 		}
 	}
-	if(GetNumItems()+GetNumOpenItems()> maxNum)
-		maxNum = GetNumItems()+GetNumOpenItems();
+	if(GetNumItems()> maxNum)
+		maxNum = GetNumItems();
 	
 	if (useBPMX) // propagate best child to parent
 	{

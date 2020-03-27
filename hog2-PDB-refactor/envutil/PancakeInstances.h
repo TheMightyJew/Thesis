@@ -16,11 +16,6 @@ bool GetPancakeInstance(PancakePuzzleState<N> &s, int instance)
 {
 	return false;
 }
-
-template <>
-bool GetPancakeInstance(PancakePuzzleState<8> &s, int instance);
-template <>
-bool GetPancakeInstance(PancakePuzzleState<10> &s, int instance);
 template <>
 bool GetPancakeInstance(PancakePuzzleState<16> &s, int instance);
 template <>

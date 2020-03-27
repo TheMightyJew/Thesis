@@ -16,37 +16,6 @@
 // Rick provided 1000 composition instances from which we selected 100 random instances for
 // each of the following sizes, shown below.
 template <>
-bool GetPancakeInstance(PancakePuzzleState<8> &s, int instance)
-{
-	int problems[3][8] = {
-		{7,1,5,3,4,0,2,6},
-		{4,3,1,7,5,0,6,2},
-		{3,4,5,6,2,0,7,1}
-	};
-	if (instance < 0 || instance >= 3)
-		return false;
-	for (int x = 0; x < 8; x++)
-		s.puzzle[x] = problems[instance][x];
-	return true;
-}
-
-template <>
-bool GetPancakeInstance(PancakePuzzleState<10> &s, int instance)
-{
-	int problems[4][10] = {
-		{5,9,3,1,4,0,6,2,7,8},
-		{0,4,7,3,6,2,5,8,9,1},
-		{7,8,5,0,4,6,3,1,9,2},
-		{7,2,6,3,9,0,1,4,5,8}
-	};
-	if (instance < 0 || instance >= 4)
-		return false;
-	for (int x = 0; x < 10; x++)
-		s.puzzle[x] = problems[instance][x];
-	return true;
-}
-
-template <>
 bool GetPancakeInstance(PancakePuzzleState<16> &s, int instance)
 {
 	int problems[100][16] = {

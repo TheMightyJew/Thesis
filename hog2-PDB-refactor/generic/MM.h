@@ -60,6 +60,8 @@ public:
 	inline const int GetNumBackwardItems() { return backwardQueue.size(); }
 	inline const AStarOpenClosedData<state> &GetBackwardItem(unsigned int which) { return backwardQueue.Lookat(which); }
 	
+	int maxNum=0;
+	
 	uint64_t GetUniqueNodesExpanded() const { return uniqueNodesExpanded; }
 	uint64_t GetNodesExpanded() const { return nodesExpanded; }
 	uint64_t GetNodesTouched() const { return nodesTouched; }
@@ -158,6 +160,9 @@ private:
 	double oldp1;
 	double oldp2;
 	bool recheckPath;
+	
+	double lastF = 0;
+	uint64_t nodesExpandedInThisF = 0;
 };
 
 template <class state, class action, class environment, class priorityQueue>
@@ -169,6 +174,7 @@ void MM<state, action, environment, priorityQueue>::GetPath(environment *env, co
 	t.StartTimer();
 	while (!DoSingleSearchStep(thePath))
 	{ }
+	printf("\t\tmax states in memory: %d\n",maxNum);
 }
 
 template <class state, class action, class environment, class priorityQueue>
@@ -262,6 +268,8 @@ bool MM<state, action, environment, priorityQueue>::DoSingleSearchStep(std::vect
 			//Expand(forwardQueue, backwardQueue, forwardHeuristic, goal, g_f, f_f);
 		}
 	}
+	if(GetNumBackwardItems()+GetNumForwardItems() > maxNum)
+		maxNum = GetNumBackwardItems()+GetNumForwardItems();
 	// check if we can terminate
 	if (recheckPath)
 	{

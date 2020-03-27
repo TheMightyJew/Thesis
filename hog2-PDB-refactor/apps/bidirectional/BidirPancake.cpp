@@ -36,20 +36,21 @@ void TestError();
 void TestPancake()
 {
 //	TestRob();
-
-	TestPancakeHard(0); // GAP heuristic #
+	TestPancakeRandom();
+	//TestPancakeHard(0); // GAP heuristic #
 	//TestPancakeHard(1);
 	//TestPancakeHard(2);
-	TestPancakeHard(3);
+	//TestPancakeHard(3);
 	//TestPancakeHard(4);
-	//TestPancakeHard(10); // Heuristic 0
-	TestPancakeRandom();
+	//TestPancakeHard(pancakes_num); // Heuristic 0
+	
 //	TestError();
 //	TestVariants();
 	exit(0);
 }
 
 const int pancakes_num = 16;
+int all_problems_num = 1;
 
 
 void TestRob()
@@ -160,12 +161,13 @@ void TestPancakeTR()
 	exit(0);
 }
 
-const int N = 16;
+const int N = pancakes_num;
 void TestPancakeRandom()
 {
-	printf("\nTestPancakeRandom:(Pancakes: %d)\n", N);
-	for (int gap = 0; gap < 4; gap = gap + 3)
+	int singleGap = 0;
+	for (int gap = singleGap; gap <= singleGap; gap = gap + 1)
 	{
+		printf("\nTestPancakeRandom:(Pancakes: %d, Gap: %d)\n", N, gap);
 		srandom(2017218);
 		PancakePuzzleState<N> start;
 		PancakePuzzleState<N> original;
@@ -178,9 +180,9 @@ void TestPancakeRandom()
 		std::vector<PancakePuzzleState<N>> bsPath;
 		std::vector<PancakePuzzleState<N>> astarPath;
 		std::vector<PancakePuzzleState<N>> mmPath;
-		std::vector<PancakePuzzleAction> idaPath;
-		Timer t1, t2, t3, t4, t5, t6;
-		int problems_num = 3;
+		std::vector<PancakePuzzleState<N>> idaPath;
+		Timer t1, t2, t3, t4, t5, t6,t7;
+		int problems_num = 1;
 		for (int count = 0; count < problems_num; count++)
 		{
 			srandom(random());
@@ -235,35 +237,50 @@ void TestPancakeRandom()
 			// IDA*
 			if (1)
 			{
-				IDAStar<PancakePuzzleState<N>, PancakePuzzleAction, false> idastar;
+				IDAStar<PancakePuzzleState<N>, PancakePuzzleAction, true> idastar;
 				goal.Reset();
 				start = original;
 				t3.StartTimer();
 				idastar.GetPath(&pancake, start, goal, idaPath);
 				t3.EndTimer();
-				printf("\t\tGAP-%d IDA* found path length %ld; %llu expanded; %llu generated; %1.4fs elapsed\n", gap, idaPath.size(),
+				printf("\t\tGAP-%d IDA* found path length %1.0f; %llu expanded; %llu generated; %1.4fs elapsed\n", gap, pancake.GetPathLength(idaPath),
 					   idastar.GetNodesExpanded(), idastar.GetNodesTouched(), t3.GetElapsedTime());
 			}
 			
 			// MBBDS
+			const long byte = 8;
+			const long kb = pow(2,10) * byte;
+			const long mb = pow(2,10) * kb;
+			const unsigned long statesQuantityBound = 100;
+			const long stateSize = sizeof(original);
+			const long memoryBound = statesQuantityBound*stateSize/2;
 			if (1)
 			{
-				const long byte = 8;
-				const long kb = pow(2,10) * byte;
-				const long mb = pow(2,10) * kb;
-				const unsigned long statesQuantityBound = pow(10,8);
-				const long stateSize = sizeof(original);
-				const long memoryBound = statesQuantityBound*stateSize;
-				MBBDS<PancakePuzzleState<N>, PancakePuzzleAction, MyBloomFilter<PancakePuzzleState<N>, PancakeHasher<N>, memoryBound, 3>, false> mbbds(statesQuantityBound, memoryBound) ;
+				//k=1
+				MBBDS<PancakePuzzleState<N>, PancakePuzzleAction, MyBloomFilter<PancakePuzzleState<N>, PancakeHasher<N>, memoryBound, 1>, false> mbbds(statesQuantityBound, memoryBound) ;
 				goal.Reset();
 				start = original;
 				PancakePuzzleState<N> midState;
 				t6.StartTimer();
 				double path_length = mbbds.GetMidState(&pancake, start, goal, midState);
 				t6.EndTimer();
-				printf("\t\tHARD-%d GAP-%d MBBDS using memory for %1.0llu states(state size: %d bits) found path with cost %1.0f; %llu expanded; %llu generated; %1.4fs elapsed; \n", count, gap, statesQuantityBound*2, stateSize, path_length,
+				printf("\t\tHARD-%d GAP-%d MBBDS(k=1) using memory for %1.0llu states(state size: %d bits) found path length %1.0f; %llu expanded; %llu generated; %1.4fs elapsed; \n", count, gap, statesQuantityBound, stateSize, path_length,
 					   mbbds.GetNodesExpanded(), mbbds.GetNodesTouched(), t6.GetElapsedTime());
-				std::cout << "\t\t\t\Mid state: " << midState << std::endl;				
+				std::cout << "\t\t\t\Mid state: " << midState << std::endl;
+			}
+			if(1)
+			{
+				//k=3				
+				MBBDS<PancakePuzzleState<N>, PancakePuzzleAction, MyBloomFilter<PancakePuzzleState<N>, PancakeHasher<N>, memoryBound, 3>, false> mbbds(statesQuantityBound, memoryBound) ;
+				goal.Reset();
+				start = original;
+				PancakePuzzleState<N> midState;
+				t7.StartTimer();
+				double path_length = mbbds.GetMidState(&pancake, start, goal, midState);
+				t7.EndTimer();
+				printf("\t\tHARD-%d GAP-%d MBBDS(k=3) using memory for %1.0llu states(state size: %d bits) found path length %1.0f; %llu expanded; %llu generated; %1.4fs elapsed; \n", count, gap, statesQuantityBound, stateSize, path_length,
+					   mbbds.GetNodesExpanded(), mbbds.GetNodesTouched(), t7.GetElapsedTime());
+				std::cout << "\t\t\t\Mid state: " << midState << std::endl;			
 			}
 			
 			// MM
@@ -314,7 +331,7 @@ void TestPancakeHard(int gap)
 	std::vector<PancakePuzzleState<CNT>> idaPath;
 	Timer t1, t2, t3, t4, t5, t6;
 	
-	int problems_num = 2;
+	int problems_num = all_problems_num;
 	printf("\nTestPancakeHard:(Pancakes: %d, Gap: %d)\n", CNT, gap);
 	for (int count = 0; count < problems_num; count++)
 	{
@@ -493,13 +510,13 @@ void TestPancakeHard(int gap)
 		// IDA*
 		if (1)
 		{
-			IDAStar<PancakePuzzleState<CNT>, PancakePuzzleAction, false> idastar;
+			IDAStar<PancakePuzzleState<CNT>, PancakePuzzleAction, true> idastar;
 			goal.Reset();
 			start = original;
 			t3.StartTimer();
 			idastar.GetPath(&pancake, start, goal, idaPath);
 			t3.EndTimer();
-			printf("\t\tHARD-%d GAP-%d IDA* found path length %ld; %llu expanded; %llu generated; %1.4fs elapsed\n", count, gap, idaPath.size(),
+			printf("\t\tHARD-%d GAP-%d IDA* found path length %1.0f; %llu expanded; %llu generated; %1.4fs elapsed\n", count, gap, pancake.GetPathLength(idaPath),
 				   idastar.GetNodesExpanded(), idastar.GetNodesTouched(), t3.GetElapsedTime());
 		}
 		
@@ -511,7 +528,7 @@ void TestPancakeHard(int gap)
 			const long mb = pow(2,10) * kb;
 			const unsigned long statesQuantityBound = pow(10,8);
 			const long stateSize = sizeof(original);
-			const long memoryBound = statesQuantityBound*stateSize;
+			const long memoryBound = statesQuantityBound*stateSize/2;
 			MBBDS<PancakePuzzleState<CNT>, PancakePuzzleAction, MyBloomFilter<PancakePuzzleState<CNT>, PancakeHasher<CNT>, memoryBound, 3>, false> mbbds(statesQuantityBound, memoryBound) ;
 			goal.Reset();
 			start = original;
@@ -519,7 +536,7 @@ void TestPancakeHard(int gap)
 			t6.StartTimer();
 			double path_length = mbbds.GetMidState(&pancake, start, goal, midState);
 			t6.EndTimer();
-			printf("\t\tHARD-%d GAP-%d MBBDS using memory for %1.0llu states(state size: %d bits) found path with cost %1.0f; %llu expanded; %llu generated; %1.4fs elapsed; \n", count, gap, statesQuantityBound*2, stateSize, path_length,
+			printf("\t\tHARD-%d GAP-%d MBBDS using memory for %1.0llu states(state size: %d bits) found path length %1.0f; %llu expanded; %llu generated; %1.4fs elapsed; \n", count, gap, statesQuantityBound, stateSize, path_length,
 				   mbbds.GetNodesExpanded(), mbbds.GetNodesTouched(), t6.GetElapsedTime());
 			std::cout << "\t\t\t\Mid state: " << midState << std::endl;				
 		}

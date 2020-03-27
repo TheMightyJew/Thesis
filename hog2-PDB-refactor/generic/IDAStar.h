@@ -86,7 +86,7 @@ void IDAStar<state, action, verbose>::GetPath(SearchEnvironment<state, action> *
 									 std::vector<state> &thePath)
 {
 	if(verbose){
-		printf("\nStarting to solve with IDAStar\n");
+		printf("\t\tStarting to solve with IDAStar\n");
 	}
 	if (!storedHeuristic)
 		heuristic = env;
@@ -103,13 +103,18 @@ void IDAStar<state, action, verbose>::GetPath(SearchEnvironment<state, action> *
 		gCostHistogram.clear();
 		gCostHistogram.resize(nextBound+1);
 		if (verbose)
-			printf("Starting iteration with bound %f. ", nextBound, nodesExpanded);
+			printf("\t\tStarting iteration with bound %1.1f: ", nextBound, nodesExpanded);
 		double res = DoIteration(env, from, from, thePath, nextBound, 0, 0);
 		if (verbose)
 			printf("Nodes expanded: %llu(%llu)\n", nodesExpanded-nodesExpandedSoFar, nodesExpanded);
-		nodesExpandedSoFar = nodesExpanded;
-		if (res == 0)
+		if (res == 0){
+			/*if (verbose)
+				printf("\t\tStarting iteration with bound %f. ", nextBound, nodesExpanded);
+			if (verbose)
+				printf("Nodes expanded: %llu(%llu)\n", nodesExpanded-nodesExpandedSoFar, nodesExpanded);*/
 			break;
+		}
+		nodesExpandedSoFar = nodesExpanded;
 		PrintGHistogram();
 	}
 	PrintGHistogram();
@@ -181,8 +186,9 @@ double IDAStar<state, action, verbose>::DoIteration(SearchEnvironment<state, act
 		double edgeCost = env->GCost(currState, neighbors[x]);
 		double childH = DoIteration(env, currState, neighbors[x], thePath, bound,
 																g+edgeCost, maxH - edgeCost);
-		if (env->GoalTest(thePath.back(), goal))
+		if (env->GoalTest(thePath.back(), goal) && g+edgeCost<=bound){
 			return 0;
+		}
 		thePath.pop_back();
 		// pathmax
 		if (usePathMax && fgreater(childH-edgeCost, h))
