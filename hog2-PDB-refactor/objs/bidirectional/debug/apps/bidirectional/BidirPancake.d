@@ -28,4 +28,5 @@
  ../../../../utils/Graphics.h ../../../../utils/StringUtils.h \
  ../../../../generic/HeuristicError.h ../../../../search/Heuristic.h \
  ../../../../generic/MBBDS.h ../../../../generic/PancakeHasher.h \
- ../../../../generic/MurmurHash3.h ../../../../generic/MyBloomFilter.h
+ ../../../../generic/MurmurHash3.h ../../../../generic/IDMM.h \
+ ../../../../generic/MyBloomFilter.h

@@ -9,6 +9,7 @@
 #define MBBDS_H
 
 #include <iostream>
+#include<algorithm> 
 #include <unordered_set>
 #include "SearchEnvironment.h"
 #include "PancakeHasher.h"
@@ -17,19 +18,16 @@
 template <class state, class action, class BloomFilter, bool verbose = true>
 class MBBDS {
 public:
-	MBBDS(unsigned long statesQuantityBound, long long unsigned int memoryBound) {
+	MBBDS(unsigned long statesQuantityBound) {
 		this->statesQuantityBound = statesQuantityBound;
-		this->memoryBound = memoryBound;
 	}
 	virtual ~MBBDS() {}
 	double GetMidState(SearchEnvironment<state, action>* env, state fromState, state toState, state &midState);
-	bool checkState(state midState);
 	uint64_t GetNodesExpanded() { return nodesExpanded; }
 	uint64_t GetNodesTouched() { return nodesTouched; }
 	void ResetNodeCount() { nodesExpanded = nodesTouched = 0; }
 private:
 	unsigned long nodesExpanded, nodesTouched, statesQuantityBound;
-	long long unsigned int memoryBound;
 	BloomFilter previousBloomfilter;
 	BloomFilter currentBloomfilter;
 	bool listReady;
@@ -41,7 +39,8 @@ private:
 
 	bool DoIteration(SearchEnvironment<state, action>* env,
 		state parent, state currState, double bound, double g, state& midState);
-
+	bool checkState(state midState);
+	
 	state goal;
 	state start;
 
@@ -69,6 +68,7 @@ double MBBDS<state, action, BloomFilter, verbose>::GetMidState(SearchEnvironment
 	listReady = false;
 	middleStates.clear();
 	unsigned long nodesExpandedSoFar = 0;
+	double last_saturation = 1;
 	while(true){
 		if (verbose){
 			printf("Bounds: %f and %f\n", forwardBound, backwardBound);
@@ -94,7 +94,6 @@ double MBBDS<state, action, BloomFilter, verbose>::GetMidState(SearchEnvironment
 				from = toState;
 				goal = fromState;
 			}
-			//env->StoreGoal(goal);
 			outOfSpace = false;
 			bool solved = DoIteration(env, from, from, bound, 0, midState);
 			if(verbose){
@@ -112,17 +111,26 @@ double MBBDS<state, action, BloomFilter, verbose>::GetMidState(SearchEnvironment
 				break;
 			}
 			if (!outOfSpace) {
-				listReady = true;
-				previousBloomfilter.clear();
+				if(middleStates.size()==0){
+					if(verbose){
+						std::cout << "No solution" << std::endl;
+					}
+					break;
+				}
+				else{
+					listReady = true;
+					previousBloomfilter.clear();
+				}				
 			}
 			else {
 				double saturation = currentBloomfilter.getSaturation();
-				if (saturation == 1) {
+				if (saturation == 1 || saturation > last_saturation) {
 					if(verbose){
-						std::cout << "fuck" << std::endl;
+						std::cout << "BloomFilter Overflow" << std::endl;
 					}
 					return -1; //bloomfilter is fluded.
 				}
+				last_saturation = saturation;
 				if(verbose){
 					printf("Bloomfilter saturation is: %1.3f%%\n", saturation);
 				}
@@ -132,19 +140,50 @@ double MBBDS<state, action, BloomFilter, verbose>::GetMidState(SearchEnvironment
 			}
 			firstRun = false;
 			forwardSearch = !forwardSearch;
-		}
-		
-		if (forwardBound > backwardBound) {
-			backwardBound = forwardBound;
+		}	
+		bool resetSearch;
+		if(listReady){
+			if(backwardBound == forwardBound){
+				if(forwardSearch){
+					forwardBound++;				
+				}
+				else{
+					backwardBound++;
+				}
+				resetSearch = false;
+			}
+			else{
+				if((forwardSearch && backwardBound > forwardBound) || (!forwardSearch && backwardBound < forwardBound)){
+					resetSearch = false;
+				}
+				else{
+					resetSearch = true;
+				}
+				int maxBound = std::max(forwardBound, backwardBound);
+				forwardBound = maxBound;
+				backwardBound = maxBound;
+			}
 		}
 		else{
-			forwardBound++;
-		}
-		firstRun = true;
-		forwardSearch = true;
-		listReady = false;
-		middleStates.clear();
+			resetSearch = true;
+			if (forwardBound == backwardBound) {
+				forwardBound++;
+			}
+			else{
+				int maxBound = std::max(forwardBound, backwardBound);
+				forwardBound = maxBound;
+				backwardBound = maxBound;
+			}
+		}	
+		last_saturation = 1;
 		previousBloomfilter.clear();
+		if(resetSearch){
+			firstRun = true;
+			forwardSearch = true;
+			listReady = false;
+			middleStates.clear();			
+		}
+		
 	}
 }
 
