@@ -2,14 +2,20 @@
 #ifndef MyBloomFilter_H
 #define MyBloomFilter_H
 
-template<typename T, class H, long long unsigned int M, int K>
+template<typename T, class H>
 class MyBloomFilter {
 public:
 	MyBloomFilter(unsigned hashOffset = 0) : onesCount(0), count(0) {
 		this->hashOffset = hashOffset;
+	}
+	MyBloomFilter(long long unsigned int M, int K, unsigned hashOffset = 0) : onesCount(0), count(0) {
+		this->hashOffset = hashOffset;
+		this->M = M;
+		this->K = K;
 		filter.resize(M, false);
 	}
-
+	long long unsigned int M;
+	int K;
 
 	void insert(const T& object) {
 		for (unsigned i = hashOffset; i < hashOffset + K; ++i) {

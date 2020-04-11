@@ -60,12 +60,14 @@ public:
 	inline const int GetNumBackwardItems() { return backwardQueue.size(); }
 	inline const AStarOpenClosedData<state> &GetBackwardItem(unsigned int which) { return backwardQueue.Lookat(which); }
 	
-	int maxNum=0;
+	unsigned long maxNum=0;
 	
 	uint64_t GetUniqueNodesExpanded() const { return uniqueNodesExpanded; }
 	uint64_t GetNodesExpanded() const { return nodesExpanded; }
 	uint64_t GetNodesTouched() const { return nodesTouched; }
 	uint64_t GetNecessaryExpansions() const;
+	unsigned long getIMMExpansions() { return iMMExpansions; }
+	unsigned long getMemoryStatesUse() { return memoryStatesUse; }
 	//void FullBPMX(uint64_t nodeID, int distance);
 	
 	std::string SVGDraw() const;
@@ -160,6 +162,9 @@ private:
 	double oldp1;
 	double oldp2;
 	bool recheckPath;
+	std::vector<unsigned long> gCounts;
+	unsigned long iMMExpansions = 0;
+	unsigned long memoryStatesUse = 0;
 	
 	double lastF = 0;
 	uint64_t nodesExpandedInThisF = 0;
@@ -174,7 +179,13 @@ void MM<state, action, environment, priorityQueue>::GetPath(environment *env, co
 	t.StartTimer();
 	while (!DoSingleSearchStep(thePath))
 	{ }
-	printf("\t\tmax states in memory: %d\n",maxNum);
+	int sum=0;
+	for (int x = 0; x < gCounts.size(); x++)
+	{
+		sum += gCounts[x]*(gCounts.size()-x);
+	}
+	iMMExpansions = sum;
+	memoryStatesUse = maxNum;
 }
 
 template <class state, class action, class environment, class priorityQueue>
@@ -378,6 +389,12 @@ void MM<state, action, environment, priorityQueue>::Expand(priorityQueue &curren
 {
 	uint64_t nextID = current.Close();
 	nodesExpanded++;
+	int currentG = (int)(current.Lookup(nextID).g);
+	while(currentG >= gCounts.size()){
+		gCounts.push_back(0);
+	}
+	//printf("%d|%d\n", currentG,gCounts.size());
+	gCounts[currentG] = gCounts[currentG] + 1;
 	if (current.Lookup(nextID).reopened == false)
 		uniqueNodesExpanded++;
 

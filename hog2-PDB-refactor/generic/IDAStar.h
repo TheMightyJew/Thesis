@@ -36,6 +36,7 @@ public:
 	void ResetNodeCount() { nodesExpanded = nodesTouched = 0; }
 	void SetUseBDPathMax(bool val) { usePathMax = val; }
 	void SetHeuristic(Heuristic<state> *heur) { heuristic = heur; if (heur != 0) storedHeuristic = true;}
+	unsigned long getDAstarExpansions() { return dAstarExpansions; }
 private:
 	unsigned long long nodesExpanded, nodesTouched;
 	
@@ -73,6 +74,7 @@ private:
 	bool storedHeuristic;
 	Heuristic<state> *heuristic;
 	std::vector<uint64_t> gCostHistogram;
+	unsigned long dAstarExpansions = 0;
 
 #ifdef DO_LOGGING
 public:
@@ -97,6 +99,7 @@ void IDAStar<state, action, verbose>::GetPath(SearchEnvironment<state, action> *
 	goal = to;
 	thePath.push_back(from);
 	unsigned long nodesExpandedSoFar = 0;
+	unsigned long lastIterationExpansions = 0;
 	while (true) //thePath.size() == 0)
 	{
 		//nodeTable.clear();
@@ -105,8 +108,9 @@ void IDAStar<state, action, verbose>::GetPath(SearchEnvironment<state, action> *
 		if (verbose)
 			printf("\t\tStarting iteration with bound %1.1f: ", nextBound, nodesExpanded);
 		double res = DoIteration(env, from, from, thePath, nextBound, 0, 0);
+		lastIterationExpansions = nodesExpanded-nodesExpandedSoFar;
 		if (verbose)
-			printf("Nodes expanded: %llu(%llu)\n", nodesExpanded-nodesExpandedSoFar, nodesExpanded);
+			printf("Nodes expanded: %llu(%llu)\n", lastIterationExpansions, nodesExpanded);
 		if (res == 0){
 			/*if (verbose)
 				printf("\t\tStarting iteration with bound %f. ", nextBound, nodesExpanded);
@@ -117,6 +121,7 @@ void IDAStar<state, action, verbose>::GetPath(SearchEnvironment<state, action> *
 		nodesExpandedSoFar = nodesExpanded;
 		PrintGHistogram();
 	}
+	dAstarExpansions = lastIterationExpansions;
 	PrintGHistogram();
 }
 

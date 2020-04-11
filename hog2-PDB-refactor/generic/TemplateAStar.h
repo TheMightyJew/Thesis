@@ -107,7 +107,7 @@ public:
 	void ResetNodeCount() { nodesExpanded = nodesTouched = 0; uniqueNodesExpanded = 0; }
 	int GetMemoryUsage();
 	
-	int maxNum=0;
+	unsigned long maxNum=0;
 	bool GetClosedListGCost(const state &val, double &gCost) const;
 	bool GetOpenListGCost(const state &val, double &gCost) const;
 	bool GetClosedItem(const state &s, AStarOpenClosedDataWithF<state> &);
@@ -162,6 +162,8 @@ public:
 		phi = [=](double h, double g){ return g+weight*h; };
 	}
 	double GetWeight() { return weight; }
+	unsigned long getIAstarExpansions() { return iAstarExpansions; }
+	unsigned long getMemoryStatesUse() { return memoryStatesUse; }
 private:
 	uint64_t nodesTouched, nodesExpanded;
 	
@@ -182,7 +184,10 @@ private:
 	environment *radEnv;
 	Heuristic<state> *theHeuristic;
 	Constraint<state> *theConstraint;
-
+	std::vector<unsigned long> fCounts;
+	unsigned long iAstarExpansions = 0;
+	unsigned long memoryStatesUse = 0;
+	
 	double lastF = 0;
 	uint64_t nodesExpandedInThisF = 0;
 };
@@ -226,9 +231,15 @@ void TemplateAStar<state,action,environment,openList>::GetPath(environment *_env
 //		if (0 == nodesExpanded%100000)
 //			printf("%llu nodes expanded, %llu generated\n", nodesExpanded, nodesTouched);
 	}
-	printf("\t\tNodes expanded with F=%1.1f: %llu(%llu)\n", lastF, nodesExpanded - nodesExpandedInThisF, nodesExpanded);
+	fCounts.push_back(nodesExpanded - nodesExpandedInThisF);
 	nodesExpandedInThisF = nodesExpanded;
-	printf("\t\tmax states in memory: %d\n",maxNum);
+	unsigned long sum=0;
+	for (int x = 0; x < fCounts.size(); x++)
+	{
+		sum += fCounts[x]*(fCounts.size()-x);
+	} 
+	iAstarExpansions = sum;
+	memoryStatesUse = maxNum;
 }
 
 template <class state, class action, class environment, class openList>
@@ -333,8 +344,10 @@ bool TemplateAStar<state,action,environment,openList>::DoSingleSearchStep(std::v
 //	}
 
 	if (lastF < phi(openClosedList.Lookup(nodeid).g, openClosedList.Lookup(nodeid).h)){	
-		if(lastF!=0)
-			printf("\t\tNodes expanded with F=%1.1f: %llu(%llu)\n", lastF, nodesExpanded - nodesExpandedInThisF, nodesExpanded);
+		uint64_t last_iteration_expanded = nodesExpanded - nodesExpandedInThisF;
+		if(lastF!=0){
+			fCounts.push_back(last_iteration_expanded);
+		}
 		nodesExpandedInThisF = nodesExpanded;
 		lastF = phi(openClosedList.Lookup(nodeid).g, openClosedList.Lookup(nodeid).h);
 	}

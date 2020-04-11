@@ -36,6 +36,7 @@ private:
 	double backwardBound;
 	double forwardBound;
 	std::unordered_set<state> middleStates;
+	unsigned long memoryBound;
 
 	bool DoIteration(SearchEnvironment<state, action>* env,
 		state parent, state currState, double bound, double g, state& midState);
@@ -52,7 +53,9 @@ template <class state, class action, class BloomFilter, bool verbose>
 double MBBDS<state, action, BloomFilter, verbose>::GetMidState(SearchEnvironment<state, action>* env,
 	state fromState, state toState, state &midState)
 {
+	memoryBound = sizeof(fromState)*statesQuantityBound;
 	if(verbose){
+		printf("\nmemory is %1.1llu\n", memoryBound);
 		printf("\nStarting to solve with MBBDS\n");
 	}
 	nodesExpanded = nodesTouched = 0;
@@ -61,6 +64,8 @@ double MBBDS<state, action, BloomFilter, verbose>::GetMidState(SearchEnvironment
 	backwardBound = (int)(heuristic / 2);
 	forwardBound = heuristic - backwardBound;
 	bool forwardSearch;
+	int saturationIncreased = 0;
+	int saturationMaxIncreacsements = 100;
 	int iteration_num = 0;
 	double bound;
 	firstRun = true;
@@ -76,13 +81,11 @@ double MBBDS<state, action, BloomFilter, verbose>::GetMidState(SearchEnvironment
 		while (true){
 			if (verbose){
 				printf("Starting iteration number: %d. ", iteration_num);
-				if(false){
-					printf("start middleStates.size() = %d\n", middleStates.size());
-					printf("start previousBloomfilter.getSaturation() = %f\n", previousBloomfilter.getSaturation());
-					printf("start listReady = %d\n", listReady);
-					printf("start firstRun = %d\n", firstRun);
-					printf("start forwardSearch = %d\n", forwardSearch);
-				}
+				printf("start middleStates.size() = %d\n", middleStates.size());
+				printf("start previousBloomfilter.getSaturationgetSaturation() = %f\n", previousBloomfilter.getSaturation());
+				printf("start listReady = %d\n", listReady);
+				printf("start firstRun = %d\n", firstRun);
+				printf("start forwardSearch = %d\n", forwardSearch);
 			}
 			if (forwardSearch) {
 				bound = forwardBound;
@@ -124,9 +127,12 @@ double MBBDS<state, action, BloomFilter, verbose>::GetMidState(SearchEnvironment
 			}
 			else {
 				double saturation = currentBloomfilter.getSaturation();
-				if (saturation == 1 || saturation > last_saturation) {
+				if(saturation >= last_saturation){
+					saturationIncreased += 1;
+				}
+				if (saturation == 1 || saturationIncreased >= saturationMaxIncreacsements) {
 					if(verbose){
-						std::cout << "BloomFilter Overflow" << std::endl;
+						std::cout << "\t\tBloomFilter Overflow" << std::endl;
 					}
 					return -1; //bloomfilter is fluded.
 				}
@@ -176,6 +182,7 @@ double MBBDS<state, action, BloomFilter, verbose>::GetMidState(SearchEnvironment
 			}
 		}	
 		last_saturation = 1;
+		saturationIncreased = 0;
 		previousBloomfilter.clear();
 		if(resetSearch){
 			firstRun = true;
@@ -237,9 +244,9 @@ bool MBBDS<state, action, BloomFilter, verbose>::checkState(state midState)
 			currentBloomfilter.insert(midState);
 		}
 		else {
-			if (middleStates.size() == statesQuantityBound) {
+			if (middleStates.size() == (int)(statesQuantityBound/2)) {
 				outOfSpace = true;
-				currentBloomfilter = BloomFilter(previousBloomfilter.hashOffset + previousBloomfilter.getK());
+				currentBloomfilter = BloomFilter(memoryBound/2, 1, previousBloomfilter.hashOffset + previousBloomfilter.getK());
 				for (state possibleMidState : middleStates) {
 					currentBloomfilter.insert(possibleMidState);
 				}

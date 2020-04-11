@@ -20,8 +20,10 @@ public:
 	uint64_t GetNodesExpanded() { return nodesExpanded; }
 	uint64_t GetNodesTouched() { return nodesTouched; }
 	void ResetNodeCount() { nodesExpanded = nodesTouched = 0; }
+	unsigned long getDMMExpansions() { return dMMExpansions; }
+
 private:
-	unsigned long nodesExpanded, nodesTouched;
+	unsigned long nodesExpanded, nodesTouched, dMMExpansions;
 	double backwardBound;
 	double forwardBound;
 	bool DoIterationForward(SearchEnvironment<state, action>* env, state parent, state currState, double g, state& midState);	
@@ -44,19 +46,20 @@ double IDMM<state, action, verbose>::GetMidState(SearchEnvironment<state, action
 	double heuristic = env->HCost(fromState, toState);
 	backwardBound = (int)(heuristic / 2);
 	forwardBound = heuristic - backwardBound;
-	bool forwardSearch;
-	double bound;
 	unsigned long nodesExpandedSoFar = 0;
+	unsigned long lastIterationExpansions = 0;
 	while (true){
 		if (verbose){
 			printf("\t\tBounds: %1.1f and %1.1f: ", forwardBound, backwardBound);
 		}
 		bool solved = DoIterationForward(env, originStart, originStart, 0, midState);
+		lastIterationExpansions = nodesExpanded-nodesExpandedSoFar;
 		if(verbose){
-			printf("Nodes expanded: %d(%d)\n", nodesExpanded-nodesExpandedSoFar, nodesExpanded);
+			printf("Nodes expanded: %d(%d)\n", lastIterationExpansions, nodesExpanded);
 		}
 		nodesExpandedSoFar = nodesExpanded;
 		if (solved) {
+			dMMExpansions = lastIterationExpansions;
 			return backwardBound + forwardBound;
 		}
 		else{
@@ -77,7 +80,11 @@ bool IDMM<state, action, verbose>::DoIterationForward(SearchEnvironment<state, a
 	state parent, state currState, double g, state& midState)
 {
 	double h = env->HCost(currState, originGoal);
-	if (g == forwardBound) {
+	if (g > forwardBound  || fgreater(g + h, backwardBound + forwardBound))//not sure about that
+	{
+		return false;
+	}
+	else if (g == forwardBound) {
 		if (DoIterationBackward(env, originGoal, originGoal, 0, midState, currState)) {
 			midState = currState;
 			return true;
@@ -85,10 +92,6 @@ bool IDMM<state, action, verbose>::DoIterationForward(SearchEnvironment<state, a
 		else{
 			return false;
 		}
-	}
-	else if (g > forwardBound  || fgreater(g + h, backwardBound + forwardBound))//not sure about that
-	{
-		return false;
 	}
 	std::vector<state> neighbors;
 	env->GetSuccessors(currState, neighbors);
@@ -111,18 +114,14 @@ template <class state, class action, bool verbose>
 bool IDMM<state, action, verbose>::DoIterationBackward(SearchEnvironment<state, action>* env,
 	state parent, state currState, double g, state& midState, state possibleMidState)
 {
-	double h = env->HCost(currState, originStart);
-	if (g == backwardBound) {
-		if (currState == possibleMidState) {
-			return true;
-		}
-		else{
-			return false;
-		}
-	}
-	else if (g > backwardBound  || fgreater(g + h, backwardBound + forwardBound))//not sure about that
+	double h = env->HCost(currState, possibleMidState);
+	double originalH = env->HCost(currState, originStart);
+	if (fgreater(g + h, backwardBound) || fgreater(g + originalH, forwardBound+backwardBound))//not sure about that
 	{
 		return false;
+	}
+	else if (currState == possibleMidState) {
+		return true;
 	}
 	std::vector<state> neighbors;
 	env->GetSuccessors(currState, neighbors);
