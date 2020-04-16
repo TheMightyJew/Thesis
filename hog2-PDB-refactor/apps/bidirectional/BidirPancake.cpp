@@ -20,8 +20,12 @@
 #include "IDMM.h"
 #include "MyBloomFilter.h"
 #include "PancakeHasher.h"
+#include <fstream>
 #include <iostream>
+#include <boost/format.hpp>
+using namespace std;
 #include <math.h> 
+#include <ctime>
 
 
 
@@ -34,26 +38,49 @@ void TestRob();
 void TestVariants();
 void TestError();
 
+const int pancakes_num = 16;
+int all_problems_num = 100;
+unsigned long statesQuantityBound = 1000000;
+int secondsLimit = 60*30;
+
+
+string datetime()
+{
+    time_t rawtime;
+    struct tm * timeinfo;
+    char buffer[80];
+
+    time (&rawtime);
+    timeinfo = localtime(&rawtime);
+
+    strftime(buffer,80,"%d-%m-%Y_%H-%M-%S",timeinfo);
+    return string(buffer);
+}
+
+ofstream myfile;
+string filename = "test_results/results_" + datetime() + ".txt";
+
+
 void TestPancake()
 {
-//	TestRob();
-	TestPancakeRandom();
-	//TestPancakeHard(0); // GAP heuristic #
+	cout << "running..." << endl;
+	
+	myfile.open (filename);
+	//TestRob();
+	//TestPancakeRandom();
+	TestPancakeHard(0); // GAP heuristic #
 	//TestPancakeHard(1);
 	//TestPancakeHard(2);
 	//TestPancakeHard(3);
 	//TestPancakeHard(4);
 	//TestPancakeHard(pancakes_num); // Heuristic 0
+	//TestError();
+	//TestVariants();
+	myfile.close();
 	
-//	TestError();
-//	TestVariants();
+	cout << "completed!" << endl;
 	exit(0);
 }
-
-const int pancakes_num = 16;
-int all_problems_num = 1;
-unsigned long statesQuantityBound = 1000;
-
 
 void TestRob()
 {
@@ -62,7 +89,7 @@ void TestRob()
 	PancakePuzzleState<4> goal;
 	PancakePuzzle<4> cake(1);
 	ZeroHeuristic<PancakePuzzleState<4>> z;
-	std::vector<PancakePuzzleState<4>> path;
+	vector<PancakePuzzleState<4>> path;
 	start.puzzle[0] = 0;
 	start.puzzle[1] = 3;
 	start.puzzle[2] = 2;
@@ -101,10 +128,10 @@ void TestPancakeTR()
 		TemplateAStar<PancakePuzzleState<S>, PancakePuzzleAction, PancakePuzzle<S>> astar;
 		IDAStar<PancakePuzzleState<S>, PancakePuzzleAction, false> idastar;
 		
-		std::vector<PancakePuzzleState<S>> nbsPath;
-		std::vector<PancakePuzzleState<S>> astarPath;
-		std::vector<PancakePuzzleState<S>> mmPath;
-		std::vector<PancakePuzzleAction> idaPath;
+		vector<PancakePuzzleState<S>> nbsPath;
+		vector<PancakePuzzleState<S>> astarPath;
+		vector<PancakePuzzleState<S>> mmPath;
+		vector<PancakePuzzleAction> idaPath;
 		Timer t1, t2, t3, t4;
 		
 		
@@ -178,13 +205,13 @@ void TestPancakeRandom()
 		PancakePuzzle<N> pancake2(gap);
 		pancake.SetUseRealValueEdges(false);
 		
-		std::vector<PancakePuzzleState<N>> nbsPath;
-		std::vector<PancakePuzzleState<N>> bsPath;
-		std::vector<PancakePuzzleState<N>> astarPath;
-		std::vector<PancakePuzzleState<N>> mmPath;
-		std::vector<PancakePuzzleState<N>> idaPath;
+		vector<PancakePuzzleState<N>> nbsPath;
+		vector<PancakePuzzleState<N>> bsPath;
+		vector<PancakePuzzleState<N>> astarPath;
+		vector<PancakePuzzleState<N>> mmPath;
+		vector<PancakePuzzleState<N>> idaPath;
 		Timer t1, t2, t3, t4, t5, t6, t7, t8;
-		int problems_num = 1;
+		int problems_num = all_problems_num;
 		for (int count = 0; count < problems_num; count++)
 		{
 			srandom(random());
@@ -192,12 +219,12 @@ void TestPancakeRandom()
 			goal.Reset();
 			original.Reset();
 			for (int x = 0; x < N; x++)
-				std::swap(original.puzzle[x], original.puzzle[x+random()%(N-x)]);
+				swap(original.puzzle[x], original.puzzle[x+random()%(N-x)]);
 			
 			printf("\tProblem %d of %d\n", count+1, problems_num);
-			std::cout << "\tStart state: " << original << std::endl;
-			std::cout << "\tGoal state: " << goal << std::endl;
-			std::cout <<"\tInitial heuristic " << pancake.HCost(original, goal) << std::endl;
+			cout << "\tStart state: " << original << endl;
+			cout << "\tGoal state: " << goal << endl;
+			cout <<"\tInitial heuristic " << pancake.HCost(original, goal) << endl;
 			// A*
 			if (1)
 			{
@@ -205,12 +232,18 @@ void TestPancakeRandom()
 				TemplateAStar<PancakePuzzleState<N>, PancakePuzzleAction, PancakePuzzle<N>> astar;
 				start = original;
 				t1.StartTimer();
-				astar.GetPath(&pancake, start, goal, astarPath);
+				bool solved = astar.GetPathTime(&pancake, start, goal, astarPath, secondsLimit);
 				statesQuantityBound = astar.getMemoryStatesUse();
 				t1.EndTimer();
-				printf("\t\tGAP-%d A* found path length %1.0f; %llu expanded; %llu necessary;  %llu necessary; using %1.0llu states in memory; %1.4fs elapsed\n", gap, pancake.GetPathLength(astarPath),
+				if(solved){
+					printf("\t\tGAP-%d A* found path length %1.0f; %llu expanded; %llu necessary;  %llu necessary; using %1.0llu states in memory; %1.4fs elapsed\n", gap, pancake.GetPathLength(astarPath),
 					   astar.GetNodesExpanded(), astar.GetNecessaryExpansions(), statesQuantityBound, t1.GetElapsedTime());
-				printf("\t\tGAP-%d I-MM ; %llu expanded;\n", gap, astar.getIAstarExpansions());	   
+					printf("\t\tGAP-%d I-A* ; %llu expanded;\n", gap, astar.getIAstarExpansions());	
+				}
+				else{
+					printf("\t\tGAP-%d A* failed after %1.4fs\n", gap, t1.GetElapsedTime());
+					printf("\t\tGAP-%d I-A* failed after %1.4fs\n", gap, t1.GetElapsedTime());	
+				}
 				printf("\t\t_A*_\n");
 			}
 			
@@ -248,11 +281,17 @@ void TestPancakeRandom()
 				goal.Reset();
 				start = original;
 				t3.StartTimer();
-				idastar.GetPath(&pancake, start, goal, idaPath);
+				bool solved = idastar.GetPath(&pancake, start, goal, idaPath, secondsLimit);
 				t3.EndTimer();
-				printf("\t\tGAP-%d IDA* found path length %1.0f; %llu expanded; %llu generated; %1.4fs elapsed\n", gap, pancake.GetPathLength(idaPath),
+				if(solved){
+					printf("\t\tGAP-%d IDA* found path length %1.0f; %llu expanded; %llu generated; %1.4fs elapsed\n", gap, pancake.GetPathLength(idaPath),
 					   idastar.GetNodesExpanded(), idastar.GetNodesTouched(), t3.GetElapsedTime());
-				printf("\t\tGAP-%d D-A* ; %llu expanded;\n", gap, idastar.getDAstarExpansions());	   
+					printf("\t\tGAP-%d D-A* ; %llu expanded;\n", gap, idastar.getDAstarExpansions());
+				}
+				else{
+					printf("\t\tGAP-%d IDA* failed after %1.4fs\n", t3.GetElapsedTime());
+					printf("\t\tGAP-%d D-A* failed after %1.4fs\n", t3.GetElapsedTime());
+				}					   
 				printf("\t\t_IDA*_\n");
 			}
 			
@@ -264,14 +303,19 @@ void TestPancakeRandom()
 				goal.Reset();
 				start = original;
 				t4.StartTimer();
-				mm.GetPath(&pancake, start, goal, &pancake, &pancake2, mmPath);
-				if (statesQuantityBound==0 || statesQuantityBound > mm.getMemoryStatesUse()){
-					statesQuantityBound = mm.getMemoryStatesUse();
-				}
+				bool solved = mm.GetPath(&pancake, start, goal, &pancake, &pancake2, mmPath, secondsLimit);
+				statesQuantityBound = mm.getMemoryStatesUse();
 				t4.EndTimer();
-				printf("\t\tGAP-%d MM found path length %1.0f; %llu expanded; %llu necessary; using %1.0llu states in memory; %1.4fs elapsed\n", gap, pancake.GetPathLength(mmPath),
-					   mm.GetNodesExpanded(), mm.GetNecessaryExpansions(), statesQuantityBound, t4.GetElapsedTime());
-				printf("\t\tGAP-%d I-MM ; %llu expanded;\n", gap, mm.getIMMExpansions());	   
+				if(solved){
+					printf("\t\tGAP-%d MM found path length %1.0f; %llu expanded; %llu necessary; using %1.0llu states in memory; %1.4fs elapsed\n", gap, pancake.GetPathLength(mmPath),
+						   mm.GetNodesExpanded(), mm.GetNecessaryExpansions(), statesQuantityBound, t4.GetElapsedTime());
+					printf("\t\tGAP-%d I-MM ; %llu expanded;\n", gap, mm.getIMMExpansions());	   
+
+				}
+				else{
+					printf("\t\tGAP-%d MM failed after %1.4fs\n", t4.GetElapsedTime());
+					printf("\t\tGAP-%d I-MM failed after %1.4fs\n", t4.GetElapsedTime());
+				}
 				printf("\t\t_MM_\n");
 			}
 
@@ -303,11 +347,16 @@ void TestPancakeRandom()
 				start = original;
 				PancakePuzzleState<N> midState;
 				t6.StartTimer();
-				double path_length = mbbds.GetMidState(&pancake, start, goal, midState);
+				bool solved = mbbds.GetMidState(&pancake, start, goal, midState, secondsLimit);
 				t6.EndTimer();
-				printf("\t\tHARD-%d GAP-%d MBBDS(k=1) using memory for %1.0llu states(state size: %d bits) found path length %1.0f; %llu expanded; %llu generated; %1.4fs elapsed; \n", count, gap, statesQuantityBound, stateSize, path_length,
+				if(solved){
+					printf("\t\tHARD-%d GAP-%d MBBDS(k=1) using memory for %1.0llu states(state size: %d bits) found path length %1.0f; %llu expanded; %llu generated; %1.4fs elapsed; \n", count, gap, statesQuantityBound, stateSize, mbbds.getPathLength(),
 					   mbbds.GetNodesExpanded(), mbbds.GetNodesTouched(), t6.GetElapsedTime());
-				std::cout << "\t\t\t\Mid state: " << midState << std::endl;
+					cout << "\t\t\t\Mid state: " << midState << endl;
+				}
+				else{
+					printf("\t\tGAP-%d MBBDS(k=1) failed after %1.4fs\n", t6.GetElapsedTime());
+				}
 				printf("\t\t_MBBDS 1_\n");
 			}
 			
@@ -320,12 +369,18 @@ void TestPancakeRandom()
 				start = original;
 				PancakePuzzleState<N> midState;
 				t8.StartTimer();
-				double path_length = idmm.GetMidState(&pancake, start, goal, midState);
+				bool solved = idmm.GetMidState(&pancake, start, goal, midState, secondsLimit);
 				t8.EndTimer();
-				printf("\t\tHARD-%d GAP-%d IDMM found path length %1.0f; %llu expanded; %llu generated; %1.4fs elapsed; \n", count, gap, path_length,
+				if(solved){
+					printf("\t\tHARD-%d GAP-%d IDMM found path length %1.0f; %llu expanded; %llu generated; %1.4fs elapsed; \n", count, gap, idmm.getPathLength(),
 					   idmm.GetNodesExpanded(), idmm.GetNodesTouched(), t8.GetElapsedTime());
-				std::cout << "\t\t\t\Mid state: " << midState << std::endl;	
-				printf("\t\tGAP-%d D-MM ; %llu expanded;\n", gap, idmm.getDMMExpansions());	   				
+					cout << "\t\t\t\Mid state: " << midState << endl;	
+					printf("\t\tGAP-%d D-MM ; %llu expanded;\n", gap, idmm.getDMMExpansions());
+				}
+				else{
+					printf("\t\tGAP-%d IDMM failed after %1.4fs\n", t8.GetElapsedTime());
+					printf("\t\tGAP-%d D-MM failed after %1.4fs\n", t8.GetElapsedTime());
+				}   				
 				printf("\t\t_IDMM_\n");
 			}
 			
@@ -343,47 +398,43 @@ void TestPancakeHard(int gap)
 	PancakePuzzle<CNT> pancake2(gap);
 	pancake.SetUseRealValueEdges(false);
 	
-	std::vector<PancakePuzzleState<CNT>> nbsPath;
-	std::vector<PancakePuzzleState<CNT>> bsPath;
-	std::vector<PancakePuzzleState<CNT>> astarPath;
-	std::vector<PancakePuzzleState<CNT>> mmPath;
-	std::vector<PancakePuzzleState<CNT>> idaPath;
-	Timer t1, t2, t3, t4, t5, t6;
+	vector<PancakePuzzleState<CNT>> nbsPath;
+	vector<PancakePuzzleState<CNT>> bsPath;
+	vector<PancakePuzzleState<CNT>> astarPath;
+	vector<PancakePuzzleState<CNT>> mmPath;
+	vector<PancakePuzzleState<CNT>> idaPath;
+	Timer t1, t2, t3, t4, t5, t6, t7, t8;
 	
 	int problems_num = all_problems_num;
-	printf("\nTestPancakeHard:(Pancakes: %d, Gap: %d)\n", CNT, gap);
+	myfile << boost::format("TestPancakeHard:(Pancakes: %d, Gap: %d)\n") % CNT % gap;
 	for (int count = 0; count < problems_num; count++)
 	{
 		goal.Reset();
 		original.Reset();
 		GetPancakeInstance(original, count);
-		printf("\tProblem %d of %d\n", count+1, problems_num);
-		std::cout << "\tStart state: " << original << std::endl;
-		std::cout << "\tGoal state: " << goal << std::endl;
-		std::cout <<"\tInitial heuristic " << pancake.HCost(original, goal) << std::endl;
+		myfile << boost::format("\tProblem %d of %d\n") % (count+1) % problems_num;
+		myfile << "\tStart state: " << original << endl;
+		myfile << "\tGoal state: " << goal << endl;
+		myfile <<"\tInitial heuristic " << pancake.HCost(original, goal) << endl;
 		// A*
 		if (1)
 		{
-			TemplateAStar<PancakePuzzleState<CNT>, PancakePuzzleAction, PancakePuzzle<CNT>> astar;
+			myfile <<"\t\t_A*_\n";
+			TemplateAStar<PancakePuzzleState<N>, PancakePuzzleAction, PancakePuzzle<N>> astar;
 			start = original;
 			t1.StartTimer();
-			astar.GetPath(&pancake, start, goal, astarPath);
+			bool solved = astar.GetPathTime(&pancake, start, goal, astarPath, secondsLimit);
+			statesQuantityBound = astar.getMemoryStatesUse();
 			t1.EndTimer();
-			printf("\t\tHARD-%d-G%d A* found path length %1.0f; %llu expanded; %llu necessary; %1.4fs elapsed\n", count, gap, pancake.GetPathLength(astarPath),
-				   astar.GetNodesExpanded(), astar.GetNecessaryExpansions(), t1.GetElapsedTime());
-//			std::unordered_map<int, bool> m;
-//			for (int x = 0; x < astar.GetNumItems(); x++)
-//			{
-//				auto &i = astar.GetItem(x);
-//				if (i.where != kClosedList)
-//					continue;
-//				int tmp = (((int)i.g)<<10)|(int)i.h;
-//				if (m.find(tmp) == m.end())
-//				{
-//					m[tmp] = true;
-//					printf("(%d, %d)\n", (int)i.g, (int)i.h);
-//				}
-//			}
+			if(solved){
+				myfile << boost::format("\t\t\tGAP-%d A* found path length %1.0f; %llu expanded; %llu necessary; using %1.0llu states in memory; %1.4fs elapsed\n") % gap % pancake.GetPathLength(astarPath) %
+				   astar.GetNodesExpanded() % astar.GetNecessaryExpansions() % statesQuantityBound % t1.GetElapsedTime();
+				myfile << boost::format("\t\t\tGAP-%d I-A* ; %llu expanded;\n") % gap % astar.getIAstarExpansions();	
+			}
+			else{
+				myfile << boost::format("\t\t\tHard-GAP-%d A* failed after %1.4fs\n") % gap % t1.GetElapsedTime();
+				myfile << boost::format("\t\t\tHard-GAP-%d I-A* failed after %1.4fs\n") % gap % t1.GetElapsedTime();	
+			}
 		}
 
 		// Reverse A*
@@ -396,7 +447,7 @@ void TestPancakeHard(int gap)
 			t1.EndTimer();
 			printf("HARD-%d-G%d ReverseA* found path length %1.0f; %llu expanded; %llu necessary; %1.4fs elapsed\n", count, gap, pancake.GetPathLength(astarPath),
 				   astar.GetNodesExpanded(), astar.GetNecessaryExpansions(), t1.GetElapsedTime());
-//			std::unordered_map<int, bool> m;
+//			unordered_map<int, bool> m;
 //			for (int x = 0; x < astar.GetNumItems(); x++)
 //			{
 //				auto &i = astar.GetItem(x);
@@ -416,10 +467,10 @@ void TestPancakeHard(int gap)
 		{
 			start = original;
 
-			std::string t = "/Users/nathanst/bidir/pancake/pancake_";
-			t += std::to_string(count);
+			string t = "/Users/nathanst/bidir/pancake/pancake_";
+			t += to_string(count);
 			t += "_GAP";
-			t += std::to_string(gap);
+			t += to_string(gap);
 
 			BidirectionalProblemAnalyzer<PancakePuzzleState<CNT>, PancakePuzzleAction, PancakePuzzle<CNT>> p(start, goal, &pancake, &pancake, &pancake);
 			p.drawFullGraph = true;
@@ -498,18 +549,28 @@ void TestPancakeHard(int gap)
 			printf("HARD-%d BS* found path length %1.0f; %llu expanded; %llu necessary; %1.4fs elapsed\n", count, pancake.GetPathLength(bsPath),
 				   bs.GetNodesExpanded(), bs.GetNecessaryExpansions(), t2.GetElapsedTime());
 		}
-		
+		bool MMcompleted = true;
 		// MM
 		if (1)
 		{
-			MM<PancakePuzzleState<CNT>, PancakePuzzleAction, PancakePuzzle<CNT>> mm;
+			myfile << "\t\t_MM_\n";				
+			MM<PancakePuzzleState<N>, PancakePuzzleAction, PancakePuzzle<N>> mm;
 			goal.Reset();
 			start = original;
 			t4.StartTimer();
-			mm.GetPath(&pancake, start, goal, &pancake, &pancake2, mmPath);
+			bool solved = mm.GetPath(&pancake, start, goal, &pancake, &pancake2, mmPath, secondsLimit);
+			statesQuantityBound = mm.getMemoryStatesUse();
 			t4.EndTimer();
-			printf("\t\tHARD-%d MM found path length %1.0f; %llu expanded; %llu necessary; %1.4fs elapsed\n", count, pancake.GetPathLength(mmPath),
-				   mm.GetNodesExpanded(), mm.GetNecessaryExpansions(), t4.GetElapsedTime());
+			if(solved){
+				myfile << boost::format("\t\t\tHard-GAP-%d MM found path length %1.0f; %llu expanded; %llu necessary; using %1.0llu states in memory; %1.4fs elapsed\n") % gap % pancake.GetPathLength(mmPath) %
+					   mm.GetNodesExpanded() % mm.GetNecessaryExpansions() % statesQuantityBound % t4.GetElapsedTime();
+				myfile << boost::format("\t\t\tHard-GAP-%d I-MM ; %llu expanded;\n") % gap % mm.getIMMExpansions();				
+			}
+			else{
+				myfile << boost::format("\t\t\tHard-GAP-%d MM failed after %1.4fs\n") % gap % t4.GetElapsedTime();
+				myfile << boost::format("\t\t\tHard-GAP-%d I-MM failed after %1.4fs\n") % gap % t4.GetElapsedTime();
+				MMcompleted = false;
+			}
 		}
 		
 		// MM0
@@ -529,34 +590,77 @@ void TestPancakeHard(int gap)
 		// IDA*
 		if (1)
 		{
-			IDAStar<PancakePuzzleState<CNT>, PancakePuzzleAction, true> idastar;
+			myfile << "\t\t_IDA*_\n";
+			IDAStar<PancakePuzzleState<N>, PancakePuzzleAction, false> idastar;
 			goal.Reset();
 			start = original;
 			t3.StartTimer();
-			idastar.GetPath(&pancake, start, goal, idaPath);
+			bool solved = idastar.GetPath(&pancake, start, goal, idaPath, secondsLimit);
 			t3.EndTimer();
-			printf("\t\tHARD-%d GAP-%d IDA* found path length %1.0f; %llu expanded; %llu generated; %1.4fs elapsed\n", count, gap, pancake.GetPathLength(idaPath),
-				   idastar.GetNodesExpanded(), idastar.GetNodesTouched(), t3.GetElapsedTime());
+			if(solved){
+				myfile << boost::format("\t\t\tHard-GAP-%d IDA* found path length %1.0f; %llu expanded; %llu generated; %1.4fs elapsed\n") % gap % pancake.GetPathLength(idaPath) %
+				   idastar.GetNodesExpanded() % idastar.GetNodesTouched() % t3.GetElapsedTime();
+				myfile << boost::format("\t\t\tHard-GAP-%d D-A* ; %llu expanded;\n") % gap % idastar.getDAstarExpansions();
+			}
+			else{
+				myfile << boost::format("\t\t\tHard-GAP-%d IDA* failed after %1.4fs\n") % gap % t3.GetElapsedTime();
+				myfile << boost::format("\t\t\tHard-GAP-%d D-A* failed after %1.4fs\n") % gap % t3.GetElapsedTime();
+			}					   
 		}
 		
 		// MBBDS
-		if (1)
+		long byte = 8;
+		long kb = pow(2,10) * byte;
+		long mb = pow(2,10) * kb;
+		long stateSize = sizeof(original);
+		if (1 && MMcompleted)
 		{
-			long byte = 8;
-			long kb = pow(2,10) * byte;
-			long mb = pow(2,10) * kb;
-			long stateSize = sizeof(original);
-			unsigned long statesQuantityBoundforMBBDS = statesQuantityBound * 0.75;
-			MBBDS<PancakePuzzleState<CNT>, PancakePuzzleAction, MyBloomFilter<PancakePuzzleState<CNT>, PancakeHasher<CNT>>, false> mbbds(statesQuantityBoundforMBBDS) ;
+			myfile << "\t\t_MBBDS_\n";
+			double percentages[6] = {1, 0.9, 0.75, 0.5, 0.25, 0.1};
+			for(double percentage : percentages){
+				unsigned long statesQuantityBoundforMBBDS = statesQuantityBound*percentage;
+				myfile << boost::format("\t\t\tMemory_percentage_from_MM=%1.2f_\n") % percentage;
+				//k=1
+				MBBDS<PancakePuzzleState<N>, PancakePuzzleAction, MyBloomFilter<PancakePuzzleState<N>, PancakeHasher<N>>, false> mbbds(statesQuantityBoundforMBBDS) ;
+				goal.Reset();
+				start = original;
+				PancakePuzzleState<N> midState;
+				t6.StartTimer();
+				bool solved = mbbds.GetMidState(&pancake, start, goal, midState, secondsLimit);
+				t6.EndTimer();
+				if(solved){
+					myfile << boost::format("\t\t\t\tHARD-%d GAP-%d MBBDS(k=1) using memory for %1.0llu states(state size: %d bits) found path length %1.0f; %llu expanded; %llu generated; %1.4fs elapsed; \n") % count % gap % statesQuantityBoundforMBBDS % stateSize % mbbds.getPathLength() %
+					   mbbds.GetNodesExpanded() % mbbds.GetNodesTouched() % t6.GetElapsedTime();
+					myfile << "\t\t\t\t\Mid state: " << midState << endl;
+				}
+				else{
+					myfile << boost::format("\t\t\t\tHard-GAP-%d MBBDS(k=1) failed after %1.4fs\n") % gap % t6.GetElapsedTime();
+					break;
+				}
+			}				
+		}
+		
+		//IDMM
+		if(1)
+		{
+			myfile << "\t\t_IDMM_\n";
+			IDMM<PancakePuzzleState<N>, PancakePuzzleAction, false> idmm;
 			goal.Reset();
 			start = original;
-			PancakePuzzleState<CNT> midState;
-			t6.StartTimer();
-			double path_length = mbbds.GetMidState(&pancake, start, goal, midState);
-			t6.EndTimer();
-			printf("\t\tHARD-%d GAP-%d MBBDS using memory for %1.0llu states(state size: %d bits) found path length %1.0f; %llu expanded; %llu generated; %1.4fs elapsed; \n", count, gap, statesQuantityBound, stateSize, path_length,
-				   mbbds.GetNodesExpanded(), mbbds.GetNodesTouched(), t6.GetElapsedTime());
-			std::cout << "\t\t\t\Mid state: " << midState << std::endl;				
+			PancakePuzzleState<N> midState;
+			t8.StartTimer();
+			bool solved = idmm.GetMidState(&pancake, start, goal, midState, secondsLimit);
+			t8.EndTimer();
+			if(solved){
+				myfile << boost::format("\t\t\tHARD-%d GAP-%d IDMM found path length %1.0f; %llu expanded; %llu generated; %1.4fs elapsed; \n") % count % gap % idmm.getPathLength() %
+				   idmm.GetNodesExpanded() % idmm.GetNodesTouched() % t8.GetElapsedTime();
+				myfile << "\t\t\t\Mid state: " << midState << endl;	
+				myfile << boost::format("\t\t\tGAP-%d D-MM ; %llu expanded;\n") % gap % idmm.getDMMExpansions();
+			}
+			else{
+				myfile << boost::format("\t\t\tGAP-%d IDMM failed after %1.4fs\n") % gap % t8.GetElapsedTime();
+				myfile << boost::format("\t\t\tGAP-%d D-MM failed after %1.4fs\n") % gap % t8.GetElapsedTime();
+			}   				
 		}
 	}
 }
@@ -579,7 +683,7 @@ void Solve(Heuristic<PancakePuzzleState<CNT>> *h, const char *name)
 		p.drawShortenedEdges = false;
 		{
 			p.drawProblemInstance = true;
-			std::string s(name);
+			string s(name);
 			s += "-instance.svg";
 			p.SaveSVG(s.c_str());
 			p.drawProblemInstance = false;
@@ -589,7 +693,7 @@ void Solve(Heuristic<PancakePuzzleState<CNT>> *h, const char *name)
 		p.drawAllG = false;
 		p.flipBackwardsGCost = false;
 		{
-			std::string s(name);
+			string s(name);
 			s += "-ey-gn-fn.svg";
 			p.SaveSVG(s.c_str());
 		}
@@ -599,14 +703,14 @@ void Solve(Heuristic<PancakePuzzleState<CNT>> *h, const char *name)
 		p.flipBackwardsGCost = true;
 		p.drawSumOnEdge = false;
 		{
-			std::string s(name);
+			string s(name);
 			s += "-ey-gn-fy.svg";
 			p.SaveSVG(s.c_str());
 		}
 
 		p.drawAllG = true;
 		{
-			std::string s(name);
+			string s(name);
 			s += "-ey-gy-fy.svg";
 			p.SaveSVG(s.c_str());
 		}
@@ -616,7 +720,7 @@ void Solve(Heuristic<PancakePuzzleState<CNT>> *h, const char *name)
 		p.flipBackwardsGCost = true;
 		p.drawSumOnEdge = true;
 		{
-			std::string s(name);
+			string s(name);
 			s += "-en-gy-fy.svg";
 			p.SaveSVG(s.c_str());
 		}
@@ -627,7 +731,7 @@ void Solve(Heuristic<PancakePuzzleState<CNT>> *h, const char *name)
 		p.drawShortenedEdges = true;
 		p.drawSumOnEdge = true;
 		{
-			std::string s(name);
+			string s(name);
 			s += "-es-gy-fy.svg";
 			p.SaveSVG(s.c_str());
 		}
@@ -636,7 +740,7 @@ void Solve(Heuristic<PancakePuzzleState<CNT>> *h, const char *name)
 	
 	if (0)
 	{
-		std::vector<PancakePuzzleState<CNT>> nbsPath;
+		vector<PancakePuzzleState<CNT>> nbsPath;
 		NBS<PancakePuzzleState<CNT>, PancakePuzzleAction, PancakePuzzle<CNT>> nbs;
 		nbs.GetPath(&pancake, start, goal, h, h, nbsPath);
 		printf("NBS found path length %1.0f; %llu expanded; %llu necessary; %f meeting\n", pancake.GetPathLength(nbsPath),

@@ -16,7 +16,8 @@ template <class state, class action, bool verbose = true>
 class IDMM {
 public:
 	virtual ~IDMM() {}
-	double GetMidState(SearchEnvironment<state, action>* env, state fromState, state toState, state &midState);
+	bool GetMidState(SearchEnvironment<state, action>* env, state fromState, state toState, state &midState, int secondsLimit=600);
+	double getPathLength()	{ return pathLength; }
 	uint64_t GetNodesExpanded() { return nodesExpanded; }
 	uint64_t GetNodesTouched() { return nodesTouched; }
 	void ResetNodeCount() { nodesExpanded = nodesTouched = 0; }
@@ -26,6 +27,7 @@ private:
 	unsigned long nodesExpanded, nodesTouched, dMMExpansions;
 	double backwardBound;
 	double forwardBound;
+	double pathLength;
 	bool DoIterationForward(SearchEnvironment<state, action>* env, state parent, state currState, double g, state& midState);	
 	bool DoIterationBackward(SearchEnvironment<state, action>* env, state parent, state currState, double g, state& midState, state possibleMidState);
 	
@@ -37,8 +39,8 @@ private:
 };
 
 template <class state, class action, bool verbose>
-double IDMM<state, action, verbose>::GetMidState(SearchEnvironment<state, action>* env,
-	state fromState, state toState, state &midState)
+bool IDMM<state, action, verbose>::GetMidState(SearchEnvironment<state, action>* env,
+	state fromState, state toState, state &midState, int secondsLimit)
 {
 	nodesExpanded = nodesTouched = 0;
 	originStart = fromState;
@@ -48,7 +50,13 @@ double IDMM<state, action, verbose>::GetMidState(SearchEnvironment<state, action
 	forwardBound = heuristic - backwardBound;
 	unsigned long nodesExpandedSoFar = 0;
 	unsigned long lastIterationExpansions = 0;
+	auto startTime = std::chrono::steady_clock::now();
 	while (true){
+		auto currentTime = std::chrono::steady_clock::now();
+		std::chrono::duration<double> elapsed_seconds = currentTime-startTime;
+		if(elapsed_seconds.count() >= secondsLimit){
+			return false;
+		}
 		if (verbose){
 			printf("\t\tBounds: %1.1f and %1.1f: ", forwardBound, backwardBound);
 		}
@@ -60,7 +68,8 @@ double IDMM<state, action, verbose>::GetMidState(SearchEnvironment<state, action
 		nodesExpandedSoFar = nodesExpanded;
 		if (solved) {
 			dMMExpansions = lastIterationExpansions;
-			return backwardBound + forwardBound;
+			pathLength = backwardBound + forwardBound;
+			return true;
 		}
 		else{
 			if (forwardBound > backwardBound) {
@@ -71,7 +80,7 @@ double IDMM<state, action, verbose>::GetMidState(SearchEnvironment<state, action
 			}			
 		}
 	}
-	return -1;
+	return false;
 }
 
 

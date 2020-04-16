@@ -80,6 +80,7 @@ public:
 	}
 	virtual ~TemplateAStar() {}
 	void GetPath(environment *env, const state& from, const state& to, std::vector<state> &thePath);
+	bool GetPathTime(environment *env, const state& from, const state& to, std::vector<state> &thePath, int secondsLimit=600);
 	void GetPath(environment *, const state&, const state&, std::vector<action> & );
 	
 	openList openClosedList;
@@ -220,6 +221,36 @@ const char *TemplateAStar<state,action,environment,openList>::GetName()
  * between from and to when the function returns, if one exists. 
  */
 template <class state, class action, class environment, class openList>
+bool TemplateAStar<state,action,environment,openList>::GetPathTime(environment *_env, const state& from, const state& to, std::vector<state> &thePath, int secondsLimit)
+{
+	if (!InitializeSearch(_env, from, to, thePath))
+  	{	
+  		return false;
+  	}
+	auto startTime = std::chrono::steady_clock::now();
+  	while (!DoSingleSearchStep(thePath))
+	{
+		memoryStatesUse = maxNum;
+		
+		auto currentTime = std::chrono::steady_clock::now();
+		std::chrono::duration<double> elapsed_seconds = currentTime-startTime;
+		if(elapsed_seconds.count() >= secondsLimit){
+			return false;
+		}
+	}
+	fCounts.push_back(nodesExpanded - nodesExpandedInThisF);
+	nodesExpandedInThisF = nodesExpanded;
+	unsigned long sum=0;
+	for (int x = 0; x < fCounts.size(); x++)
+	{
+		sum += fCounts[x]*(fCounts.size()-x);
+	} 
+	iAstarExpansions = sum;
+	memoryStatesUse = maxNum;
+	return true;
+}
+
+template <class state, class action, class environment, class openList>
 void TemplateAStar<state,action,environment,openList>::GetPath(environment *_env, const state& from, const state& to, std::vector<state> &thePath)
 {
 	if (!InitializeSearch(_env, from, to, thePath))
@@ -228,8 +259,6 @@ void TemplateAStar<state,action,environment,openList>::GetPath(environment *_env
   	}
   	while (!DoSingleSearchStep(thePath))
 	{
-//		if (0 == nodesExpanded%100000)
-//			printf("%llu nodes expanded, %llu generated\n", nodesExpanded, nodesTouched);
 	}
 	fCounts.push_back(nodesExpanded - nodesExpandedInThisF);
 	nodesExpandedInThisF = nodesExpanded;

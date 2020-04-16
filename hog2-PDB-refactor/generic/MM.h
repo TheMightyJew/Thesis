@@ -45,8 +45,8 @@ class MM {
 public:
 	MM(double epsilon = 1.0):epsilon(epsilon) { forwardHeuristic = 0; backwardHeuristic = 0; env = 0; ResetNodeCount(); }
 	virtual ~MM() {}
-	void GetPath(environment *env, const state& from, const state& to,
-				 Heuristic<state> *forward, Heuristic<state> *backward, std::vector<state> &thePath);
+	bool GetPath(environment *env, const state& from, const state& to,
+				 Heuristic<state> *forward, Heuristic<state> *backward, std::vector<state> &thePath, int secondsLimit=600);
 	bool InitializeSearch(environment *env, const state& from, const state& to,
 						  Heuristic<state> *forward, Heuristic<state> *backward, std::vector<state> &thePath);
 	bool DoSingleSearchStep(std::vector<state> &thePath);
@@ -171,14 +171,22 @@ private:
 };
 
 template <class state, class action, class environment, class priorityQueue>
-void MM<state, action, environment, priorityQueue>::GetPath(environment *env, const state& from, const state& to,
-			 Heuristic<state> *forward, Heuristic<state> *backward, std::vector<state> &thePath)
+bool MM<state, action, environment, priorityQueue>::GetPath(environment *env, const state& from, const state& to,
+			 Heuristic<state> *forward, Heuristic<state> *backward, std::vector<state> &thePath, int secondsLimit)
 {
 	if (InitializeSearch(env, from, to, forward, backward, thePath) == false)
-		return;
+		return false;
 	t.StartTimer();
-	while (!DoSingleSearchStep(thePath))
-	{ }
+	auto startTime = std::chrono::steady_clock::now();
+	while (!DoSingleSearchStep(thePath)){ 
+		memoryStatesUse = maxNum;
+		
+		auto currentTime = std::chrono::steady_clock::now();
+		std::chrono::duration<double> elapsed_seconds = currentTime-startTime;
+		if(elapsed_seconds.count() >= secondsLimit){
+			return false;
+		}
+	}
 	int sum=0;
 	for (int x = 0; x < gCounts.size(); x++)
 	{
@@ -186,6 +194,7 @@ void MM<state, action, environment, priorityQueue>::GetPath(environment *env, co
 	}
 	iMMExpansions = sum;
 	memoryStatesUse = maxNum;
+	return true;
 }
 
 template <class state, class action, class environment, class priorityQueue>

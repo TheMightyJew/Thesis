@@ -26,9 +26,9 @@ class IDAStar {
 public:
 	IDAStar() { useHashTable = usePathMax = false; storedHeuristic = false;}
 	virtual ~IDAStar() {}
-	void GetPath(SearchEnvironment<state, action> *env, state from, state to,
-							 std::vector<state> &thePath);
-	void GetPath(SearchEnvironment<state, action> *env, state from, state to,
+	bool GetPath(SearchEnvironment<state, action> *env, state from, state to,
+							 std::vector<state> &thePath, int secondsLimit=600);
+	bool GetPath(SearchEnvironment<state, action> *env, state from, state to,
 				 std::vector<action> &thePath);
 
 	uint64_t GetNodesExpanded() { return nodesExpanded; }
@@ -83,9 +83,9 @@ public:
 };
 
 template <class state, class action, bool verbose>
-void IDAStar<state, action, verbose>::GetPath(SearchEnvironment<state, action> *env,
+bool IDAStar<state, action, verbose>::GetPath(SearchEnvironment<state, action> *env,
 									 state from, state to,
-									 std::vector<state> &thePath)
+									 std::vector<state> &thePath, int secondsLimit)
 {
 	if(verbose){
 		printf("\t\tStarting to solve with IDAStar\n");
@@ -100,8 +100,14 @@ void IDAStar<state, action, verbose>::GetPath(SearchEnvironment<state, action> *
 	thePath.push_back(from);
 	unsigned long nodesExpandedSoFar = 0;
 	unsigned long lastIterationExpansions = 0;
+	auto startTime = std::chrono::steady_clock::now();
 	while (true) //thePath.size() == 0)
 	{
+		auto currentTime = std::chrono::steady_clock::now();
+		std::chrono::duration<double> elapsed_seconds = currentTime-startTime;
+		if(elapsed_seconds.count() >= secondsLimit){
+			return false;
+		}
 		//nodeTable.clear();
 		gCostHistogram.clear();
 		gCostHistogram.resize(nextBound+1);
@@ -123,10 +129,11 @@ void IDAStar<state, action, verbose>::GetPath(SearchEnvironment<state, action> *
 	}
 	dAstarExpansions = lastIterationExpansions;
 	PrintGHistogram();
+	return true;
 }
 
 template <class state, class action, bool verbose>
-void IDAStar<state, action, verbose>::GetPath(SearchEnvironment<state, action> *env,
+bool IDAStar<state, action, verbose>::GetPath(SearchEnvironment<state, action> *env,
 									 state from, state to,
 									 std::vector<action> &thePath)
 {
@@ -137,7 +144,7 @@ void IDAStar<state, action, verbose>::GetPath(SearchEnvironment<state, action> *
 	thePath.resize(0);
 
 	if (env->GoalTest(from, to))
-		return;
+		return true;
 
 	double rootH = heuristic->HCost(from, to);
 	UpdateNextBound(0, rootH);
@@ -155,6 +162,7 @@ void IDAStar<state, action, verbose>::GetPath(SearchEnvironment<state, action> *
 		DoIteration(env, act[0], from, thePath, nextBound, 0, 0, rootH);
 		PrintGHistogram();
 	}
+	return true;
 }
 
 template <class state, class action, bool verbose>

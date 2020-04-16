@@ -22,7 +22,8 @@ public:
 		this->statesQuantityBound = statesQuantityBound;
 	}
 	virtual ~MBBDS() {}
-	double GetMidState(SearchEnvironment<state, action>* env, state fromState, state toState, state &midState);
+	bool GetMidState(SearchEnvironment<state, action>* env, state fromState, state toState, state &midState, int secondsLimit=600);
+	double getPathLength()	{ return pathLength; }
 	uint64_t GetNodesExpanded() { return nodesExpanded; }
 	uint64_t GetNodesTouched() { return nodesTouched; }
 	void ResetNodeCount() { nodesExpanded = nodesTouched = 0; }
@@ -35,6 +36,7 @@ private:
 	bool firstRun;
 	double backwardBound;
 	double forwardBound;
+	double pathLength;
 	std::unordered_set<state> middleStates;
 	unsigned long memoryBound;
 
@@ -50,8 +52,8 @@ private:
 };
 
 template <class state, class action, class BloomFilter, bool verbose>
-double MBBDS<state, action, BloomFilter, verbose>::GetMidState(SearchEnvironment<state, action>* env,
-	state fromState, state toState, state &midState)
+bool MBBDS<state, action, BloomFilter, verbose>::GetMidState(SearchEnvironment<state, action>* env,
+	state fromState, state toState, state &midState, int secondsLimit)
 {
 	memoryBound = sizeof(fromState)*statesQuantityBound;
 	if(verbose){
@@ -74,11 +76,17 @@ double MBBDS<state, action, BloomFilter, verbose>::GetMidState(SearchEnvironment
 	middleStates.clear();
 	unsigned long nodesExpandedSoFar = 0;
 	double last_saturation = 1;
+	auto startTime = std::chrono::steady_clock::now();
 	while(true){
 		if (verbose){
 			printf("Bounds: %f and %f\n", forwardBound, backwardBound);
 		}
 		while (true){
+			auto currentTime = std::chrono::steady_clock::now();
+			std::chrono::duration<double> elapsed_seconds = currentTime-startTime;
+			if(elapsed_seconds.count() >= secondsLimit){
+				return false;
+			}
 			if (verbose){
 				printf("Starting iteration number: %d. ", iteration_num);
 				printf("start middleStates.size() = %d\n", middleStates.size());
@@ -105,7 +113,8 @@ double MBBDS<state, action, BloomFilter, verbose>::GetMidState(SearchEnvironment
 			nodesExpandedSoFar = nodesExpanded;
 			iteration_num++;
 			if (solved) {
-				return backwardBound + forwardBound;
+				pathLength = backwardBound + forwardBound;
+				return true;
 			}
 			if (listReady) {// no solution found
 				if(verbose){
@@ -134,7 +143,7 @@ double MBBDS<state, action, BloomFilter, verbose>::GetMidState(SearchEnvironment
 					if(verbose){
 						std::cout << "\t\tBloomFilter Overflow" << std::endl;
 					}
-					return -1; //bloomfilter is fluded.
+					return false; //bloomfilter is fluded.
 				}
 				last_saturation = saturation;
 				if(verbose){
@@ -190,8 +199,8 @@ double MBBDS<state, action, BloomFilter, verbose>::GetMidState(SearchEnvironment
 			listReady = false;
 			middleStates.clear();			
 		}
-		
 	}
+	return false;
 }
 
 
