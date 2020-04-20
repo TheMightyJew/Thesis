@@ -39,7 +39,7 @@ void TestVariants();
 void TestError();
 
 const int pancakes_num = 16;
-int all_problems_num = 100;
+int all_problems_num = 2;
 unsigned long statesQuantityBound = 1000000;
 int secondsLimit = 60*30;
 
@@ -68,16 +68,16 @@ void TestPancake()
 	myfile.open (filename);
 	//TestRob();
 	//TestPancakeRandom();
-	TestPancakeHard(0); // GAP heuristic #
+	//TestPancakeHard(0); // GAP heuristic #
 	//TestPancakeHard(1);
 	//TestPancakeHard(2);
 	//TestPancakeHard(3);
-	//TestPancakeHard(4);
+	TestPancakeHard(4);
 	//TestPancakeHard(pancakes_num); // Heuristic 0
 	//TestError();
 	//TestVariants();
+	myfile << "completed!" << endl;
 	myfile.close();
-	
 	cout << "completed!" << endl;
 	exit(0);
 }
@@ -433,7 +433,7 @@ void TestPancakeHard(int gap)
 			}
 			else{
 				myfile << boost::format("\t\t\tHard-GAP-%d A* failed after %1.4fs\n") % gap % t1.GetElapsedTime();
-				myfile << boost::format("\t\t\tHard-GAP-%d I-A* failed after %1.4fs\n") % gap % t1.GetElapsedTime();	
+				myfile << boost::format("\t\t\tHard-GAP-%d I-A* failed after because A* failed\n") % gap;	
 			}
 		}
 
@@ -568,7 +568,7 @@ void TestPancakeHard(int gap)
 			}
 			else{
 				myfile << boost::format("\t\t\tHard-GAP-%d MM failed after %1.4fs\n") % gap % t4.GetElapsedTime();
-				myfile << boost::format("\t\t\tHard-GAP-%d I-MM failed after %1.4fs\n") % gap % t4.GetElapsedTime();
+				myfile << boost::format("\t\t\tHard-GAP-%d I-MM failed because MM failed\n") % gap;
 				MMcompleted = false;
 			}
 		}
@@ -604,40 +604,46 @@ void TestPancakeHard(int gap)
 			}
 			else{
 				myfile << boost::format("\t\t\tHard-GAP-%d IDA* failed after %1.4fs\n") % gap % t3.GetElapsedTime();
-				myfile << boost::format("\t\t\tHard-GAP-%d D-A* failed after %1.4fs\n") % gap % t3.GetElapsedTime();
+				myfile << boost::format("\t\t\tHard-GAP-%d D-A* failed because IDA* failed\n") % gap;
 			}					   
 		}
 		
 		// MBBDS
-		long byte = 8;
-		long kb = pow(2,10) * byte;
-		long mb = pow(2,10) * kb;
-		long stateSize = sizeof(original);
-		if (1 && MMcompleted)
+		if (1)
 		{
-			myfile << "\t\t_MBBDS_\n";
-			double percentages[6] = {1, 0.9, 0.75, 0.5, 0.25, 0.1};
-			for(double percentage : percentages){
-				unsigned long statesQuantityBoundforMBBDS = statesQuantityBound*percentage;
-				myfile << boost::format("\t\t\tMemory_percentage_from_MM=%1.2f_\n") % percentage;
-				//k=1
-				MBBDS<PancakePuzzleState<N>, PancakePuzzleAction, MyBloomFilter<PancakePuzzleState<N>, PancakeHasher<N>>, false> mbbds(statesQuantityBoundforMBBDS) ;
-				goal.Reset();
-				start = original;
-				PancakePuzzleState<N> midState;
-				t6.StartTimer();
-				bool solved = mbbds.GetMidState(&pancake, start, goal, midState, secondsLimit);
-				t6.EndTimer();
-				if(solved){
-					myfile << boost::format("\t\t\t\tHARD-%d GAP-%d MBBDS(k=1) using memory for %1.0llu states(state size: %d bits) found path length %1.0f; %llu expanded; %llu generated; %1.4fs elapsed; \n") % count % gap % statesQuantityBoundforMBBDS % stateSize % mbbds.getPathLength() %
-					   mbbds.GetNodesExpanded() % mbbds.GetNodesTouched() % t6.GetElapsedTime();
-					myfile << "\t\t\t\t\Mid state: " << midState << endl;
+			if(MMcompleted){
+				myfile << "\t\t_MBBDS_\n";
+				double percentages[6] = {1, 0.9, 0.75, 0.5, 0.25, 0.1};
+				long byte = 8;
+				long kb = pow(2,10) * byte;
+				long mb = pow(2,10) * kb;
+				long stateSize = sizeof(original);
+				for(double percentage : percentages){
+					unsigned long statesQuantityBoundforMBBDS = statesQuantityBound*percentage;
+					//k=1
+					MBBDS<PancakePuzzleState<N>, PancakePuzzleAction, MyBloomFilter<PancakePuzzleState<N>, PancakeHasher<N>>, false> mbbds(statesQuantityBoundforMBBDS) ;
+					goal.Reset();
+					start = original;
+					PancakePuzzleState<N> midState;
+					t6.StartTimer();
+					bool solved = mbbds.GetMidState(&pancake, start, goal, midState, secondsLimit);
+					t6.EndTimer();
+					if(solved){
+						myfile << boost::format("\t\t\tHARD-%d GAP-%d MBBDS(k=1) using memory for %1.0llu states(state size: %d bits, Memory_percentage_from_MM=%1.2f) found path length %1.0f; %llu expanded; %llu generated; %1.4fs elapsed; ") % count % gap % statesQuantityBoundforMBBDS % stateSize % percentage % mbbds.getPathLength() %
+						   mbbds.GetNodesExpanded() % mbbds.GetNodesTouched() % t6.GetElapsedTime();
+						myfile << "Mid state: " << midState << endl;
+					}
+					else{
+						myfile << boost::format("\t\t\tHARD-%d GAP-%d MBBDS(k=1) using memory for %1.0llu states(state size: %d bits, Memory_percentage_from_MM=%1.2f) failed after %1.4fs\n") % count % gap % statesQuantityBoundforMBBDS % stateSize % percentage % t6.GetElapsedTime();
+						break;
+					}
 				}
-				else{
-					myfile << boost::format("\t\t\t\tHard-GAP-%d MBBDS(k=1) failed after %1.4fs\n") % gap % t6.GetElapsedTime();
-					break;
-				}
-			}				
+			}
+			else{
+				double percentage = 1;
+				myfile << "\t\t_MBBDS_\n";
+				myfile << boost::format("\t\t\tHard-GAP-%d MBBDS(k=1) failed because MM failed.\n") % gap;
+			}
 		}
 		
 		//IDMM
@@ -652,14 +658,14 @@ void TestPancakeHard(int gap)
 			bool solved = idmm.GetMidState(&pancake, start, goal, midState, secondsLimit);
 			t8.EndTimer();
 			if(solved){
-				myfile << boost::format("\t\t\tHARD-%d GAP-%d IDMM found path length %1.0f; %llu expanded; %llu generated; %1.4fs elapsed; \n") % count % gap % idmm.getPathLength() %
+				myfile << boost::format("\t\t\tHARD-%d GAP-%d IDMM found path length %1.0f; %llu expanded; %llu generated; %1.4fs elapsed; ") % count % gap % idmm.getPathLength() %
 				   idmm.GetNodesExpanded() % idmm.GetNodesTouched() % t8.GetElapsedTime();
-				myfile << "\t\t\t\Mid state: " << midState << endl;	
+				myfile << "Mid state: " << midState << endl;	
 				myfile << boost::format("\t\t\tGAP-%d D-MM ; %llu expanded;\n") % gap % idmm.getDMMExpansions();
 			}
 			else{
 				myfile << boost::format("\t\t\tGAP-%d IDMM failed after %1.4fs\n") % gap % t8.GetElapsedTime();
-				myfile << boost::format("\t\t\tGAP-%d D-MM failed after %1.4fs\n") % gap % t8.GetElapsedTime();
+				myfile << boost::format("\t\t\tGAP-%d D-MM failed because IDMM failed\n") % gap;
 			}   				
 		}
 	}

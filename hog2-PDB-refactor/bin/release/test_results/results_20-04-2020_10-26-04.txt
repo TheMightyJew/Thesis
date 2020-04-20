@@ -1,0 +1,315 @@
+TestPancakeHard:(Pancakes: 16, Gap: 0)
+	Problem 1 of 5
+	Start state: 11 9 10 8 15 14 13 12 6 7 4 5 2 3 0 1 
+	Goal state: 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 
+	Initial heuristic 8
+		_A*_
+			GAP-0 A* found path length 12; 1929 expanded; 1910 necessary; using 25249 states in memory; 0.0151s elapsed
+			GAP-0 I-A* ; 4045 expanded;
+		_MM_
+			Hard-GAP-0 MM found path length 12; 3411 expanded; 3411 necessary; using 25935 states in memory; 0.0154s elapsed
+			Hard-GAP-0 I-MM ; 8077 expanded;
+		_IDA*_
+			Hard-GAP-0 IDA* found path length 12; 5443 expanded; 81645 generated; 0.0056s elapsed
+			Hard-GAP-0 D-A* ; 2737 expanded;
+		_MBBDS_
+			HARD-0 GAP-0 MBBDS(k=1) using memory for 25935 states(state size: 64 bits, Memory_percentage_from_MM=1.00) found path length 12; 33133 expanded; 496995 generated; 0.0453s elapsed; Mid state: 15 14 13 12 6 7 8 10 9 11 0 1 2 3 4 5 
+			HARD-0 GAP-0 MBBDS(k=1) using memory for 23341 states(state size: 64 bits, Memory_percentage_from_MM=0.90) found path length 12; 33133 expanded; 496995 generated; 0.0442s elapsed; Mid state: 15 14 13 12 6 7 8 10 9 11 0 1 2 3 4 5 
+			HARD-0 GAP-0 MBBDS(k=1) using memory for 19451 states(state size: 64 bits, Memory_percentage_from_MM=0.75) found path length 12; 33133 expanded; 496995 generated; 0.0468s elapsed; Mid state: 15 14 13 12 6 7 8 10 9 11 0 1 2 3 4 5 
+			HARD-0 GAP-0 MBBDS(k=1) using memory for 12967 states(state size: 64 bits, Memory_percentage_from_MM=0.50) found path length 12; 51041 expanded; 765615 generated; 0.0668s elapsed; Mid state: 2 3 0 1 9 10 8 7 6 5 4 11 12 13 14 15 
+			HARD-0 GAP-0 MBBDS(k=1) using memory for 6483 states(state size: 64 bits, Memory_percentage_from_MM=0.25) found path length 12; 62378 expanded; 935670 generated; 0.0794s elapsed; Mid state: 15 14 13 12 6 7 8 10 9 11 0 1 2 3 4 5 
+			HARD-0 GAP-0 MBBDS(k=1) using memory for 2593 states(state size: 64 bits, Memory_percentage_from_MM=0.10) found path length 12; 237848 expanded; 3567720 generated; 0.2996s elapsed; Mid state: 15 14 13 12 6 7 8 10 9 11 0 1 2 3 4 5 
+		_IDMM_
+			HARD-0 GAP-0 IDMM found path length 12; 5063 expanded; 75945 generated; 0.0063s elapsed; 
+			Mid state: 15 14 13 12 6 7 8 10 9 11 0 1 2 3 4 5 
+			GAP-0 D-MM ; 2472 expanded;
+	Problem 2 of 5
+	Start state: 8 10 9 15 12 11 14 13 6 7 4 5 2 3 0 1 
+	Goal state: 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 
+	Initial heuristic 9
+		_A*_
+			GAP-0 A* found path length 13; 2711 expanded; 2685 necessary; using 35134 states in memory; 0.0171s elapsed
+			GAP-0 I-A* ; 5631 expanded;
+		_MM_
+			Hard-GAP-0 MM found path length 13; 5594 expanded; 5067 necessary; using 73092 states in memory; 0.0376s elapsed
+			Hard-GAP-0 I-MM ; 16905 expanded;
+		_IDA*_
+			Hard-GAP-0 IDA* found path length 13; 7262 expanded; 108930 generated; 0.0076s elapsed
+			Hard-GAP-0 D-A* ; 3833 expanded;
+		_MBBDS_
+			HARD-1 GAP-0 MBBDS(k=1) using memory for 73092 states(state size: 64 bits, Memory_percentage_from_MM=1.00) found path length 14; 1318950 expanded; 19784250 generated; 1.6711s elapsed; Mid state: 13 14 11 12 15 4 5 6 7 8 0 1 2 3 9 10 
+			HARD-1 GAP-0 MBBDS(k=1) using memory for 65782 states(state size: 64 bits, Memory_percentage_from_MM=0.90) found path length 14; 1519968 expanded; 22799520 generated; 1.8993s elapsed; Mid state: 6 7 8 10 9 1 0 3 2 5 4 11 12 13 14 15 
+			HARD-1 GAP-0 MBBDS(k=1) using memory for 54819 states(state size: 64 bits, Memory_percentage_from_MM=0.75) failed after 2.1887s
+		_IDMM_
+			HARD-1 GAP-0 IDMM found path length 13; 6976 expanded; 104640 generated; 0.0069s elapsed; 
+			Mid state: 9 10 8 0 1 2 3 4 5 7 6 13 14 11 12 15 
+			GAP-0 D-MM ; 3650 expanded;
+	Problem 3 of 5
+	Start state: 0 2 1 4 3 6 5 7 8 11 10 9 13 12 15 14 
+	Goal state: 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 
+	Initial heuristic 8
+		_A*_
+			GAP-0 A* found path length 13; 11922 expanded; 11920 necessary; using 147798 states in memory; 0.0954s elapsed
+			GAP-0 I-A* ; 25273 expanded;
+		_MM_
+			Hard-GAP-0 MM found path length 13; 19883 expanded; 19516 necessary; using 248331 states in memory; 0.1339s elapsed
+			Hard-GAP-0 I-MM ; 56441 expanded;
+		_IDA*_
+			Hard-GAP-0 IDA* found path length 13; 22060 expanded; 330900 generated; 0.0228s elapsed
+			Hard-GAP-0 D-A* ; 4214 expanded;
+		_MBBDS_
+			HARD-2 GAP-0 MBBDS(k=1) using memory for 248331 states(state size: 64 bits, Memory_percentage_from_MM=1.00) found path length 13; 28151 expanded; 422265 generated; 0.0450s elapsed; Mid state: 2 1 0 13 12 11 10 9 8 7 5 6 3 4 15 14 
+			HARD-2 GAP-0 MBBDS(k=1) using memory for 223497 states(state size: 64 bits, Memory_percentage_from_MM=0.90) found path length 13; 28151 expanded; 422265 generated; 0.0451s elapsed; Mid state: 2 1 0 13 12 11 10 9 8 7 5 6 3 4 15 14 
+			HARD-2 GAP-0 MBBDS(k=1) using memory for 186248 states(state size: 64 bits, Memory_percentage_from_MM=0.75) found path length 13; 28151 expanded; 422265 generated; 0.0451s elapsed; Mid state: 2 1 0 13 12 11 10 9 8 7 5 6 3 4 15 14 
+			HARD-2 GAP-0 MBBDS(k=1) using memory for 124165 states(state size: 64 bits, Memory_percentage_from_MM=0.50) found path length 13; 28151 expanded; 422265 generated; 0.0459s elapsed; Mid state: 2 1 0 13 12 11 10 9 8 7 5 6 3 4 15 14 
+			HARD-2 GAP-0 MBBDS(k=1) using memory for 62082 states(state size: 64 bits, Memory_percentage_from_MM=0.25) failed after 2.1498s
+		_IDMM_
+			HARD-2 GAP-0 IDMM found path length 13; 22915 expanded; 343725 generated; 0.0263s elapsed; 
+			Mid state: 1 2 0 12 13 9 10 11 8 7 6 5 4 3 14 15 
+			GAP-0 D-MM ; 4979 expanded;
+	Problem 4 of 5
+	Start state: 15 12 13 14 8 10 9 11 0 2 1 3 5 4 7 6 
+	Goal state: 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 
+	Initial heuristic 10
+		_A*_
+			GAP-0 A* found path length 14; 8711 expanded; 8708 necessary; using 110789 states in memory; 0.0494s elapsed
+			GAP-0 I-A* ; 18135 expanded;
+		_MM_
+			Hard-GAP-0 MM found path length 14; 14403 expanded; 14403 necessary; using 104606 states in memory; 0.0609s elapsed
+			Hard-GAP-0 I-MM ; 35387 expanded;
+		_IDA*_
+			Hard-GAP-0 IDA* found path length 14; 17284 expanded; 259260 generated; 0.0201s elapsed
+			Hard-GAP-0 D-A* ; 1689 expanded;
+		_MBBDS_
+			HARD-3 GAP-0 MBBDS(k=1) using memory for 104606 states(state size: 64 bits, Memory_percentage_from_MM=1.00) found path length 14; 177145 expanded; 2657175 generated; 0.2538s elapsed; Mid state: 6 7 4 5 3 2 1 0 11 12 13 14 8 10 9 15 
+			HARD-3 GAP-0 MBBDS(k=1) using memory for 94145 states(state size: 64 bits, Memory_percentage_from_MM=0.90) found path length 14; 177145 expanded; 2657175 generated; 0.2600s elapsed; Mid state: 6 7 4 5 3 2 1 0 11 12 13 14 8 10 9 15 
+			HARD-3 GAP-0 MBBDS(k=1) using memory for 78454 states(state size: 64 bits, Memory_percentage_from_MM=0.75) found path length 14; 177145 expanded; 2657175 generated; 0.2487s elapsed; Mid state: 6 7 4 5 3 2 1 0 11 12 13 14 8 10 9 15 
+			HARD-3 GAP-0 MBBDS(k=1) using memory for 52303 states(state size: 64 bits, Memory_percentage_from_MM=0.50) found path length 14; 260176 expanded; 3902640 generated; 0.3691s elapsed; Mid state: 12 13 14 15 5 4 3 1 2 0 11 10 9 8 7 6 
+			HARD-3 GAP-0 MBBDS(k=1) using memory for 26151 states(state size: 64 bits, Memory_percentage_from_MM=0.25) found path length 14; 343494 expanded; 5152410 generated; 0.4632s elapsed; Mid state: 6 7 4 5 3 2 1 0 11 12 13 14 8 10 9 15 
+			HARD-3 GAP-0 MBBDS(k=1) using memory for 10460 states(state size: 64 bits, Memory_percentage_from_MM=0.10) failed after 2.0222s
+		_IDMM_
+			HARD-3 GAP-0 IDMM found path length 14; 18276 expanded; 274140 generated; 0.0243s elapsed; 
+			Mid state: 6 7 4 5 3 2 1 0 11 12 13 14 8 10 9 15 
+			GAP-0 D-MM ; 1861 expanded;
+	Problem 5 of 5
+	Start state: 8 10 9 12 11 14 13 15 7 5 6 3 4 1 2 0 
+	Goal state: 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 
+	Initial heuristic 10
+		_A*_
+			GAP-0 A* found path length 15; 59712 expanded; 59707 necessary; using 714538 states in memory; 0.5754s elapsed
+			GAP-0 I-A* ; 125519 expanded;
+		_MM_
+			Hard-GAP-0 MM found path length 15; 97274 expanded; 95714 necessary; using 1173771 states in memory; 1.0216s elapsed
+			Hard-GAP-0 I-MM ; 286721 expanded;
+		_IDA*_
+			Hard-GAP-0 IDA* found path length 15; 122446 expanded; 1836690 generated; 0.1277s elapsed
+			Hard-GAP-0 D-A* ; 18491 expanded;
+		_MBBDS_
+			HARD-4 GAP-0 MBBDS(k=1) using memory for 1173771 states(state size: 64 bits, Memory_percentage_from_MM=1.00) found path length 15; 143693 expanded; 2155395 generated; 0.3243s elapsed; Mid state: 13 14 15 3 4 5 6 7 8 10 9 12 11 1 2 0 
+			HARD-4 GAP-0 MBBDS(k=1) using memory for 1056393 states(state size: 64 bits, Memory_percentage_from_MM=0.90) found path length 15; 143693 expanded; 2155395 generated; 0.3127s elapsed; Mid state: 13 14 15 3 4 5 6 7 8 10 9 12 11 1 2 0 
+			HARD-4 GAP-0 MBBDS(k=1) using memory for 880328 states(state size: 64 bits, Memory_percentage_from_MM=0.75) found path length 15; 143693 expanded; 2155395 generated; 0.3114s elapsed; Mid state: 13 14 15 3 4 5 6 7 8 10 9 12 11 1 2 0 
+			HARD-4 GAP-0 MBBDS(k=1) using memory for 586885 states(state size: 64 bits, Memory_percentage_from_MM=0.50) found path length 15; 143693 expanded; 2155395 generated; 0.3127s elapsed; Mid state: 13 14 15 3 4 5 6 7 8 10 9 12 11 1 2 0 
+			HARD-4 GAP-0 MBBDS(k=1) using memory for 293442 states(state size: 64 bits, Memory_percentage_from_MM=0.25) found path length 15; 638281 expanded; 9574215 generated; 0.9004s elapsed; Mid state: 14 13 15 3 4 5 6 7 8 10 9 12 11 0 1 2 
+			HARD-4 GAP-0 MBBDS(k=1) using memory for 117377 states(state size: 64 bits, Memory_percentage_from_MM=0.10) found path length 15; 518814 expanded; 7782210 generated; 0.6980s elapsed; Mid state: 10 11 12 13 14 0 2 1 9 8 7 5 6 3 4 15 
+		_IDMM_
+			HARD-4 GAP-0 IDMM found path length 15; 133556 expanded; 2003340 generated; 0.1601s elapsed; 
+			Mid state: 6 5 7 15 14 13 12 11 0 1 2 3 4 9 10 8 
+			GAP-0 D-MM ; 20592 expanded;
+TestPancakeHard:(Pancakes: 16, Gap: 1)
+	Problem 1 of 5
+	Start state: 11 9 10 8 15 14 13 12 6 7 4 5 2 3 0 1 
+	Goal state: 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 
+	Initial heuristic 7
+		_A*_
+			GAP-1 A* found path length 12; 21417 expanded; 21416 necessary; using 261737 states in memory; 0.1380s elapsed
+			GAP-1 I-A* ; 45196 expanded;
+		_MM_
+			Hard-GAP-1 MM found path length 12; 61756 expanded; 61756 necessary; using 298921 states in memory; 0.2817s elapsed
+			Hard-GAP-1 I-MM ; 93871 expanded;
+		_IDA*_
+			Hard-GAP-1 IDA* found path length 12; 102639 expanded; 1539585 generated; 0.1142s elapsed
+			Hard-GAP-1 D-A* ; 64399 expanded;
+		_MBBDS_
+			HARD-0 GAP-1 MBBDS(k=1) using memory for 298921 states(state size: 64 bits, Memory_percentage_from_MM=1.00) found path length 12; 380002 expanded; 5700030 generated; 0.6572s elapsed; Mid state: 15 14 13 12 6 7 8 10 9 11 0 1 2 3 4 5 
+			HARD-0 GAP-1 MBBDS(k=1) using memory for 269028 states(state size: 64 bits, Memory_percentage_from_MM=0.90) found path length 12; 380002 expanded; 5700030 generated; 0.6468s elapsed; Mid state: 15 14 13 12 6 7 8 10 9 11 0 1 2 3 4 5 
+			HARD-0 GAP-1 MBBDS(k=1) using memory for 224190 states(state size: 64 bits, Memory_percentage_from_MM=0.75) found path length 12; 530596 expanded; 7958940 generated; 0.8590s elapsed; Mid state: 2 3 0 1 9 10 8 7 6 5 4 11 12 13 14 15 
+			HARD-0 GAP-1 MBBDS(k=1) using memory for 149460 states(state size: 64 bits, Memory_percentage_from_MM=0.50) found path length 12; 530596 expanded; 7958940 generated; 0.8430s elapsed; Mid state: 2 3 0 1 9 10 8 7 6 5 4 11 12 13 14 15 
+			HARD-0 GAP-1 MBBDS(k=1) using memory for 74730 states(state size: 64 bits, Memory_percentage_from_MM=0.25) found path length 12; 826841 expanded; 12402615 generated; 1.2414s elapsed; Mid state: 2 3 0 1 9 10 8 7 6 5 4 11 12 13 14 15 
+			HARD-0 GAP-1 MBBDS(k=1) using memory for 29892 states(state size: 64 bits, Memory_percentage_from_MM=0.10) failed after 2.0551s
+		_IDMM_
+			HARD-0 GAP-1 IDMM found path length 12; 107185 expanded; 1607775 generated; 0.1698s elapsed; 
+			Mid state: 15 14 13 12 6 7 8 10 9 11 0 1 2 3 4 5 
+			GAP-1 D-MM ; 67143 expanded;
+	Problem 2 of 5
+	Start state: 8 10 9 15 12 11 14 13 6 7 4 5 2 3 0 1 
+	Goal state: 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 
+	Initial heuristic 8
+		_A*_
+			GAP-1 A* found path length 13; 34056 expanded; 34055 necessary; using 414554 states in memory; 0.3034s elapsed
+			GAP-1 I-A* ; 71363 expanded;
+		_MM_
+			Hard-GAP-1 MM found path length 13; 103381 expanded; 96036 necessary; using 1247848 states in memory; 1.0859s elapsed
+			Hard-GAP-1 I-MM ; 238798 expanded;
+		_IDA*_
+			Hard-GAP-1 IDA* found path length 13; 156813 expanded; 2352195 generated; 0.1703s elapsed
+			Hard-GAP-1 D-A* ; 101768 expanded;
+		_MBBDS_
+			HARD-1 GAP-1 MBBDS(k=1) using memory for 1247848 states(state size: 64 bits, Memory_percentage_from_MM=1.00) found path length 13; 693289 expanded; 10399335 generated; 1.8310s elapsed; Mid state: 1 0 8 10 9 2 3 7 6 5 4 13 14 11 12 15 
+			HARD-1 GAP-1 MBBDS(k=1) using memory for 1123063 states(state size: 64 bits, Memory_percentage_from_MM=0.90) found path length 13; 693289 expanded; 10399335 generated; 1.8178s elapsed; Mid state: 1 0 8 10 9 2 3 7 6 5 4 13 14 11 12 15 
+			HARD-1 GAP-1 MBBDS(k=1) using memory for 935886 states(state size: 64 bits, Memory_percentage_from_MM=0.75) found path length 13; 693289 expanded; 10399335 generated; 1.8640s elapsed; Mid state: 1 0 8 10 9 2 3 7 6 5 4 13 14 11 12 15 
+			HARD-1 GAP-1 MBBDS(k=1) using memory for 623924 states(state size: 64 bits, Memory_percentage_from_MM=0.50) found path length 13; 693289 expanded; 10399335 generated; 1.8353s elapsed; Mid state: 1 0 8 10 9 2 3 7 6 5 4 13 14 11 12 15 
+			HARD-1 GAP-1 MBBDS(k=1) using memory for 311962 states(state size: 64 bits, Memory_percentage_from_MM=0.25) found path length 13; 693289 expanded; 10399335 generated; 1.8340s elapsed; Mid state: 1 0 8 10 9 2 3 7 6 5 4 13 14 11 12 15 
+			HARD-1 GAP-1 MBBDS(k=1) using memory for 124784 states(state size: 64 bits, Memory_percentage_from_MM=0.10) failed after 2.8534s
+		_IDMM_
+			HARD-1 GAP-1 IDMM found path length 13; 152802 expanded; 2292030 generated; 0.2132s elapsed; 
+			Mid state: 9 10 8 0 1 2 3 4 5 7 6 13 14 11 12 15 
+			GAP-1 D-MM ; 93295 expanded;
+	Problem 3 of 5
+	Start state: 0 2 1 4 3 6 5 7 8 11 10 9 13 12 15 14 
+	Goal state: 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 
+	Initial heuristic 7
+		_A*_
+			Hard-GAP-1 A* failed after 2.1188s
+			Hard-GAP-1 I-A* failed after because A* failed
+		_MM_
+			Hard-GAP-1 MM failed after 2.0060s
+			Hard-GAP-1 I-MM failed because MM failed
+		_IDA*_
+			Hard-GAP-1 IDA* found path length 13; 1285216 expanded; 19278240 generated; 1.3288s elapsed
+			Hard-GAP-1 D-A* ; 132944 expanded;
+		_MBBDS_
+			Hard-GAP-1 MBBDS(k=1) failed because MM failed.
+		_IDMM_
+			HARD-2 GAP-1 IDMM found path length 13; 633843 expanded; 9507645 generated; 0.9628s elapsed; 
+			Mid state: 1 2 0 12 13 9 10 11 8 7 6 5 4 3 14 15 
+			GAP-1 D-MM ; 104186 expanded;
+	Problem 4 of 5
+	Start state: 15 12 13 14 8 10 9 11 0 2 1 3 5 4 7 6 
+	Goal state: 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 
+	Initial heuristic 8
+		_A*_
+			Hard-GAP-1 A* failed after 2.1830s
+			Hard-GAP-1 I-A* failed after because A* failed
+		_MM_
+			Hard-GAP-1 MM failed after 2.0000s
+			Hard-GAP-1 I-MM failed because MM failed
+		_IDA*_
+			Hard-GAP-1 IDA* failed after 2.0512s
+			Hard-GAP-1 D-A* failed because IDA* failed
+		_MBBDS_
+			Hard-GAP-1 MBBDS(k=1) failed because MM failed.
+		_IDMM_
+			HARD-3 GAP-1 IDMM found path length 14; 1063506 expanded; 15952590 generated; 1.7406s elapsed; 
+			Mid state: 6 7 4 5 3 2 1 0 11 12 13 14 8 10 9 15 
+			GAP-1 D-MM ; 99270 expanded;
+	Problem 5 of 5
+	Start state: 8 10 9 12 11 14 13 15 7 5 6 3 4 1 2 0 
+	Goal state: 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 
+	Initial heuristic 9
+		_A*_
+			Hard-GAP-1 A* failed after 2.1389s
+			Hard-GAP-1 I-A* failed after because A* failed
+		_MM_
+			Hard-GAP-1 MM failed after 2.0000s
+			Hard-GAP-1 I-MM failed because MM failed
+		_IDA*_
+			Hard-GAP-1 IDA* failed after 6.9394s
+			Hard-GAP-1 D-A* failed because IDA* failed
+		_MBBDS_
+			Hard-GAP-1 MBBDS(k=1) failed because MM failed.
+		_IDMM_
+			GAP-1 IDMM failed after 6.9341s
+			GAP-1 D-MM failed because IDMM failed
+TestPancakeHard:(Pancakes: 16, Gap: 2)
+	Problem 1 of 5
+	Start state: 11 9 10 8 15 14 13 12 6 7 4 5 2 3 0 1 
+	Goal state: 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 
+	Initial heuristic 7
+		_A*_
+			GAP-2 A* found path length 12; 172426 expanded; 172240 necessary; using 1970345 states in memory; 1.9559s elapsed
+			GAP-2 I-A* ; 361728 expanded;
+		_MM_
+			Hard-GAP-2 MM found path length 12; 231836 expanded; 231836 necessary; using 1207670 states in memory; 1.6491s elapsed
+			Hard-GAP-2 I-MM ; 287869 expanded;
+		_IDA*_
+			Hard-GAP-2 IDA* found path length 12; 2071152 expanded; 31067280 generated; 2.2693s elapsed
+			Hard-GAP-2 D-A* ; 1657290 expanded;
+		_MBBDS_
+			HARD-0 GAP-2 MBBDS(k=1) using memory for 1207670 states(state size: 64 bits, Memory_percentage_from_MM=1.00) failed after 2.0530s
+		_IDMM_
+			HARD-0 GAP-2 IDMM found path length 12; 1661076 expanded; 24916140 generated; 3.0164s elapsed; 
+			Mid state: 15 14 13 12 6 7 8 10 9 11 0 1 2 3 4 5 
+			GAP-2 D-MM ; 1266751 expanded;
+	Problem 2 of 5
+	Start state: 8 10 9 15 12 11 14 13 6 7 4 5 2 3 0 1 
+	Goal state: 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 
+	Initial heuristic 8
+		_A*_
+			Hard-GAP-2 A* failed after 2.0000s
+			Hard-GAP-2 I-A* failed after because A* failed
+		_MM_
+			Hard-GAP-2 MM failed after 2.0000s
+			Hard-GAP-2 I-MM failed because MM failed
+		_IDA*_
+			Hard-GAP-2 IDA* found path length 13; 3979201 expanded; 59688015 generated; 4.2728s elapsed
+			Hard-GAP-2 D-A* ; 3237296 expanded;
+		_MBBDS_
+			Hard-GAP-2 MBBDS(k=1) failed because MM failed.
+		_IDMM_
+			HARD-1 GAP-2 IDMM found path length 13; 2403298 expanded; 36049470 generated; 4.1393s elapsed; 
+			Mid state: 9 10 8 0 1 2 3 4 5 7 6 13 14 11 12 15 
+			GAP-2 D-MM ; 1721073 expanded;
+	Problem 3 of 5
+	Start state: 0 2 1 4 3 6 5 7 8 11 10 9 13 12 15 14 
+	Goal state: 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 
+	Initial heuristic 6
+		_A*_
+			Hard-GAP-2 A* failed after 2.1336s
+			Hard-GAP-2 I-A* failed after because A* failed
+		_MM_
+			Hard-GAP-2 MM failed after 2.0000s
+			Hard-GAP-2 I-MM failed because MM failed
+		_IDA*_
+			Hard-GAP-2 IDA* failed after 17.7086s
+			Hard-GAP-2 D-A* failed because IDA* failed
+		_MBBDS_
+			Hard-GAP-2 MBBDS(k=1) failed because MM failed.
+		_IDMM_
+			GAP-2 IDMM failed after 13.4850s
+			GAP-2 D-MM failed because IDMM failed
+	Problem 4 of 5
+	Start state: 15 12 13 14 8 10 9 11 0 2 1 3 5 4 7 6 
+	Goal state: 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 
+	Initial heuristic 7
+		_A*_
+			Hard-GAP-2 A* failed after 2.1288s
+			Hard-GAP-2 I-A* failed after because A* failed
+		_MM_
+			Hard-GAP-2 MM failed after 2.0000s
+			Hard-GAP-2 I-MM failed because MM failed
+		_IDA*_
+			Hard-GAP-2 IDA* failed after 2.6444s
+			Hard-GAP-2 D-A* failed because IDA* failed
+		_MBBDS_
+			Hard-GAP-2 MBBDS(k=1) failed because MM failed.
+		_IDMM_
+			GAP-2 IDMM failed after 2.3766s
+			GAP-2 D-MM failed because IDMM failed
+	Problem 5 of 5
+	Start state: 8 10 9 12 11 14 13 15 7 5 6 3 4 1 2 0 
+	Goal state: 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 
+	Initial heuristic 8
+		_A*_
+			Hard-GAP-2 A* failed after 2.0000s
+			Hard-GAP-2 I-A* failed after because A* failed
+		_MM_
+			Hard-GAP-2 MM failed after 2.0000s
+			Hard-GAP-2 I-MM failed because MM failed
+		_IDA*_
+			Hard-GAP-2 IDA* failed after 8.7935s
+			Hard-GAP-2 D-A* failed because IDA* failed
+		_MBBDS_
+			Hard-GAP-2 MBBDS(k=1) failed because MM failed.
+		_IDMM_
+			GAP-2 IDMM failed after 8.9493s
+			GAP-2 D-MM failed because IDMM failed
