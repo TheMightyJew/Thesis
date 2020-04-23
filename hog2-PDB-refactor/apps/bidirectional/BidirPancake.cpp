@@ -18,14 +18,14 @@
 #include "HeuristicError.h"
 #include "MBBDS.h"
 #include "IDMM.h"
-#include "MyBloomFilter.h"
+#include "MbbdsBloomFilter.h"
 #include "PancakeHasher.h"
 #include <fstream>
 #include <iostream>
 #include <boost/format.hpp>
-using namespace std;
 #include <math.h> 
 #include <ctime>
+using namespace std;
 
 
 
@@ -39,9 +39,9 @@ void TestVariants();
 void TestError();
 
 const int pancakes_num = 16;
-int all_problems_num = 2;
+int all_problems_num = 5;
 unsigned long statesQuantityBound = 1000000;
-int secondsLimit = 60*30;
+int secondsLimit = 90;
 
 
 string datetime()
@@ -68,11 +68,11 @@ void TestPancake()
 	myfile.open (filename);
 	//TestRob();
 	//TestPancakeRandom();
-	//TestPancakeHard(0); // GAP heuristic #
-	//TestPancakeHard(1);
+	TestPancakeHard(0); // GAP heuristic #
+	TestPancakeHard(1);
 	//TestPancakeHard(2);
 	//TestPancakeHard(3);
-	TestPancakeHard(4);
+	//TestPancakeHard(4);
 	//TestPancakeHard(pancakes_num); // Heuristic 0
 	//TestError();
 	//TestVariants();
@@ -342,7 +342,7 @@ void TestPancakeRandom()
 			if(1){
 				printf("\t\t_MBBDS 1_\n");
 				//k=1
-				MBBDS<PancakePuzzleState<N>, PancakePuzzleAction, MyBloomFilter<PancakePuzzleState<N>, PancakeHasher<N>>, false> mbbds(statesQuantityBoundforMBBDS) ;
+				MBBDS<PancakePuzzleState<N>, PancakePuzzleAction, MbbdsBloomFilter<PancakePuzzleState<N>, PancakeHasher<N>>, false> mbbds(statesQuantityBoundforMBBDS) ;
 				goal.Reset();
 				start = original;
 				PancakePuzzleState<N> midState;
@@ -621,7 +621,7 @@ void TestPancakeHard(int gap)
 				for(double percentage : percentages){
 					unsigned long statesQuantityBoundforMBBDS = statesQuantityBound*percentage;
 					//k=1
-					MBBDS<PancakePuzzleState<N>, PancakePuzzleAction, MyBloomFilter<PancakePuzzleState<N>, PancakeHasher<N>>, false> mbbds(statesQuantityBoundforMBBDS) ;
+					MBBDS<PancakePuzzleState<N>, PancakePuzzleAction, MbbdsBloomFilter<PancakePuzzleState<N>, PancakeHasher<N>>, false> mbbds(statesQuantityBoundforMBBDS) ;
 					goal.Reset();
 					start = original;
 					PancakePuzzleState<N> midState;

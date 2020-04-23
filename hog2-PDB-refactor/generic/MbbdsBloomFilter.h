@@ -1,21 +1,27 @@
 #pragma once
-#ifndef MyBloomFilter_H
-#define MyBloomFilter_H
+#ifndef MbbdsBloomFilter_H
+#define MbbdsBloomFilter_H
 
 template<typename T, class H>
-class MyBloomFilter {
+class MbbdsBloomFilter {
 public:
-	MyBloomFilter(unsigned hashOffset = 0) : onesCount(0), count(0) {
+
+	long long unsigned int M;
+	int K;
+	unsigned hashOffset;
+	std::vector<bool> filter;
+	std::uint64_t onesCount;
+	std::uint64_t count;
+	
+	MbbdsBloomFilter(unsigned hashOffset = 0) : onesCount(0), count(0) {
 		this->hashOffset = hashOffset;
 	}
-	MyBloomFilter(long long unsigned int M, int K, unsigned hashOffset = 0) : onesCount(0), count(0) {
+	MbbdsBloomFilter(long long unsigned int M, int K, unsigned hashOffset = 0) : onesCount(0), count(0) {
 		this->hashOffset = hashOffset;
 		this->M = M;
 		this->K = K;
 		filter.resize(M, false);
 	}
-	long long unsigned int M;
-	int K;
 
 	void insert(const T& object) {
 		for (unsigned i = hashOffset; i < hashOffset + K; ++i) {
@@ -34,6 +40,13 @@ public:
 			}
 		}
 		return true;
+	}
+	
+	void clear() {
+		++hashOffset;
+		std::fill(filter.begin(), filter.end(), false);
+		onesCount = 0;
+		count = 0;
 	}
 
 	double getSaturation() const {
@@ -59,18 +72,6 @@ public:
 	int getK() const {
 		return K;
 	}
-
-	void clear() {
-		++hashOffset;
-		std::fill(filter.begin(), filter.end(), false);
-		onesCount = 0;
-		count = 0;
-	}
-
-	unsigned hashOffset;
-	std::vector<bool> filter;
-	std::uint64_t onesCount;
-	std::uint64_t count;
 };
 
 #endif

@@ -67,7 +67,7 @@ bool MBBDS<state, action, BloomFilter, verbose>::GetMidState(SearchEnvironment<s
 	forwardBound = heuristic - backwardBound;
 	bool forwardSearch;
 	int saturationIncreased = 0;
-	int saturationMaxIncreacsements = 100;
+	int saturationMaxIncreasements = 100;
 	int iteration_num = 0;
 	double bound;
 	firstRun = true;
@@ -139,7 +139,7 @@ bool MBBDS<state, action, BloomFilter, verbose>::GetMidState(SearchEnvironment<s
 				if(saturation >= last_saturation){
 					saturationIncreased += 1;
 				}
-				if (saturation == 1 || saturationIncreased >= saturationMaxIncreacsements) {
+				if (saturation == 1 || saturationIncreased >= saturationMaxIncreasements) {
 					if(verbose){
 						std::cout << "\t\tBloomFilter Overflow" << std::endl;
 					}
@@ -233,7 +233,7 @@ bool MBBDS<state, action, BloomFilter, verbose>::DoIteration(SearchEnvironment<s
 			continue;
 		}
 		double edgeCost = env->GCost(currState, neighbors[x]);
-		if (DoIteration(env, currState, neighbors[x], bound, g + edgeCost,midState)) {
+		if (DoIteration(env, currState, neighbors[x], bound, g + edgeCost, midState)) {
 			return true;
 		}
 	}
@@ -255,7 +255,7 @@ bool MBBDS<state, action, BloomFilter, verbose>::checkState(state midState)
 		else {
 			if (middleStates.size() == (int)(statesQuantityBound/2)) {
 				outOfSpace = true;
-				currentBloomfilter = BloomFilter(memoryBound/2, 1, previousBloomfilter.hashOffset + previousBloomfilter.getK());
+				currentBloomfilter = BloomFilter(memoryBound/2, 2, previousBloomfilter.hashOffset + previousBloomfilter.getK());
 				for (state possibleMidState : middleStates) {
 					currentBloomfilter.insert(possibleMidState);
 				}
