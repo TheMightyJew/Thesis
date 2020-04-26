@@ -39,9 +39,9 @@ void TestVariants();
 void TestError();
 
 const int pancakes_num = 16;
-int all_problems_num = 5;
+int all_problems_num = 100;
 unsigned long statesQuantityBound = 1000000;
-int secondsLimit = 90;
+int secondsLimit = 60*30;
 
 
 string datetime()
@@ -70,8 +70,8 @@ void TestPancake()
 	//TestPancakeRandom();
 	TestPancakeHard(0); // GAP heuristic #
 	TestPancakeHard(1);
-	//TestPancakeHard(2);
-	//TestPancakeHard(3);
+	TestPancakeHard(2);
+	TestPancakeHard(3);
 	//TestPancakeHard(4);
 	//TestPancakeHard(pancakes_num); // Heuristic 0
 	//TestError();
