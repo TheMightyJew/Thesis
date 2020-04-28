@@ -194,7 +194,7 @@ const int N = pancakes_num;
 void TestPancakeRandom()
 {
 	int singleGap = 0;
-	for (int gap = 0; gap <= 4; gap = gap + 1)
+	for (int gap = 1; gap <= 1; gap = gap + 1)
 	{
 		printf("\nTestPancakeRandom:(Pancakes: %d, Gap: %d)\n", N, gap);
 		srandom(2017218);
@@ -212,6 +212,7 @@ void TestPancakeRandom()
 		vector<PancakePuzzleState<N>> idaPath;
 		Timer t1, t2, t3, t4, t5, t6, t7, t8;
 		int problems_num = all_problems_num;
+		problems_num = 1;
 		for (int count = 0; count < problems_num; count++)
 		{
 			srandom(random());
@@ -220,13 +221,12 @@ void TestPancakeRandom()
 			original.Reset();
 			for (int x = 0; x < N; x++)
 				swap(original.puzzle[x], original.puzzle[x+random()%(N-x)]);
-			
 			printf("\tProblem %d of %d\n", count+1, problems_num);
 			cout << "\tStart state: " << original << endl;
 			cout << "\tGoal state: " << goal << endl;
 			cout <<"\tInitial heuristic " << pancake.HCost(original, goal) << endl;
 			// A*
-			if (1)
+			if (0)
 			{
 				printf("\t\t_A*_\n");
 				TemplateAStar<PancakePuzzleState<N>, PancakePuzzleAction, PancakePuzzle<N>> astar;
@@ -272,13 +272,61 @@ void TestPancakeRandom()
 				printf("GAP-%d BS* found path length %1.0f; %llu expanded; %llu necessary; %1.4fs elapsed\n", gap, pancake.GetPathLength(bsPath),
 					   bs.GetNodesExpanded(), bs.GetNecessaryExpansions(), t2.GetElapsedTime());
 			}
-			
+			//test first half
+			int specificOriginal[] = {8, 15, 10, 9, 12, 11, 14, 13, 6, 7, 4, 5, 1, 2, 3, 0};
+			int specificGoal[] = {12, 11, 7, 6, 13, 14, 15, 3, 2, 1, 5, 4, 8, 9, 10, 0};
+			if(1)
+			{
+				printf("\t\t_A*_\n");
+				TemplateAStar<PancakePuzzleState<N>, PancakePuzzleAction, PancakePuzzle<N>> astar;
+				goal.Reset();
+				
+				for(int i=0;i<N;i++){
+					original.puzzle[i] = specificOriginal[i];
+					goal.puzzle[i] = specificGoal[i];
+				}
+				
+				start = original;
+				t1.StartTimer();
+				bool solved = astar.GetPathTime(&pancake, start, goal, astarPath, secondsLimit);
+				t1.EndTimer();
+				if(solved){
+					printf("\t\tGAP-%d A* found path length %1.0f; %llu expanded; %llu necessary;  %llu necessary; using %1.0llu states in memory; %1.4fs elapsed\n", gap, pancake.GetPathLength(astarPath),
+					   astar.GetNodesExpanded(), astar.GetNecessaryExpansions(), statesQuantityBound, t1.GetElapsedTime());
+				}
+				else{
+					printf("\t\tGAP-%d A* failed after %1.4fs\n", gap, t1.GetElapsedTime());
+				}
+			}
+			//test second half
+			if(1)
+			{
+				TemplateAStar<PancakePuzzleState<N>, PancakePuzzleAction, PancakePuzzle<N>> astar;
+				goal.Reset();
+				
+				for(int i=0;i<N;i++){
+					original.puzzle[i] = specificGoal[i];
+				}		
+				
+				start = original;
+				t1.StartTimer();
+				bool solved = astar.GetPathTime(&pancake, start, goal, astarPath, secondsLimit);
+				t1.EndTimer();
+				if(solved){
+					printf("\t\tGAP-%d A* found path length %1.0f; %llu expanded; %llu necessary;  %llu necessary; using %1.0llu states in memory; %1.4fs elapsed\n", gap, pancake.GetPathLength(astarPath),
+					   astar.GetNodesExpanded(), astar.GetNecessaryExpansions(), statesQuantityBound, t1.GetElapsedTime());
+				}
+				else{
+					printf("\t\tGAP-%d A* failed after %1.4fs\n", gap, t1.GetElapsedTime());
+				}				   
+				printf("\t\t_A*_\n");
+			}
 			// IDA*
-			if (1)
+			if (0)
 			{
 				printf("\t\t_IDA*_\n");
 				IDAStar<PancakePuzzleState<N>, PancakePuzzleAction, false> idastar;
-				goal.Reset();
+				goal.Reset();				
 				start = original;
 				t3.StartTimer();
 				bool solved = idastar.GetPath(&pancake, start, goal, idaPath, secondsLimit);
@@ -296,7 +344,7 @@ void TestPancakeRandom()
 			}
 			
 			// MM
-			if (1)
+			if (0)
 			{
 				printf("\t\t_MM_\n");				
 				MM<PancakePuzzleState<N>, PancakePuzzleAction, PancakePuzzle<N>> mm;
@@ -339,7 +387,7 @@ void TestPancakeRandom()
 			long mb = pow(2,10) * kb;
 			long stateSize = sizeof(original);
 			unsigned long statesQuantityBoundforMBBDS = statesQuantityBound * 0.75;
-			if(1){
+			if(0){
 				printf("\t\t_MBBDS 1_\n");
 				//k=1
 				MBBDS<PancakePuzzleState<N>, PancakePuzzleAction, MbbdsBloomFilter<PancakePuzzleState<N>, PancakeHasher<N>>, false> mbbds(statesQuantityBoundforMBBDS) ;
@@ -361,7 +409,7 @@ void TestPancakeRandom()
 			}
 			
 			//IDMM
-			if(1)
+			if(0)
 			{
 				printf("\t\t_IDMM_\n");
 				IDMM<PancakePuzzleState<N>, PancakePuzzleAction, false> idmm;
@@ -645,7 +693,6 @@ void TestPancakeHard(int gap)
 				myfile << boost::format("\t\t\tHard-GAP-%d MBBDS(k=1) failed because MM failed.\n") % gap;
 			}
 		}
-		
 		//IDMM
 		if(1)
 		{

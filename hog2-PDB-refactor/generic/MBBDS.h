@@ -66,6 +66,7 @@ bool MBBDS<state, action, BloomFilter, verbose>::GetMidState(SearchEnvironment<s
 	backwardBound = (int)(heuristic / 2);
 	forwardBound = heuristic - backwardBound;
 	bool forwardSearch;
+	bool wasOOS = false;
 	int saturationIncreased = 0;
 	int saturationMaxIncreasements = 100;
 	int iteration_num = 0;
@@ -135,6 +136,7 @@ bool MBBDS<state, action, BloomFilter, verbose>::GetMidState(SearchEnvironment<s
 				}				
 			}
 			else {
+				wasOOS = true;
 				double saturation = currentBloomfilter.getSaturation();
 				if(saturation >= last_saturation){
 					saturationIncreased += 1;
@@ -156,8 +158,8 @@ bool MBBDS<state, action, BloomFilter, verbose>::GetMidState(SearchEnvironment<s
 			firstRun = false;
 			forwardSearch = !forwardSearch;
 		}	
-		bool resetSearch;
-		if(listReady){
+		bool resetSearch = true;
+		if(!wasOOS && listReady){
 			if(backwardBound == forwardBound){
 				if(forwardSearch){
 					forwardBound++;				
@@ -189,7 +191,7 @@ bool MBBDS<state, action, BloomFilter, verbose>::GetMidState(SearchEnvironment<s
 				forwardBound = maxBound;
 				backwardBound = maxBound;
 			}
-		}	
+		}
 		last_saturation = 1;
 		saturationIncreased = 0;
 		previousBloomfilter.clear();
@@ -197,7 +199,7 @@ bool MBBDS<state, action, BloomFilter, verbose>::GetMidState(SearchEnvironment<s
 			firstRun = true;
 			forwardSearch = true;
 			listReady = false;
-			middleStates.clear();			
+			middleStates.clear();
 		}
 	}
 	return false;
