@@ -159,7 +159,7 @@ bool MBBDS<state, action, BloomFilter, verbose>::GetMidState(SearchEnvironment<s
 			forwardSearch = !forwardSearch;
 		}	
 		bool resetSearch = true;
-		if(!wasOOS && listReady){
+		if(false && !wasOOS && listReady){
 			if(backwardBound == forwardBound){
 				if(forwardSearch){
 					forwardBound++;				

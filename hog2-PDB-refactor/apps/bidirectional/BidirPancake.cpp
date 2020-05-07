@@ -39,10 +39,14 @@ void TestVariants();
 void TestError();
 
 const int pancakes_num = 16;
-int all_problems_num = 100;
+int all_problems_num = 5;
 unsigned long statesQuantityBound = 1000000;
 int secondsLimit = 60*30;
-
+bool AstarRun=false;
+bool MMRun=true;
+bool IDAstarRun=false;
+bool MBBDSRun=true;
+bool IDMMRun=false;
 
 string datetime()
 {
@@ -63,15 +67,15 @@ string filename = "test_results/results_" + datetime() + ".txt";
 
 void TestPancake()
 {
+
 	cout << "running..." << endl;
-	
 	myfile.open (filename);
 	//TestRob();
 	//TestPancakeRandom();
 	TestPancakeHard(0); // GAP heuristic #
-	TestPancakeHard(1);
-	TestPancakeHard(2);
-	TestPancakeHard(3);
+	//TestPancakeHard(1);
+	//TestPancakeHard(2);
+	//TestPancakeHard(3);
 	//TestPancakeHard(4);
 	//TestPancakeHard(pancakes_num); // Heuristic 0
 	//TestError();
@@ -465,7 +469,7 @@ void TestPancakeHard(int gap)
 		myfile << "\tGoal state: " << goal << endl;
 		myfile <<"\tInitial heuristic " << pancake.HCost(original, goal) << endl;
 		// A*
-		if (1)
+		if (AstarRun)
 		{
 			myfile <<"\t\t_A*_\n";
 			TemplateAStar<PancakePuzzleState<N>, PancakePuzzleAction, PancakePuzzle<N>> astar;
@@ -599,7 +603,7 @@ void TestPancakeHard(int gap)
 		}
 		bool MMcompleted = true;
 		// MM
-		if (1)
+		if (MMRun)
 		{
 			myfile << "\t\t_MM_\n";				
 			MM<PancakePuzzleState<N>, PancakePuzzleAction, PancakePuzzle<N>> mm;
@@ -636,7 +640,7 @@ void TestPancakeHard(int gap)
 		}
 		
 		// IDA*
-		if (1)
+		if (IDAstarRun)
 		{
 			myfile << "\t\t_IDA*_\n";
 			IDAStar<PancakePuzzleState<N>, PancakePuzzleAction, false> idastar;
@@ -657,7 +661,7 @@ void TestPancakeHard(int gap)
 		}
 		
 		// MBBDS
-		if (1)
+		if (MBBDSRun)
 		{
 			if(MMcompleted){
 				myfile << "\t\t_MBBDS_\n";
@@ -694,7 +698,7 @@ void TestPancakeHard(int gap)
 			}
 		}
 		//IDMM
-		if(1)
+		if(IDMMRun)
 		{
 			myfile << "\t\t_IDMM_\n";
 			IDMM<PancakePuzzleState<N>, PancakePuzzleAction, false> idmm;
