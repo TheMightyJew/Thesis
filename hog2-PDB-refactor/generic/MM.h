@@ -67,7 +67,7 @@ public:
 	uint64_t GetNecessaryExpansions() const;
 	unsigned long getIMMExpansions() { return iMMExpansions; }
 	unsigned long getMemoryStatesUse() { return memoryStatesUse; }
-	double getLastF() { return lastF; }
+	double getLastBound() { return lastBound; }
 	//void FullBPMX(uint64_t nodeID, int distance);
 	
 	std::string SVGDraw() const;
@@ -131,6 +131,7 @@ private:
 		} while (forwardQueue.Lookup(node).parentID != node);
 		thePath.push_back(forwardQueue.Lookup(node).data);
 	}
+	void calculateBounds(double &minForwardG, double &minBackwardG, double &minForwardF, double &minBackwardF, double &forwardP, double &backwardP);
 
 	void OpenGLDraw(const priorityQueue &queue) const;
 	std::string SVGDraw(const priorityQueue &queue) const;
@@ -167,7 +168,7 @@ private:
 	unsigned long memoryStatesUse = 0;
 	unsigned long statesBound = std::numeric_limits<int>::max();
 	
-	double lastF;
+	double lastBound;
 	uint64_t nodesExpandedInThisF = 0;
 };
 
@@ -176,6 +177,7 @@ bool MM<state, action, environment, priorityQueue>::GetPath(environment *env, co
 			 Heuristic<state> *forward, Heuristic<state> *backward, std::vector<state> &thePath, int secondsLimit, unsigned long statesBound)
 {
 	this->statesBound = statesBound;
+	lastBound = 0;
 	if (InitializeSearch(env, from, to, forward, backward, thePath) == false)
 		return false;
 	t.StartTimer();
@@ -290,13 +292,23 @@ bool MM<state, action, environment, priorityQueue>::DoSingleSearchStep(std::vect
 			//Expand(forwardQueue, backwardQueue, forwardHeuristic, goal, g_f, f_f);
 		}
 	}
-	if(GetNumBackwardItems()+GetNumForwardItems() > memoryStatesUse){
+	if(GetNumBackwardItems() + GetNumForwardItems() > memoryStatesUse){
 		memoryStatesUse = GetNumBackwardItems()+GetNumForwardItems();
 		if(statesBound < memoryStatesUse){
-			lastF = std::min(oldp1, oldp2);
+			double minForwardG = DBL_MAX;
+			double minBackwardG = DBL_MAX;
+			double minForwardF = DBL_MAX;
+			double minBackwardF =  DBL_MAX;
+			double forwardP;
+			double backwardP;
+			calculateBounds(minForwardG, minBackwardG, minForwardF, minBackwardF, forwardP, backwardP);
+			lastBound = std::max(lastBound, minForwardF);
+			lastBound = std::max(lastBound, minBackwardF);
+			lastBound = std::max(lastBound, minForwardG + minBackwardG);
+			lastBound = std::max(lastBound, std::min(forwardP, backwardP));
 			return false;
 		}	
-	}
+	}	
 	// check if we can terminate
 	if (recheckPath)
 	{
@@ -308,8 +320,66 @@ bool MM<state, action, environment, priorityQueue>::DoSingleSearchStep(std::vect
 		double minBackwardF =  DBL_MAX;
 		double forwardP;
 		double backwardP;
+		calculateBounds(minForwardG, minBackwardG, minForwardF, minBackwardF, forwardP, backwardP);
+		bool done = false;
+		if (minForwardF == DBL_MAX)
+		{
+			minForwardF = minForwardG = currentCost+1;
+		}
+		if (minBackwardF == DBL_MAX)
+		{
+			minBackwardF = minBackwardG = currentCost+1;
+		}
+		if (!fgreater(currentCost, minForwardF))
+		{
+//			printf("Terminated on forwardf (%f >= %f)\n", minForwardF, currentCost);
+			done = true;
+		}
+		if (!fgreater(currentCost, minBackwardF))
+		{
+//			printf("Terminated on backwardf (%f >= %f)\n", minBackwardF, currentCost);
+			done = true;
+		}
+		if (!fgreater(currentCost, minForwardG+minBackwardG+epsilon)) // TODO: epsilon
+		{
+//			printf("Terminated on g+g+epsilon (%f+%f+%f >= %f)\n", minForwardG, minBackwardG, epsilon, currentCost);
+			done = true;
+		}
+		if (!fgreater(currentCost, std::min(forwardP, backwardP)))
+		{
+//			printf("Terminated on forwardP/backwardP (min(%f, %f) >= %f)\n", forwardP, backwardP, currentCost);
+			done = true;
+		}
 		
-		for (auto i = f.begin(); i != f.end(); i++)
+//		if (!fgreater(currentCost, backwardP))
+//		{
+//			printf("Terminated on backwardP\n");
+//			done = true;
+//		}
+		// for now, always terminate
+		lastMinBackwardG = minBackwardG;
+		lastMinForwardG = minForwardG;
+		if (done)
+		{
+//			PrintOpenStats(f);
+//			PrintOpenStats(b);
+			
+			std::vector<state> pFor, pBack;
+			ExtractPathToGoal(middleNode, pBack);
+			ExtractPathToStart(middleNode, pFor);
+			reverse(pFor.begin(), pFor.end());
+			thePath = pFor;
+			thePath.insert( thePath.end(), pBack.begin()+1, pBack.end() );
+			
+			return true;
+		}
+	}
+	return false;
+}
+template <class state, class action, class environment, class priorityQueue>
+void MM<state, action, environment, priorityQueue>::calculateBounds(double &minForwardG, double &minBackwardG, double &minForwardF, double &minBackwardF, double &forwardP, double &backwardP)
+{
+	for (auto i = f.begin(); i != f.end(); i++)
 		{
 			if (i->second > 0) // some elements
 			{
@@ -349,51 +419,8 @@ bool MM<state, action, environment, priorityQueue>::DoSingleSearchStep(std::vect
 		{
 			minBackwardF = minBackwardG = currentCost+1;
 		}
-		if (!fgreater(currentCost, minForwardF))
-		{
-//			printf("Terminated on forwardf (%f >= %f)\n", minForwardF, currentCost);
-			done = true;
-		}
-		if (!fgreater(currentCost, minBackwardF))
-		{
-//			printf("Terminated on backwardf (%f >= %f)\n", minBackwardF, currentCost);
-			done = true;
-		}
-		if (!fgreater(currentCost, minForwardG+minBackwardG+epsilon)) // TODO: epsilon
-		{
-//			printf("Terminated on g+g+epsilon (%f+%f+%f >= %f)\n", minForwardG, minBackwardG, epsilon, currentCost);
-			done = true;
-		}
-		if (!fgreater(currentCost, std::min(forwardP, backwardP)))
-		{
-//			printf("Terminated on forwardP/backwardP (min(%f, %f) >= %f)\n", forwardP, backwardP, currentCost);
-			done = true;
-		}
-//		if (!fgreater(currentCost, backwardP))
-//		{
-//			printf("Terminated on backwardP\n");
-//			done = true;
-//		}
-		// for now, always terminate
-		lastMinBackwardG = minBackwardG;
-		lastMinForwardG = minForwardG;
-		if (done)
-		{
-//			PrintOpenStats(f);
-//			PrintOpenStats(b);
-			
-			std::vector<state> pFor, pBack;
-			ExtractPathToGoal(middleNode, pBack);
-			ExtractPathToStart(middleNode, pFor);
-			reverse(pFor.begin(), pFor.end());
-			thePath = pFor;
-			thePath.insert( thePath.end(), pBack.begin()+1, pBack.end() );
-			
-			return true;
-		}
-	}
-	return false;
 }
+
 
 template <class state, class action, class environment, class priorityQueue>
 void MM<state, action, environment, priorityQueue>::Expand(priorityQueue &current,
@@ -428,6 +455,7 @@ void MM<state, action, environment, priorityQueue>::Expand(priorityQueue &curren
 	for (auto &succ : neighbors)
 	{
 		nodesTouched++;
+		
 		uint64_t childID;
 		uint64_t hash = env->GetStateHash(succ);
 		auto loc = current.Lookup(hash, childID);

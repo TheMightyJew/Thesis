@@ -661,7 +661,8 @@ void TestPancakeHard(int gap)
 		// MBBDS
 		if (MBBDSRun){
 			myfile << "\t\t_MBBDS_\n";
-			double percentages[6] = {1, 0.9, 0.75, 0.5, 0.25, 0.1};
+			//double percentages[6] = {1, 0.9, 0.75, 0.5, 0.25, 0.1};
+			double percentages[5] = {0.9, 0.75, 0.5, 0.25, 0.1};
 			long stateSize = sizeof(original);
 			for(double percentage : percentages){
 				t6.StartTimer();
@@ -681,7 +682,7 @@ void TestPancakeHard(int gap)
 					goal.Reset();
 					start = original;
 					PancakePuzzleState<N> midState;
-					solved = mbbds.GetMidState(&pancake, start, goal, midState, secondsLimit, mm.getLastF());
+					solved = mbbds.GetMidState(&pancake, start, goal, midState, secondsLimit, mm.getLastBound());
 					nodesExapanded += mbbds.GetNodesExpanded();
 					if(solved){
 						t6.EndTimer();
@@ -692,7 +693,7 @@ void TestPancakeHard(int gap)
 						IDMM<PancakePuzzleState<N>, PancakePuzzleAction, false> idmm;
 						goal.Reset();
 						start = original;
-						bool solved = idmm.GetMidState(&pancake, start, goal, midState, secondsLimit, mbbds.getLastF());
+						bool solved = idmm.GetMidState(&pancake, start, goal, midState, secondsLimit, mbbds.getLastBound());
 						nodesExapanded += idmm.GetNodesExpanded();
 						t6.EndTimer();
 						if(solved){

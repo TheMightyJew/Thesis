@@ -13,7 +13,7 @@
 #include <unordered_set>
 #include "SearchEnvironment.h"
 #include "PancakeHasher.h"
-
+#include <math.h>
 
 template <class state, class action, class BloomFilter, bool verbose = true>
 class MBBDS {
@@ -26,7 +26,7 @@ public:
 	double getPathLength()	{ return pathLength; }
 	uint64_t GetNodesExpanded() { return nodesExpanded; }
 	uint64_t GetNodesTouched() { return nodesTouched; }
-	double getLastF() { return backwardBound+forwardBound; }
+	double getLastBound() { return backwardBound+forwardBound; }
 	void ResetNodeCount() { nodesExpanded = nodesTouched = 0; }
 private:
 	unsigned long nodesExpanded, nodesTouched, statesQuantityBound;
@@ -64,7 +64,7 @@ bool MBBDS<state, action, BloomFilter, verbose>::GetMidState(SearchEnvironment<s
 	nodesExpanded = nodesTouched = 0;
 	state from;
 	double initialHeuristic = env->HCost(fromState, toState);
-	startingFBound = std::max(initialHeuristic, startingFBound); 
+	startingFBound = round(std::max(initialHeuristic, startingFBound));
 	backwardBound = (int)(startingFBound / 2);
 	forwardBound = startingFBound - backwardBound;
 	bool forwardSearch;
