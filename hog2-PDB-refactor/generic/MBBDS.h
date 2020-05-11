@@ -22,10 +22,11 @@ public:
 		this->statesQuantityBound = statesQuantityBound;
 	}
 	virtual ~MBBDS() {}
-	bool GetMidState(SearchEnvironment<state, action>* env, state fromState, state toState, state &midState, int secondsLimit=600);
+	bool GetMidState(SearchEnvironment<state, action>* env, state fromState, state toState, state &midState, int secondsLimit=600, double startingFBound=0);
 	double getPathLength()	{ return pathLength; }
 	uint64_t GetNodesExpanded() { return nodesExpanded; }
 	uint64_t GetNodesTouched() { return nodesTouched; }
+	double getLastF() { return backwardBound+forwardBound; }
 	void ResetNodeCount() { nodesExpanded = nodesTouched = 0; }
 private:
 	unsigned long nodesExpanded, nodesTouched, statesQuantityBound;
@@ -53,7 +54,7 @@ private:
 
 template <class state, class action, class BloomFilter, bool verbose>
 bool MBBDS<state, action, BloomFilter, verbose>::GetMidState(SearchEnvironment<state, action>* env,
-	state fromState, state toState, state &midState, int secondsLimit)
+	state fromState, state toState, state &midState, int secondsLimit, double startingFBound)
 {
 	memoryBound = sizeof(fromState)*statesQuantityBound;
 	if(verbose){
@@ -62,11 +63,11 @@ bool MBBDS<state, action, BloomFilter, verbose>::GetMidState(SearchEnvironment<s
 	}
 	nodesExpanded = nodesTouched = 0;
 	state from;
-	double heuristic = env->HCost(fromState, toState);
-	backwardBound = (int)(heuristic / 2);
-	forwardBound = heuristic - backwardBound;
+	double initialHeuristic = env->HCost(fromState, toState);
+	startingFBound = std::max(initialHeuristic, startingFBound); 
+	backwardBound = (int)(startingFBound / 2);
+	forwardBound = startingFBound - backwardBound;
 	bool forwardSearch;
-	bool wasOOS = false;
 	int saturationIncreased = 0;
 	int saturationMaxIncreasements = 100;
 	int iteration_num = 0;
@@ -136,7 +137,6 @@ bool MBBDS<state, action, BloomFilter, verbose>::GetMidState(SearchEnvironment<s
 				}				
 			}
 			else {
-				wasOOS = true;
 				double saturation = currentBloomfilter.getSaturation();
 				if(saturation >= last_saturation){
 					saturationIncreased += 1;
@@ -158,48 +158,19 @@ bool MBBDS<state, action, BloomFilter, verbose>::GetMidState(SearchEnvironment<s
 			firstRun = false;
 			forwardSearch = !forwardSearch;
 		}	
-		bool resetSearch = true;
-		if(false && !wasOOS && listReady){
-			if(backwardBound == forwardBound){
-				if(forwardSearch){
-					forwardBound++;				
-				}
-				else{
-					backwardBound++;
-				}
-				resetSearch = false;
-			}
-			else{
-				if((forwardSearch && backwardBound > forwardBound) || (!forwardSearch && backwardBound < forwardBound)){
-					resetSearch = false;
-				}
-				else{
-					resetSearch = true;
-				}
-				int maxBound = std::max(forwardBound, backwardBound);
-				forwardBound = maxBound;
-				backwardBound = maxBound;
-			}
-		}
-		else{
-			resetSearch = true;
-			if (forwardBound == backwardBound) {
-				forwardBound++;
-			}
-			else{
-				int maxBound = std::max(forwardBound, backwardBound);
-				forwardBound = maxBound;
-				backwardBound = maxBound;
-			}
-		}
+		
 		last_saturation = 1;
 		saturationIncreased = 0;
 		previousBloomfilter.clear();
-		if(resetSearch){
-			firstRun = true;
-			forwardSearch = true;
-			listReady = false;
-			middleStates.clear();
+		firstRun = true;
+		forwardSearch = true;
+		listReady = false;
+		middleStates.clear();
+		if (forwardBound == backwardBound) {
+			forwardBound++;
+		}
+		else{
+			forwardBound = backwardBound = std::max(forwardBound, backwardBound);
 		}
 	}
 	return false;
@@ -257,7 +228,7 @@ bool MBBDS<state, action, BloomFilter, verbose>::checkState(state midState)
 		else {
 			if (middleStates.size() == (int)(statesQuantityBound/2)) {
 				outOfSpace = true;
-				currentBloomfilter = BloomFilter(memoryBound/2, 2, previousBloomfilter.hashOffset + previousBloomfilter.getK());
+				currentBloomfilter = BloomFilter(memoryBound/2, 1, previousBloomfilter.hashOffset + previousBloomfilter.getK());
 				for (state possibleMidState : middleStates) {
 					currentBloomfilter.insert(possibleMidState);
 				}
@@ -271,8 +242,5 @@ bool MBBDS<state, action, BloomFilter, verbose>::checkState(state midState)
 	}
 	return false;
 }
-
-
-
 
 #endif

@@ -16,7 +16,7 @@ template <class state, class action, bool verbose = true>
 class IDMM {
 public:
 	virtual ~IDMM() {}
-	bool GetMidState(SearchEnvironment<state, action>* env, state fromState, state toState, state &midState, int secondsLimit=600);
+	bool GetMidState(SearchEnvironment<state, action>* env, state fromState, state toState, state &midState, int secondsLimit=600, double startingFBound=0);
 	double getPathLength()	{ return pathLength; }
 	uint64_t GetNodesExpanded() { return nodesExpanded; }
 	uint64_t GetNodesTouched() { return nodesTouched; }
@@ -40,14 +40,15 @@ private:
 
 template <class state, class action, bool verbose>
 bool IDMM<state, action, verbose>::GetMidState(SearchEnvironment<state, action>* env,
-	state fromState, state toState, state &midState, int secondsLimit)
+	state fromState, state toState, state &midState, int secondsLimit, double startingFBound)
 {
 	nodesExpanded = nodesTouched = 0;
 	originStart = fromState;
 	originGoal = toState;
-	double heuristic = env->HCost(fromState, toState);
-	backwardBound = (int)(heuristic / 2);
-	forwardBound = heuristic - backwardBound;
+	double initialHeuristic = env->HCost(fromState, toState);
+	startingFBound = std::max(initialHeuristic, startingFBound); 
+	backwardBound = (int)(startingFBound / 2);
+	forwardBound = startingFBound - backwardBound;
 	unsigned long nodesExpandedSoFar = 0;
 	unsigned long lastIterationExpansions = 0;
 	auto startTime = std::chrono::steady_clock::now();

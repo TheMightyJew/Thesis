@@ -13,6 +13,7 @@
 #include "FPUtil.h"
 #include "Timer.h"
 #include <unordered_map>
+#include <limits> 
 
 template <class state, int epsilon = 1>
 struct MMCompare {
@@ -46,7 +47,7 @@ public:
 	MM(double epsilon = 1.0):epsilon(epsilon) { forwardHeuristic = 0; backwardHeuristic = 0; env = 0; ResetNodeCount(); }
 	virtual ~MM() {}
 	bool GetPath(environment *env, const state& from, const state& to,
-				 Heuristic<state> *forward, Heuristic<state> *backward, std::vector<state> &thePath, int secondsLimit=600);
+				 Heuristic<state> *forward, Heuristic<state> *backward, std::vector<state> &thePath, int secondsLimit=600, unsigned long statesBound = std::numeric_limits<unsigned long>::max());
 	bool InitializeSearch(environment *env, const state& from, const state& to,
 						  Heuristic<state> *forward, Heuristic<state> *backward, std::vector<state> &thePath);
 	bool DoSingleSearchStep(std::vector<state> &thePath);
@@ -59,15 +60,14 @@ public:
 	inline const AStarOpenClosedData<state> &GetForwardItem(unsigned int which) { return forwardQueue.Lookat(which); }
 	inline const int GetNumBackwardItems() { return backwardQueue.size(); }
 	inline const AStarOpenClosedData<state> &GetBackwardItem(unsigned int which) { return backwardQueue.Lookat(which); }
-	
-	unsigned long maxNum=0;
-	
+		
 	uint64_t GetUniqueNodesExpanded() const { return uniqueNodesExpanded; }
 	uint64_t GetNodesExpanded() const { return nodesExpanded; }
 	uint64_t GetNodesTouched() const { return nodesTouched; }
 	uint64_t GetNecessaryExpansions() const;
 	unsigned long getIMMExpansions() { return iMMExpansions; }
 	unsigned long getMemoryStatesUse() { return memoryStatesUse; }
+	double getLastF() { return lastF; }
 	//void FullBPMX(uint64_t nodeID, int distance);
 	
 	std::string SVGDraw() const;
@@ -165,22 +165,25 @@ private:
 	std::vector<unsigned long> gCounts;
 	unsigned long iMMExpansions = 0;
 	unsigned long memoryStatesUse = 0;
+	unsigned long statesBound = std::numeric_limits<int>::max();
 	
-	double lastF = 0;
+	double lastF;
 	uint64_t nodesExpandedInThisF = 0;
 };
 
 template <class state, class action, class environment, class priorityQueue>
 bool MM<state, action, environment, priorityQueue>::GetPath(environment *env, const state& from, const state& to,
-			 Heuristic<state> *forward, Heuristic<state> *backward, std::vector<state> &thePath, int secondsLimit)
+			 Heuristic<state> *forward, Heuristic<state> *backward, std::vector<state> &thePath, int secondsLimit, unsigned long statesBound)
 {
+	this->statesBound = statesBound;
 	if (InitializeSearch(env, from, to, forward, backward, thePath) == false)
 		return false;
 	t.StartTimer();
 	auto startTime = std::chrono::steady_clock::now();
 	while (!DoSingleSearchStep(thePath)){ 
-		memoryStatesUse = maxNum;
-		
+		if(statesBound < memoryStatesUse){
+			return false;
+		}	
 		auto currentTime = std::chrono::steady_clock::now();
 		std::chrono::duration<double> elapsed_seconds = currentTime-startTime;
 		if(elapsed_seconds.count() >= secondsLimit){
@@ -193,7 +196,6 @@ bool MM<state, action, environment, priorityQueue>::GetPath(environment *env, co
 		sum += gCounts[x]*(gCounts.size()-x);
 	}
 	iMMExpansions = sum;
-	memoryStatesUse = maxNum;
 	return true;
 }
 
@@ -288,8 +290,13 @@ bool MM<state, action, environment, priorityQueue>::DoSingleSearchStep(std::vect
 			//Expand(forwardQueue, backwardQueue, forwardHeuristic, goal, g_f, f_f);
 		}
 	}
-	if(GetNumBackwardItems()+GetNumForwardItems() > maxNum)
-		maxNum = GetNumBackwardItems()+GetNumForwardItems();
+	if(GetNumBackwardItems()+GetNumForwardItems() > memoryStatesUse){
+		memoryStatesUse = GetNumBackwardItems()+GetNumForwardItems();
+		if(statesBound < memoryStatesUse){
+			lastF = std::min(oldp1, oldp2);
+			return false;
+		}	
+	}
 	// check if we can terminate
 	if (recheckPath)
 	{
