@@ -660,18 +660,26 @@ void TestPancakeHard(int gap)
 		
 		// MBBDS
 		if (MBBDSRun){
+			bool threePhase = false;
 			myfile << "\t\t_MBBDS_\n";
-			//double percentages[6] = {1, 0.9, 0.75, 0.5, 0.25, 0.1};
-			double percentages[5] = {0.9, 0.75, 0.5, 0.25, 0.1};
+			double percentages[6] = {1, 0.9, 0.75, 0.5, 0.25, 0.1};
 			long stateSize = sizeof(original);
+			bool solved;
+			unsigned long nodesExapanded;
 			for(double percentage : percentages){
 				t6.StartTimer();
 				unsigned long statesQuantityBoundforMBBDS = statesQuantityBound*percentage;
-				MM<PancakePuzzleState<N>, PancakePuzzleAction, PancakePuzzle<N>> mm;
-				goal.Reset();
-				start = original;
-				bool solved = mm.GetPath(&pancake, start, goal, &pancake, &pancake2, mmPath, secondsLimit, statesQuantityBoundforMBBDS);
-				unsigned long nodesExapanded = mm.GetNodesExpanded();
+				solved = false;
+				unsigned long nodesExapanded = 0;
+				double lastBound = 0;
+				if(threePhase){
+					MM<PancakePuzzleState<N>, PancakePuzzleAction, PancakePuzzle<N>> mm;
+					goal.Reset();
+					start = original;
+					solved = mm.GetPath(&pancake, start, goal, &pancake, &pancake2, mmPath, secondsLimit, statesQuantityBoundforMBBDS);
+					nodesExapanded += mm.GetNodesExpanded();
+					lastBound = mm.getLastBound();
+				}
 				if(solved){
 					t6.EndTimer();
 					myfile << boost::format("\t\t\tHARD-%d GAP-%d MBBDS(k=1) MM using memory for %1.0llu states(state size: %d bits, Memory_percentage_from_MM=%1.2f) found path length %1.0f; %llu expanded; %1.4fs elapsed;\n") % count % gap % statesQuantityBoundforMBBDS % stateSize % percentage % pancake.GetPathLength(mmPath) %
@@ -682,8 +690,9 @@ void TestPancakeHard(int gap)
 					goal.Reset();
 					start = original;
 					PancakePuzzleState<N> midState;
-					solved = mbbds.GetMidState(&pancake, start, goal, midState, secondsLimit, mm.getLastBound());
+					solved = mbbds.GetMidState(&pancake, start, goal, midState, secondsLimit, lastBound);
 					nodesExapanded += mbbds.GetNodesExpanded();
+					lastBound = mbbds.getLastBound();
 					if(solved){
 						t6.EndTimer();
 						myfile << boost::format("\t\t\tHARD-%d GAP-%d MBBDS(k=1) MBBDS using memory for %1.0llu states(state size: %d bits, Memory_percentage_from_MM=%1.2f) found path length %1.0f; %llu expanded; %1.4fs elapsed;\n") % count % gap % statesQuantityBoundforMBBDS % stateSize % percentage % mbbds.getPathLength() %
@@ -693,7 +702,7 @@ void TestPancakeHard(int gap)
 						IDMM<PancakePuzzleState<N>, PancakePuzzleAction, false> idmm;
 						goal.Reset();
 						start = original;
-						bool solved = idmm.GetMidState(&pancake, start, goal, midState, secondsLimit, mbbds.getLastBound());
+						solved = idmm.GetMidState(&pancake, start, goal, midState, secondsLimit, lastBound);
 						nodesExapanded += idmm.GetNodesExpanded();
 						t6.EndTimer();
 						if(solved){
