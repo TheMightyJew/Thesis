@@ -1,0 +1,2302 @@
+TestPancakeHard:(Pancakes: 8, Gap: 8, Random: 1, Hard: 0)
+	Problem 1 of 100
+	Start state: 2 6 4 3 5 7 0 1 
+	Goal state: 0 1 2 3 4 5 6 7 
+	Initial heuristic 1
+		_A*_
+			GAP-8 A* found path length 7; 7695 expanded; 7000 necessary; using 19789 states in memory; 0.0133s elapsed
+			GAP-8 I-A* ; 17032 expanded;
+		_MM_
+			Hard-GAP-8 MM found path length 7; 153 expanded; 153 necessary; using 893 states in memory; 0.0003s elapsed
+			Hard-GAP-8 I-MM ; 271 expanded;
+		_IDA*_
+			Hard-GAP-8 IDA* found path length 7; 56811 expanded; 397677 generated; 0.0113s elapsed
+			Hard-GAP-8 D-A* ; 47552 expanded;
+		_MBBDS_
+			HARD-0 GAP-8 MBBDS(k=1) MBBDS using memory for 893 states(state size: 32 bits, Memory_percentage_from_MM=1.00) found path length 7; 654 expanded; 0.0003s elapsed;
+			HARD-0 GAP-8 MBBDS(k=1) MBBDS using memory for 803 states(state size: 32 bits, Memory_percentage_from_MM=0.90) found path length 7; 654 expanded; 0.0003s elapsed;
+			HARD-0 GAP-8 MBBDS(k=1) MBBDS using memory for 669 states(state size: 32 bits, Memory_percentage_from_MM=0.75) found path length 7; 654 expanded; 0.0003s elapsed;
+			HARD-0 GAP-8 MBBDS(k=1) MBBDS using memory for 446 states(state size: 32 bits, Memory_percentage_from_MM=0.50) found path length 7; 754 expanded; 0.0003s elapsed;
+			HARD-0 GAP-8 MBBDS(k=1) MBBDS using memory for 223 states(state size: 32 bits, Memory_percentage_from_MM=0.25) found path length 7; 754 expanded; 0.0003s elapsed;
+			HARD-0 GAP-8 MBBDS(k=1) MBBDS using memory for 89 states(state size: 32 bits, Memory_percentage_from_MM=0.10) found path length 7; 1106 expanded; 0.0004s elapsed;
+		_IDMM_
+			HARD-0 GAP-8 IDMM found path length 7; 64532 expanded; 451724 generated; 0.0138s elapsed; Mid state: 6 7 5 4 3 2 0 1 
+			GAP-8 D-MM ; 43774 expanded;
+	Problem 2 of 100
+	Start state: 0 6 5 7 2 3 4 1 
+	Goal state: 0 1 2 3 4 5 6 7 
+	Initial heuristic 1
+		_A*_
+			GAP-8 A* found path length 7; 6988 expanded; 6973 necessary; using 18536 states in memory; 0.0107s elapsed
+			GAP-8 I-A* ; 16307 expanded;
+		_MM_
+			Hard-GAP-8 MM found path length 7; 207 expanded; 207 necessary; using 1163 states in memory; 0.0003s elapsed
+			Hard-GAP-8 I-MM ; 325 expanded;
+		_IDA*_
+			Hard-GAP-8 IDA* found path length 7; 32734 expanded; 229138 generated; 0.0067s elapsed
+			Hard-GAP-8 D-A* ; 27479 expanded;
+		_MBBDS_
+			HARD-1 GAP-8 MBBDS(k=1) MBBDS using memory for 1163 states(state size: 32 bits, Memory_percentage_from_MM=1.00) found path length 7; 587 expanded; 0.0003s elapsed;
+			HARD-1 GAP-8 MBBDS(k=1) MBBDS using memory for 1046 states(state size: 32 bits, Memory_percentage_from_MM=0.90) found path length 7; 587 expanded; 0.0003s elapsed;
+			HARD-1 GAP-8 MBBDS(k=1) MBBDS using memory for 872 states(state size: 32 bits, Memory_percentage_from_MM=0.75) found path length 7; 587 expanded; 0.0003s elapsed;
+			HARD-1 GAP-8 MBBDS(k=1) MBBDS using memory for 581 states(state size: 32 bits, Memory_percentage_from_MM=0.50) found path length 7; 587 expanded; 0.0002s elapsed;
+			HARD-1 GAP-8 MBBDS(k=1) MBBDS using memory for 290 states(state size: 32 bits, Memory_percentage_from_MM=0.25) found path length 7; 687 expanded; 0.0003s elapsed;
+			HARD-1 GAP-8 MBBDS(k=1) MBBDS using memory for 116 states(state size: 32 bits, Memory_percentage_from_MM=0.10) found path length 7; 1039 expanded; 0.0003s elapsed;
+		_IDMM_
+			HARD-1 GAP-8 IDMM found path length 7; 39649 expanded; 277543 generated; 0.0087s elapsed; Mid state: 4 3 2 1 0 6 5 7 
+			GAP-8 D-MM ; 18446 expanded;
+	Problem 3 of 100
+	Start state: 6 7 2 0 5 3 4 1 
+	Goal state: 0 1 2 3 4 5 6 7 
+	Initial heuristic 1
+		_A*_
+			GAP-8 A* found path length 6; 1949 expanded; 1881 necessary; using 7192 states in memory; 0.0025s elapsed
+			GAP-8 I-A* ; 4283 expanded;
+		_MM_
+			Hard-GAP-8 MM found path length 6; 84 expanded; 84 necessary; using 507 states in memory; 0.0001s elapsed
+			Hard-GAP-8 I-MM ; 102 expanded;
+		_IDA*_
+			Hard-GAP-8 IDA* found path length 6; 12282 expanded; 85974 generated; 0.0025s elapsed
+			Hard-GAP-8 D-A* ; 10328 expanded;
+		_MBBDS_
+			HARD-2 GAP-8 MBBDS(k=1) MBBDS using memory for 507 states(state size: 32 bits, Memory_percentage_from_MM=1.00) found path length 6; 181 expanded; 0.0001s elapsed;
+			HARD-2 GAP-8 MBBDS(k=1) MBBDS using memory for 456 states(state size: 32 bits, Memory_percentage_from_MM=0.90) found path length 6; 268 expanded; 0.0002s elapsed;
+			HARD-2 GAP-8 MBBDS(k=1) MBBDS using memory for 380 states(state size: 32 bits, Memory_percentage_from_MM=0.75) found path length 6; 268 expanded; 0.0001s elapsed;
+			HARD-2 GAP-8 MBBDS(k=1) MBBDS using memory for 253 states(state size: 32 bits, Memory_percentage_from_MM=0.50) found path length 6; 268 expanded; 0.0001s elapsed;
+			HARD-2 GAP-8 MBBDS(k=1) MBBDS using memory for 126 states(state size: 32 bits, Memory_percentage_from_MM=0.25) found path length 6; 268 expanded; 0.0001s elapsed;
+			HARD-2 GAP-8 MBBDS(k=1) MBBDS using memory for 50 states(state size: 32 bits, Memory_percentage_from_MM=0.10) found path length 6; 339 expanded; 0.0001s elapsed;
+		_IDMM_
+			HARD-2 GAP-8 IDMM found path length 6; 13639 expanded; 95473 generated; 0.0030s elapsed; Mid state: 3 4 5 6 7 2 0 1 
+			GAP-8 D-MM ; 10427 expanded;
+	Problem 4 of 100
+	Start state: 4 3 7 2 6 0 5 1 
+	Goal state: 0 1 2 3 4 5 6 7 
+	Initial heuristic 1
+		_A*_
+			GAP-8 A* found path length 8; 18889 expanded; 18328 necessary; using 33271 states in memory; 0.0242s elapsed
+			GAP-8 I-A* ; 46552 expanded;
+		_MM_
+			Hard-GAP-8 MM found path length 8; 354 expanded; 354 necessary; using 1811 states in memory; 0.0005s elapsed
+			Hard-GAP-8 I-MM ; 472 expanded;
+		_IDA*_
+			Hard-GAP-8 IDA* found path length 8; 165082 expanded; 1155574 generated; 0.0338s elapsed
+			Hard-GAP-8 D-A* ; 138294 expanded;
+		_MBBDS_
+			HARD-3 GAP-8 MBBDS(k=1) MBBDS using memory for 1811 states(state size: 32 bits, Memory_percentage_from_MM=1.00) found path length 8; 1472 expanded; 0.0007s elapsed;
+			HARD-3 GAP-8 MBBDS(k=1) MBBDS using memory for 1629 states(state size: 32 bits, Memory_percentage_from_MM=0.90) found path length 8; 1472 expanded; 0.0006s elapsed;
+			HARD-3 GAP-8 MBBDS(k=1) MBBDS using memory for 1358 states(state size: 32 bits, Memory_percentage_from_MM=0.75) found path length 8; 1472 expanded; 0.0006s elapsed;
+			HARD-3 GAP-8 MBBDS(k=1) MBBDS using memory for 905 states(state size: 32 bits, Memory_percentage_from_MM=0.50) found path length 8; 1472 expanded; 0.0006s elapsed;
+			HARD-3 GAP-8 MBBDS(k=1) MBBDS using memory for 452 states(state size: 32 bits, Memory_percentage_from_MM=0.25) found path length 8; 1522 expanded; 0.0006s elapsed;
+			HARD-3 GAP-8 MBBDS(k=1) MBBDS using memory for 181 states(state size: 32 bits, Memory_percentage_from_MM=0.10) found path length 8; 2176 expanded; 0.0007s elapsed;
+		_IDMM_
+			HARD-3 GAP-8 IDMM found path length 8; 187039 expanded; 1309273 generated; 0.0418s elapsed; Mid state: 7 6 0 5 1 2 3 4 
+			GAP-8 D-MM ; 57259 expanded;
+	Problem 5 of 100
+	Start state: 5 3 2 0 1 6 7 4 
+	Goal state: 0 1 2 3 4 5 6 7 
+	Initial heuristic 1
+		_A*_
+			GAP-8 A* found path length 5; 420 expanded; 378 necessary; using 2022 states in memory; 0.0006s elapsed
+			GAP-8 I-A* ; 870 expanded;
+		_MM_
+			Hard-GAP-8 MM found path length 5; 44 expanded; 44 necessary; using 268 states in memory; 0.0001s elapsed
+			Hard-GAP-8 I-MM ; 62 expanded;
+		_IDA*_
+			Hard-GAP-8 IDA* found path length 5; 990 expanded; 6930 generated; 0.0002s elapsed
+			Hard-GAP-8 D-A* ; 828 expanded;
+		_MBBDS_
+			HARD-4 GAP-8 MBBDS(k=1) MBBDS using memory for 268 states(state size: 32 bits, Memory_percentage_from_MM=1.00) found path length 5; 96 expanded; 0.0001s elapsed;
+			HARD-4 GAP-8 MBBDS(k=1) MBBDS using memory for 241 states(state size: 32 bits, Memory_percentage_from_MM=0.90) found path length 5; 96 expanded; 0.0001s elapsed;
+			HARD-4 GAP-8 MBBDS(k=1) MBBDS using memory for 201 states(state size: 32 bits, Memory_percentage_from_MM=0.75) found path length 5; 96 expanded; 0.0000s elapsed;
+			HARD-4 GAP-8 MBBDS(k=1) MBBDS using memory for 134 states(state size: 32 bits, Memory_percentage_from_MM=0.50) found path length 5; 96 expanded; 0.0000s elapsed;
+			HARD-4 GAP-8 MBBDS(k=1) MBBDS using memory for 67 states(state size: 32 bits, Memory_percentage_from_MM=0.25) found path length 5; 104 expanded; 0.0000s elapsed;
+			HARD-4 GAP-8 MBBDS(k=1) MBBDS using memory for 26 states(state size: 32 bits, Memory_percentage_from_MM=0.10) found path length 5; 170 expanded; 0.0001s elapsed;
+		_IDMM_
+			HARD-4 GAP-8 IDMM found path length 5; 1078 expanded; 7546 generated; 0.0002s elapsed; Mid state: 5 4 3 2 0 1 6 7 
+			GAP-8 D-MM ; 592 expanded;
+	Problem 6 of 100
+	Start state: 6 7 1 0 4 2 3 5 
+	Goal state: 0 1 2 3 4 5 6 7 
+	Initial heuristic 1
+		_A*_
+			GAP-8 A* found path length 6; 2364 expanded; 1881 necessary; using 8438 states in memory; 0.0031s elapsed
+			GAP-8 I-A* ; 4698 expanded;
+		_MM_
+			Hard-GAP-8 MM found path length 6; 99 expanded; 99 necessary; using 596 states in memory; 0.0002s elapsed
+			Hard-GAP-8 I-MM ; 117 expanded;
+		_IDA*_
+			Hard-GAP-8 IDA* found path length 6; 16226 expanded; 113582 generated; 0.0034s elapsed
+			Hard-GAP-8 D-A* ; 13633 expanded;
+		_MBBDS_
+			HARD-5 GAP-8 MBBDS(k=1) MBBDS using memory for 596 states(state size: 32 bits, Memory_percentage_from_MM=1.00) found path length 6; 170 expanded; 0.0001s elapsed;
+			HARD-5 GAP-8 MBBDS(k=1) MBBDS using memory for 536 states(state size: 32 bits, Memory_percentage_from_MM=0.90) found path length 6; 170 expanded; 0.0001s elapsed;
+			HARD-5 GAP-8 MBBDS(k=1) MBBDS using memory for 447 states(state size: 32 bits, Memory_percentage_from_MM=0.75) found path length 6; 281 expanded; 0.0002s elapsed;
+			HARD-5 GAP-8 MBBDS(k=1) MBBDS using memory for 298 states(state size: 32 bits, Memory_percentage_from_MM=0.50) found path length 6; 281 expanded; 0.0001s elapsed;
+			HARD-5 GAP-8 MBBDS(k=1) MBBDS using memory for 149 states(state size: 32 bits, Memory_percentage_from_MM=0.25) found path length 6; 281 expanded; 0.0001s elapsed;
+			HARD-5 GAP-8 MBBDS(k=1) MBBDS using memory for 59 states(state size: 32 bits, Memory_percentage_from_MM=0.10) found path length 6; 320 expanded; 0.0001s elapsed;
+		_IDMM_
+			HARD-5 GAP-8 IDMM found path length 6; 17997 expanded; 125979 generated; 0.0040s elapsed; Mid state: 1 0 4 2 3 5 6 7 
+			GAP-8 D-MM ; 14785 expanded;
+	Problem 7 of 100
+	Start state: 3 5 7 1 4 2 6 0 
+	Goal state: 0 1 2 3 4 5 6 7 
+	Initial heuristic 1
+		_A*_
+			GAP-8 A* found path length 8; 32045 expanded; 18328 necessary; using 39878 states in memory; 0.0359s elapsed
+			GAP-8 I-A* ; 59708 expanded;
+		_MM_
+			Hard-GAP-8 MM found path length 8; 459 expanded; 459 necessary; using 2360 states in memory; 0.0007s elapsed
+			Hard-GAP-8 I-MM ; 577 expanded;
+		_IDA*_
+			Hard-GAP-8 IDA* found path length 8; 412712 expanded; 2888984 generated; 0.0839s elapsed
+			Hard-GAP-8 D-A* ; 345892 expanded;
+		_MBBDS_
+			HARD-6 GAP-8 MBBDS(k=1) MBBDS using memory for 2360 states(state size: 32 bits, Memory_percentage_from_MM=1.00) found path length 8; 1602 expanded; 0.0008s elapsed;
+			HARD-6 GAP-8 MBBDS(k=1) MBBDS using memory for 2124 states(state size: 32 bits, Memory_percentage_from_MM=0.90) found path length 8; 1602 expanded; 0.0007s elapsed;
+			HARD-6 GAP-8 MBBDS(k=1) MBBDS using memory for 1770 states(state size: 32 bits, Memory_percentage_from_MM=0.75) found path length 8; 1602 expanded; 0.0007s elapsed;
+			HARD-6 GAP-8 MBBDS(k=1) MBBDS using memory for 1180 states(state size: 32 bits, Memory_percentage_from_MM=0.50) found path length 8; 1602 expanded; 0.0006s elapsed;
+			HARD-6 GAP-8 MBBDS(k=1) MBBDS using memory for 590 states(state size: 32 bits, Memory_percentage_from_MM=0.25) found path length 8; 1602 expanded; 0.0006s elapsed;
+			HARD-6 GAP-8 MBBDS(k=1) MBBDS using memory for 236 states(state size: 32 bits, Memory_percentage_from_MM=0.10) found path length 8; 1860 expanded; 0.0006s elapsed;
+		_IDMM_
+			HARD-6 GAP-8 IDMM found path length 8; 507847 expanded; 3554929 generated; 0.1112s elapsed; Mid state: 6 2 3 4 5 7 1 0 
+			GAP-8 D-MM ; 362941 expanded;
+	Problem 8 of 100
+	Start state: 2 1 3 4 0 7 5 6 
+	Goal state: 0 1 2 3 4 5 6 7 
+	Initial heuristic 1
+		_A*_
+			GAP-8 A* found path length 5; 527 expanded; 382 necessary; using 2467 states in memory; 0.0007s elapsed
+			GAP-8 I-A* ; 981 expanded;
+		_MM_
+			Hard-GAP-8 MM found path length 5; 50 expanded; 50 necessary; using 303 states in memory; 0.0001s elapsed
+			Hard-GAP-8 I-MM ; 68 expanded;
+		_IDA*_
+			Hard-GAP-8 IDA* found path length 5; 2885 expanded; 20195 generated; 0.0007s elapsed
+			Hard-GAP-8 D-A* ; 2426 expanded;
+		_MBBDS_
+			HARD-7 GAP-8 MBBDS(k=1) MBBDS using memory for 303 states(state size: 32 bits, Memory_percentage_from_MM=1.00) found path length 5; 135 expanded; 0.0001s elapsed;
+			HARD-7 GAP-8 MBBDS(k=1) MBBDS using memory for 272 states(state size: 32 bits, Memory_percentage_from_MM=0.90) found path length 5; 135 expanded; 0.0001s elapsed;
+			HARD-7 GAP-8 MBBDS(k=1) MBBDS using memory for 227 states(state size: 32 bits, Memory_percentage_from_MM=0.75) found path length 5; 135 expanded; 0.0001s elapsed;
+			HARD-7 GAP-8 MBBDS(k=1) MBBDS using memory for 151 states(state size: 32 bits, Memory_percentage_from_MM=0.50) found path length 5; 135 expanded; 0.0001s elapsed;
+			HARD-7 GAP-8 MBBDS(k=1) MBBDS using memory for 75 states(state size: 32 bits, Memory_percentage_from_MM=0.25) found path length 5; 135 expanded; 0.0001s elapsed;
+			HARD-7 GAP-8 MBBDS(k=1) MBBDS using memory for 30 states(state size: 32 bits, Memory_percentage_from_MM=0.10) found path length 5; 151 expanded; 0.0001s elapsed;
+		_IDMM_
+			HARD-7 GAP-8 IDMM found path length 5; 3124 expanded; 21868 generated; 0.0007s elapsed; Mid state: 7 0 1 2 3 4 5 6 
+			GAP-8 D-MM ; 2638 expanded;
+	Problem 9 of 100
+	Start state: 4 3 2 0 7 6 5 1 
+	Goal state: 0 1 2 3 4 5 6 7 
+	Initial heuristic 1
+		_A*_
+			GAP-8 A* found path length 5; 672 expanded; 383 necessary; using 2987 states in memory; 0.0009s elapsed
+			GAP-8 I-A* ; 1127 expanded;
+		_MM_
+			Hard-GAP-8 MM found path length 5; 35 expanded; 35 necessary; using 214 states in memory; 0.0001s elapsed
+			Hard-GAP-8 I-MM ; 53 expanded;
+		_IDA*_
+			Hard-GAP-8 IDA* found path length 5; 653 expanded; 4571 generated; 0.0001s elapsed
+			Hard-GAP-8 D-A* ; 550 expanded;
+		_MBBDS_
+			HARD-8 GAP-8 MBBDS(k=1) MBBDS using memory for 214 states(state size: 32 bits, Memory_percentage_from_MM=1.00) found path length 5; 92 expanded; 0.0001s elapsed;
+			HARD-8 GAP-8 MBBDS(k=1) MBBDS using memory for 192 states(state size: 32 bits, Memory_percentage_from_MM=0.90) found path length 5; 92 expanded; 0.0000s elapsed;
+			HARD-8 GAP-8 MBBDS(k=1) MBBDS using memory for 160 states(state size: 32 bits, Memory_percentage_from_MM=0.75) found path length 5; 92 expanded; 0.0000s elapsed;
+			HARD-8 GAP-8 MBBDS(k=1) MBBDS using memory for 107 states(state size: 32 bits, Memory_percentage_from_MM=0.50) found path length 5; 92 expanded; 0.0000s elapsed;
+			HARD-8 GAP-8 MBBDS(k=1) MBBDS using memory for 53 states(state size: 32 bits, Memory_percentage_from_MM=0.25) found path length 5; 100 expanded; 0.0000s elapsed;
+			HARD-8 GAP-8 MBBDS(k=1) MBBDS using memory for 21 states(state size: 32 bits, Memory_percentage_from_MM=0.10) found path length 5; 158 expanded; 0.0001s elapsed;
+		_IDMM_
+			HARD-8 GAP-8 IDMM found path length 5; 694 expanded; 4858 generated; 0.0002s elapsed; Mid state: 4 3 2 0 1 5 6 7 
+			GAP-8 D-MM ; 208 expanded;
+	Problem 10 of 100
+	Start state: 1 7 3 5 4 6 0 2 
+	Goal state: 0 1 2 3 4 5 6 7 
+	Initial heuristic 1
+		_A*_
+			GAP-8 A* found path length 8; 19269 expanded; 18335 necessary; using 33447 states in memory; 0.0224s elapsed
+			GAP-8 I-A* ; 46903 expanded;
+		_MM_
+			Hard-GAP-8 MM found path length 8; 354 expanded; 354 necessary; using 1811 states in memory; 0.0005s elapsed
+			Hard-GAP-8 I-MM ; 472 expanded;
+		_IDA*_
+			Hard-GAP-8 IDA* found path length 8; 212041 expanded; 1484287 generated; 0.0435s elapsed
+			Hard-GAP-8 D-A* ; 177685 expanded;
+		_MBBDS_
+			HARD-9 GAP-8 MBBDS(k=1) MBBDS using memory for 1811 states(state size: 32 bits, Memory_percentage_from_MM=1.00) found path length 8; 1498 expanded; 0.0006s elapsed;
+			HARD-9 GAP-8 MBBDS(k=1) MBBDS using memory for 1629 states(state size: 32 bits, Memory_percentage_from_MM=0.90) found path length 8; 1498 expanded; 0.0006s elapsed;
+			HARD-9 GAP-8 MBBDS(k=1) MBBDS using memory for 1358 states(state size: 32 bits, Memory_percentage_from_MM=0.75) found path length 8; 1498 expanded; 0.0006s elapsed;
+			HARD-9 GAP-8 MBBDS(k=1) MBBDS using memory for 905 states(state size: 32 bits, Memory_percentage_from_MM=0.50) found path length 8; 1498 expanded; 0.0006s elapsed;
+			HARD-9 GAP-8 MBBDS(k=1) MBBDS using memory for 452 states(state size: 32 bits, Memory_percentage_from_MM=0.25) found path length 8; 1598 expanded; 0.0006s elapsed;
+			HARD-9 GAP-8 MBBDS(k=1) MBBDS using memory for 181 states(state size: 32 bits, Memory_percentage_from_MM=0.10) found path length 8; 2542 expanded; 0.0008s elapsed;
+		_IDMM_
+			HARD-9 GAP-8 IDMM found path length 8; 242949 expanded; 1700643 generated; 0.0532s elapsed; Mid state: 5 4 6 0 1 2 3 7 
+			GAP-8 D-MM ; 113169 expanded;
+	Problem 11 of 100
+	Start state: 1 4 2 7 3 5 0 6 
+	Goal state: 0 1 2 3 4 5 6 7 
+	Initial heuristic 1
+		_A*_
+			GAP-8 A* found path length 8; 18437 expanded; 18322 necessary; using 32953 states in memory; 0.0212s elapsed
+			GAP-8 I-A* ; 46078 expanded;
+		_MM_
+			Hard-GAP-8 MM found path length 8; 384 expanded; 384 necessary; using 1977 states in memory; 0.0006s elapsed
+			Hard-GAP-8 I-MM ; 502 expanded;
+		_IDA*_
+			Hard-GAP-8 IDA* found path length 8; 331655 expanded; 2321585 generated; 0.0678s elapsed
+			Hard-GAP-8 D-A* ; 277988 expanded;
+		_MBBDS_
+			HARD-10 GAP-8 MBBDS(k=1) MBBDS using memory for 1977 states(state size: 32 bits, Memory_percentage_from_MM=1.00) found path length 8; 1560 expanded; 0.0007s elapsed;
+			HARD-10 GAP-8 MBBDS(k=1) MBBDS using memory for 1779 states(state size: 32 bits, Memory_percentage_from_MM=0.90) found path length 8; 1560 expanded; 0.0007s elapsed;
+			HARD-10 GAP-8 MBBDS(k=1) MBBDS using memory for 1482 states(state size: 32 bits, Memory_percentage_from_MM=0.75) found path length 8; 1560 expanded; 0.0006s elapsed;
+			HARD-10 GAP-8 MBBDS(k=1) MBBDS using memory for 988 states(state size: 32 bits, Memory_percentage_from_MM=0.50) found path length 8; 1560 expanded; 0.0006s elapsed;
+			HARD-10 GAP-8 MBBDS(k=1) MBBDS using memory for 494 states(state size: 32 bits, Memory_percentage_from_MM=0.25) found path length 8; 1660 expanded; 0.0006s elapsed;
+			HARD-10 GAP-8 MBBDS(k=1) MBBDS using memory for 197 states(state size: 32 bits, Memory_percentage_from_MM=0.10) found path length 8; 2264 expanded; 0.0008s elapsed;
+		_IDMM_
+			HARD-10 GAP-8 IDMM found path length 8; 377975 expanded; 2645825 generated; 0.0817s elapsed; Mid state: 6 0 1 4 5 3 2 7 
+			GAP-8 D-MM ; 248195 expanded;
+	Problem 12 of 100
+	Start state: 1 5 3 6 0 4 7 2 
+	Goal state: 0 1 2 3 4 5 6 7 
+	Initial heuristic 1
+		_A*_
+			GAP-8 A* found path length 8; 19228 expanded; 18427 necessary; using 33359 states in memory; 0.0222s elapsed
+			GAP-8 I-A* ; 46953 expanded;
+		_MM_
+			Hard-GAP-8 MM found path length 8; 566 expanded; 566 necessary; using 2844 states in memory; 0.0008s elapsed
+			Hard-GAP-8 I-MM ; 684 expanded;
+		_IDA*_
+			Hard-GAP-8 IDA* found path length 8; 270243 expanded; 1891701 generated; 0.0558s elapsed
+			Hard-GAP-8 D-A* ; 225866 expanded;
+		_MBBDS_
+			HARD-11 GAP-8 MBBDS(k=1) MBBDS using memory for 2844 states(state size: 32 bits, Memory_percentage_from_MM=1.00) found path length 8; 1032 expanded; 0.0006s elapsed;
+			HARD-11 GAP-8 MBBDS(k=1) MBBDS using memory for 2559 states(state size: 32 bits, Memory_percentage_from_MM=0.90) found path length 8; 1032 expanded; 0.0005s elapsed;
+			HARD-11 GAP-8 MBBDS(k=1) MBBDS using memory for 2133 states(state size: 32 bits, Memory_percentage_from_MM=0.75) found path length 8; 1521 expanded; 0.0007s elapsed;
+			HARD-11 GAP-8 MBBDS(k=1) MBBDS using memory for 1422 states(state size: 32 bits, Memory_percentage_from_MM=0.50) found path length 8; 1521 expanded; 0.0006s elapsed;
+			HARD-11 GAP-8 MBBDS(k=1) MBBDS using memory for 711 states(state size: 32 bits, Memory_percentage_from_MM=0.25) found path length 8; 1521 expanded; 0.0006s elapsed;
+			HARD-11 GAP-8 MBBDS(k=1) MBBDS using memory for 284 states(state size: 32 bits, Memory_percentage_from_MM=0.10) found path length 8; 2038 expanded; 0.0007s elapsed;
+		_IDMM_
+			HARD-11 GAP-8 IDMM found path length 8; 308049 expanded; 2156343 generated; 0.0684s elapsed; Mid state: 7 6 3 5 4 0 1 2 
+			GAP-8 D-MM ; 178269 expanded;
+	Problem 13 of 100
+	Start state: 4 1 0 2 7 6 3 5 
+	Goal state: 0 1 2 3 4 5 6 7 
+	Initial heuristic 1
+		_A*_
+			GAP-8 A* found path length 6; 2544 expanded; 1888 necessary; using 8847 states in memory; 0.0033s elapsed
+			GAP-8 I-A* ; 4887 expanded;
+		_MM_
+			Hard-GAP-8 MM found path length 6; 92 expanded; 92 necessary; using 554 states in memory; 0.0002s elapsed
+			Hard-GAP-8 I-MM ; 110 expanded;
+		_IDA*_
+			Hard-GAP-8 IDA* found path length 6; 6565 expanded; 45955 generated; 0.0014s elapsed
+			Hard-GAP-8 D-A* ; 5521 expanded;
+		_MBBDS_
+			HARD-12 GAP-8 MBBDS(k=1) MBBDS using memory for 554 states(state size: 32 bits, Memory_percentage_from_MM=1.00) found path length 6; 185 expanded; 0.0001s elapsed;
+			HARD-12 GAP-8 MBBDS(k=1) MBBDS using memory for 498 states(state size: 32 bits, Memory_percentage_from_MM=0.90) found path length 6; 250 expanded; 0.0001s elapsed;
+			HARD-12 GAP-8 MBBDS(k=1) MBBDS using memory for 415 states(state size: 32 bits, Memory_percentage_from_MM=0.75) found path length 6; 200 expanded; 0.0001s elapsed;
+			HARD-12 GAP-8 MBBDS(k=1) MBBDS using memory for 277 states(state size: 32 bits, Memory_percentage_from_MM=0.50) found path length 6; 250 expanded; 0.0001s elapsed;
+			HARD-12 GAP-8 MBBDS(k=1) MBBDS using memory for 138 states(state size: 32 bits, Memory_percentage_from_MM=0.25) found path length 6; 250 expanded; 0.0001s elapsed;
+			HARD-12 GAP-8 MBBDS(k=1) MBBDS using memory for 55 states(state size: 32 bits, Memory_percentage_from_MM=0.10) found path length 6; 343 expanded; 0.0001s elapsed;
+		_IDMM_
+			HARD-12 GAP-8 IDMM found path length 6; 7310 expanded; 51170 generated; 0.0016s elapsed; Mid state: 5 4 1 0 2 3 6 7 
+			GAP-8 D-MM ; 4098 expanded;
+	Problem 14 of 100
+	Start state: 1 6 0 7 3 4 5 2 
+	Goal state: 0 1 2 3 4 5 6 7 
+	Initial heuristic 1
+		_A*_
+			GAP-8 A* found path length 7; 8768 expanded; 6973 necessary; using 21083 states in memory; 0.0104s elapsed
+			GAP-8 I-A* ; 18087 expanded;
+		_MM_
+			Hard-GAP-8 MM found path length 7; 207 expanded; 207 necessary; using 1163 states in memory; 0.0003s elapsed
+			Hard-GAP-8 I-MM ; 325 expanded;
+		_IDA*_
+			Hard-GAP-8 IDA* found path length 7; 32772 expanded; 229404 generated; 0.0067s elapsed
+			Hard-GAP-8 D-A* ; 27510 expanded;
+		_MBBDS_
+			HARD-13 GAP-8 MBBDS(k=1) MBBDS using memory for 1163 states(state size: 32 bits, Memory_percentage_from_MM=1.00) found path length 7; 587 expanded; 0.0003s elapsed;
+			HARD-13 GAP-8 MBBDS(k=1) MBBDS using memory for 1046 states(state size: 32 bits, Memory_percentage_from_MM=0.90) found path length 7; 587 expanded; 0.0003s elapsed;
+			HARD-13 GAP-8 MBBDS(k=1) MBBDS using memory for 872 states(state size: 32 bits, Memory_percentage_from_MM=0.75) found path length 7; 587 expanded; 0.0003s elapsed;
+			HARD-13 GAP-8 MBBDS(k=1) MBBDS using memory for 581 states(state size: 32 bits, Memory_percentage_from_MM=0.50) found path length 7; 587 expanded; 0.0002s elapsed;
+			HARD-13 GAP-8 MBBDS(k=1) MBBDS using memory for 290 states(state size: 32 bits, Memory_percentage_from_MM=0.25) found path length 7; 687 expanded; 0.0003s elapsed;
+			HARD-13 GAP-8 MBBDS(k=1) MBBDS using memory for 116 states(state size: 32 bits, Memory_percentage_from_MM=0.10) found path length 7; 1039 expanded; 0.0003s elapsed;
+		_IDMM_
+			HARD-13 GAP-8 IDMM found path length 7; 36671 expanded; 256697 generated; 0.0082s elapsed; Mid state: 5 4 3 2 1 6 0 7 
+			GAP-8 D-MM ; 15913 expanded;
+	Problem 15 of 100
+	Start state: 5 2 7 6 0 3 1 4 
+	Goal state: 0 1 2 3 4 5 6 7 
+	Initial heuristic 1
+		_A*_
+			GAP-8 A* found path length 7; 7199 expanded; 6987 necessary; using 18941 states in memory; 0.0089s elapsed
+			GAP-8 I-A* ; 16534 expanded;
+		_MM_
+			Hard-GAP-8 MM found path length 7; 290 expanded; 290 necessary; using 1545 states in memory; 0.0004s elapsed
+			Hard-GAP-8 I-MM ; 408 expanded;
+		_IDA*_
+			Hard-GAP-8 IDA* found path length 7; 36928 expanded; 258496 generated; 0.0075s elapsed
+			Hard-GAP-8 D-A* ; 30987 expanded;
+		_MBBDS_
+			HARD-14 GAP-8 MBBDS(k=1) MBBDS using memory for 1545 states(state size: 32 bits, Memory_percentage_from_MM=1.00) found path length 7; 599 expanded; 0.0003s elapsed;
+			HARD-14 GAP-8 MBBDS(k=1) MBBDS using memory for 1390 states(state size: 32 bits, Memory_percentage_from_MM=0.90) found path length 7; 599 expanded; 0.0003s elapsed;
+			HARD-14 GAP-8 MBBDS(k=1) MBBDS using memory for 1158 states(state size: 32 bits, Memory_percentage_from_MM=0.75) found path length 7; 599 expanded; 0.0003s elapsed;
+			HARD-14 GAP-8 MBBDS(k=1) MBBDS using memory for 772 states(state size: 32 bits, Memory_percentage_from_MM=0.50) found path length 7; 599 expanded; 0.0003s elapsed;
+			HARD-14 GAP-8 MBBDS(k=1) MBBDS using memory for 386 states(state size: 32 bits, Memory_percentage_from_MM=0.25) found path length 7; 699 expanded; 0.0003s elapsed;
+			HARD-14 GAP-8 MBBDS(k=1) MBBDS using memory for 154 states(state size: 32 bits, Memory_percentage_from_MM=0.10) found path length 7; 961 expanded; 0.0003s elapsed;
+		_IDMM_
+			HARD-14 GAP-8 IDMM found path length 7; 41366 expanded; 289562 generated; 0.0090s elapsed; Mid state: 1 2 5 4 3 0 6 7 
+			GAP-8 D-MM ; 20608 expanded;
+	Problem 16 of 100
+	Start state: 6 4 1 2 0 7 5 3 
+	Goal state: 0 1 2 3 4 5 6 7 
+	Initial heuristic 1
+		_A*_
+			GAP-8 A* found path length 8; 18630 expanded; 18346 necessary; using 33070 states in memory; 0.0215s elapsed
+			GAP-8 I-A* ; 46313 expanded;
+		_MM_
+			Hard-GAP-8 MM found path length 8; 403 expanded; 403 necessary; using 2078 states in memory; 0.0006s elapsed
+			Hard-GAP-8 I-MM ; 521 expanded;
+		_IDA*_
+			Hard-GAP-8 IDA* found path length 8; 140631 expanded; 984417 generated; 0.0286s elapsed
+			Hard-GAP-8 D-A* ; 117907 expanded;
+		_MBBDS_
+			HARD-15 GAP-8 MBBDS(k=1) MBBDS using memory for 2078 states(state size: 32 bits, Memory_percentage_from_MM=1.00) found path length 8; 1460 expanded; 0.0007s elapsed;
+			HARD-15 GAP-8 MBBDS(k=1) MBBDS using memory for 1870 states(state size: 32 bits, Memory_percentage_from_MM=0.90) found path length 8; 1460 expanded; 0.0006s elapsed;
+			HARD-15 GAP-8 MBBDS(k=1) MBBDS using memory for 1558 states(state size: 32 bits, Memory_percentage_from_MM=0.75) found path length 8; 1460 expanded; 0.0006s elapsed;
+			HARD-15 GAP-8 MBBDS(k=1) MBBDS using memory for 1039 states(state size: 32 bits, Memory_percentage_from_MM=0.50) found path length 8; 1460 expanded; 0.0006s elapsed;
+			HARD-15 GAP-8 MBBDS(k=1) MBBDS using memory for 519 states(state size: 32 bits, Memory_percentage_from_MM=0.25) found path length 8; 1460 expanded; 0.0005s elapsed;
+			HARD-15 GAP-8 MBBDS(k=1) MBBDS using memory for 207 states(state size: 32 bits, Memory_percentage_from_MM=0.10) found path length 8; 2164 expanded; 0.0007s elapsed;
+		_IDMM_
+			HARD-15 GAP-8 IDMM found path length 8; 158810 expanded; 1111670 generated; 0.0345s elapsed; Mid state: 5 7 0 1 2 3 4 6 
+			GAP-8 D-MM ; 29030 expanded;
+	Problem 17 of 100
+	Start state: 3 1 6 4 5 2 0 7 
+	Goal state: 0 1 2 3 4 5 6 7 
+	Initial heuristic 0
+		_A*_
+			GAP-8 A* found path length 6; 4226 expanded; 2849 necessary; using 11265 states in memory; 0.0050s elapsed
+			GAP-8 I-A* ; 8157 expanded;
+		_MM_
+			Hard-GAP-8 MM found path length 6; 87 expanded; 87 necessary; using 525 states in memory; 0.0001s elapsed
+			Hard-GAP-8 I-MM ; 105 expanded;
+		_IDA*_
+			Hard-GAP-8 IDA* found path length 0; 1 expanded; 7 generated; 0.0000s elapsed
+			Hard-GAP-8 D-A* ; 1 expanded;
+		_MBBDS_
+			HARD-16 GAP-8 MBBDS(k=1) MBBDS using memory for 525 states(state size: 32 bits, Memory_percentage_from_MM=1.00) found path length 6; 148 expanded; 0.0001s elapsed;
+			HARD-16 GAP-8 MBBDS(k=1) MBBDS using memory for 472 states(state size: 32 bits, Memory_percentage_from_MM=0.90) found path length 6; 265 expanded; 0.0001s elapsed;
+			HARD-16 GAP-8 MBBDS(k=1) MBBDS using memory for 393 states(state size: 32 bits, Memory_percentage_from_MM=0.75) found path length 6; 215 expanded; 0.0001s elapsed;
+			HARD-16 GAP-8 MBBDS(k=1) MBBDS using memory for 262 states(state size: 32 bits, Memory_percentage_from_MM=0.50) found path length 6; 265 expanded; 0.0001s elapsed;
+			HARD-16 GAP-8 MBBDS(k=1) MBBDS using memory for 131 states(state size: 32 bits, Memory_percentage_from_MM=0.25) found path length 6; 265 expanded; 0.0001s elapsed;
+			HARD-16 GAP-8 MBBDS(k=1) MBBDS using memory for 52 states(state size: 32 bits, Memory_percentage_from_MM=0.10) found path length 6; 381 expanded; 0.0001s elapsed;
+		_IDMM_
+			HARD-16 GAP-8 IDMM found path length 6; 27359 expanded; 191513 generated; 0.0060s elapsed; Mid state: 1 6 5 4 3 2 0 7 
+			GAP-8 D-MM ; 19087 expanded;
+	Problem 18 of 100
+	Start state: 1 3 5 7 4 2 6 0 
+	Goal state: 0 1 2 3 4 5 6 7 
+	Initial heuristic 1
+		_A*_
+			GAP-8 A* found path length 8; 19562 expanded; 18322 necessary; using 33752 states in memory; 0.0219s elapsed
+			GAP-8 I-A* ; 47203 expanded;
+		_MM_
+			Hard-GAP-8 MM found path length 8; 358 expanded; 358 necessary; using 1834 states in memory; 0.0005s elapsed
+			Hard-GAP-8 I-MM ; 476 expanded;
+		_IDA*_
+			Hard-GAP-8 IDA* found path length 8; 250270 expanded; 1751890 generated; 0.0511s elapsed
+			Hard-GAP-8 D-A* ; 209666 expanded;
+		_MBBDS_
+			HARD-17 GAP-8 MBBDS(k=1) MBBDS using memory for 1834 states(state size: 32 bits, Memory_percentage_from_MM=1.00) found path length 8; 1516 expanded; 0.0007s elapsed;
+			HARD-17 GAP-8 MBBDS(k=1) MBBDS using memory for 1650 states(state size: 32 bits, Memory_percentage_from_MM=0.90) found path length 8; 1516 expanded; 0.0006s elapsed;
+			HARD-17 GAP-8 MBBDS(k=1) MBBDS using memory for 1375 states(state size: 32 bits, Memory_percentage_from_MM=0.75) found path length 8; 1516 expanded; 0.0006s elapsed;
+			HARD-17 GAP-8 MBBDS(k=1) MBBDS using memory for 917 states(state size: 32 bits, Memory_percentage_from_MM=0.50) found path length 8; 1516 expanded; 0.0006s elapsed;
+			HARD-17 GAP-8 MBBDS(k=1) MBBDS using memory for 458 states(state size: 32 bits, Memory_percentage_from_MM=0.25) found path length 8; 1616 expanded; 0.0006s elapsed;
+			HARD-17 GAP-8 MBBDS(k=1) MBBDS using memory for 183 states(state size: 32 bits, Memory_percentage_from_MM=0.10) found path length 8; 2270 expanded; 0.0007s elapsed;
+		_IDMM_
+			HARD-17 GAP-8 IDMM found path length 8; 303451 expanded; 2124157 generated; 0.0661s elapsed; Mid state: 3 5 6 7 4 2 1 0 
+			GAP-8 D-MM ; 158545 expanded;
+	Problem 19 of 100
+	Start state: 4 6 0 7 3 1 5 2 
+	Goal state: 0 1 2 3 4 5 6 7 
+	Initial heuristic 1
+		_A*_
+			GAP-8 A* found path length 8; 19030 expanded; 18322 necessary; using 33361 states in memory; 0.0215s elapsed
+			GAP-8 I-A* ; 46671 expanded;
+		_MM_
+			Hard-GAP-8 MM found path length 8; 382 expanded; 382 necessary; using 1965 states in memory; 0.0006s elapsed
+			Hard-GAP-8 I-MM ; 500 expanded;
+		_IDA*_
+			Hard-GAP-8 IDA* found path length 8; 306360 expanded; 2144520 generated; 0.0637s elapsed
+			Hard-GAP-8 D-A* ; 256742 expanded;
+		_MBBDS_
+			HARD-18 GAP-8 MBBDS(k=1) MBBDS using memory for 1965 states(state size: 32 bits, Memory_percentage_from_MM=1.00) found path length 8; 1546 expanded; 0.0007s elapsed;
+			HARD-18 GAP-8 MBBDS(k=1) MBBDS using memory for 1768 states(state size: 32 bits, Memory_percentage_from_MM=0.90) found path length 8; 1546 expanded; 0.0007s elapsed;
+			HARD-18 GAP-8 MBBDS(k=1) MBBDS using memory for 1473 states(state size: 32 bits, Memory_percentage_from_MM=0.75) found path length 8; 1546 expanded; 0.0006s elapsed;
+			HARD-18 GAP-8 MBBDS(k=1) MBBDS using memory for 982 states(state size: 32 bits, Memory_percentage_from_MM=0.50) found path length 8; 1546 expanded; 0.0006s elapsed;
+			HARD-18 GAP-8 MBBDS(k=1) MBBDS using memory for 491 states(state size: 32 bits, Memory_percentage_from_MM=0.25) found path length 8; 1646 expanded; 0.0006s elapsed;
+			HARD-18 GAP-8 MBBDS(k=1) MBBDS using memory for 196 states(state size: 32 bits, Memory_percentage_from_MM=0.10) found path length 8; 2250 expanded; 0.0008s elapsed;
+		_IDMM_
+			HARD-18 GAP-8 IDMM found path length 8; 347207 expanded; 2430449 generated; 0.0757s elapsed; Mid state: 7 0 6 5 4 3 1 2 
+			GAP-8 D-MM ; 217427 expanded;
+	Problem 20 of 100
+	Start state: 3 7 4 2 0 5 1 6 
+	Goal state: 0 1 2 3 4 5 6 7 
+	Initial heuristic 1
+		_A*_
+			GAP-8 A* found path length 8; 18571 expanded; 18335 necessary; using 33002 states in memory; 0.0210s elapsed
+			GAP-8 I-A* ; 46205 expanded;
+		_MM_
+			Hard-GAP-8 MM found path length 8; 469 expanded; 469 necessary; using 2407 states in memory; 0.0007s elapsed
+			Hard-GAP-8 I-MM ; 587 expanded;
+		_IDA*_
+			Hard-GAP-8 IDA* found path length 8; 596527 expanded; 4175689 generated; 0.1226s elapsed
+			Hard-GAP-8 D-A* ; 499884 expanded;
+		_MBBDS_
+			HARD-19 GAP-8 MBBDS(k=1) MBBDS using memory for 2407 states(state size: 32 bits, Memory_percentage_from_MM=1.00) found path length 8; 1698 expanded; 0.0008s elapsed;
+			HARD-19 GAP-8 MBBDS(k=1) MBBDS using memory for 2166 states(state size: 32 bits, Memory_percentage_from_MM=0.90) found path length 8; 1698 expanded; 0.0007s elapsed;
+			HARD-19 GAP-8 MBBDS(k=1) MBBDS using memory for 1805 states(state size: 32 bits, Memory_percentage_from_MM=0.75) found path length 8; 1698 expanded; 0.0007s elapsed;
+			HARD-19 GAP-8 MBBDS(k=1) MBBDS using memory for 1203 states(state size: 32 bits, Memory_percentage_from_MM=0.50) found path length 8; 1698 expanded; 0.0007s elapsed;
+			HARD-19 GAP-8 MBBDS(k=1) MBBDS using memory for 601 states(state size: 32 bits, Memory_percentage_from_MM=0.25) found path length 8; 1698 expanded; 0.0006s elapsed;
+			HARD-19 GAP-8 MBBDS(k=1) MBBDS using memory for 240 states(state size: 32 bits, Memory_percentage_from_MM=0.10) found path length 8; 1990 expanded; 0.0007s elapsed;
+		_IDMM_
+			HARD-19 GAP-8 IDMM found path length 8; 679249 expanded; 4754743 generated; 0.1464s elapsed; Mid state: 4 3 2 0 5 1 6 7 
+			GAP-8 D-MM ; 549469 expanded;
+	Problem 21 of 100
+	Start state: 3 7 5 4 0 2 6 1 
+	Goal state: 0 1 2 3 4 5 6 7 
+	Initial heuristic 1
+		_A*_
+			GAP-8 A* found path length 7; 8511 expanded; 6965 necessary; using 20745 states in memory; 0.0101s elapsed
+			GAP-8 I-A* ; 17810 expanded;
+		_MM_
+			Hard-GAP-8 MM found path length 7; 269 expanded; 269 necessary; using 1458 states in memory; 0.0004s elapsed
+			Hard-GAP-8 I-MM ; 387 expanded;
+		_IDA*_
+			Hard-GAP-8 IDA* found path length 7; 62144 expanded; 435008 generated; 0.0128s elapsed
+			Hard-GAP-8 D-A* ; 52165 expanded;
+		_MBBDS_
+			HARD-20 GAP-8 MBBDS(k=1) MBBDS using memory for 1458 states(state size: 32 bits, Memory_percentage_from_MM=1.00) found path length 7; 681 expanded; 0.0003s elapsed;
+			HARD-20 GAP-8 MBBDS(k=1) MBBDS using memory for 1312 states(state size: 32 bits, Memory_percentage_from_MM=0.90) found path length 7; 681 expanded; 0.0003s elapsed;
+			HARD-20 GAP-8 MBBDS(k=1) MBBDS using memory for 1093 states(state size: 32 bits, Memory_percentage_from_MM=0.75) found path length 7; 681 expanded; 0.0003s elapsed;
+			HARD-20 GAP-8 MBBDS(k=1) MBBDS using memory for 729 states(state size: 32 bits, Memory_percentage_from_MM=0.50) found path length 7; 681 expanded; 0.0003s elapsed;
+			HARD-20 GAP-8 MBBDS(k=1) MBBDS using memory for 364 states(state size: 32 bits, Memory_percentage_from_MM=0.25) found path length 7; 781 expanded; 0.0003s elapsed;
+			HARD-20 GAP-8 MBBDS(k=1) MBBDS using memory for 145 states(state size: 32 bits, Memory_percentage_from_MM=0.10) found path length 7; 972 expanded; 0.0003s elapsed;
+		_IDMM_
+			HARD-20 GAP-8 IDMM found path length 7; 70359 expanded; 492513 generated; 0.0153s elapsed; Mid state: 1 0 4 5 6 2 3 7 
+			GAP-8 D-MM ; 49601 expanded;
+	Problem 22 of 100
+	Start state: 1 0 5 3 7 2 4 6 
+	Goal state: 0 1 2 3 4 5 6 7 
+	Initial heuristic 1
+		_A*_
+			GAP-8 A* found path length 7; 7554 expanded; 6983 necessary; using 19608 states in memory; 0.0092s elapsed
+			GAP-8 I-A* ; 16880 expanded;
+		_MM_
+			Hard-GAP-8 MM found path length 7; 177 expanded; 177 necessary; using 1015 states in memory; 0.0003s elapsed
+			Hard-GAP-8 I-MM ; 295 expanded;
+		_IDA*_
+			Hard-GAP-8 IDA* found path length 7; 59175 expanded; 414225 generated; 0.0121s elapsed
+			Hard-GAP-8 D-A* ; 49661 expanded;
+		_MBBDS_
+			HARD-21 GAP-8 MBBDS(k=1) MBBDS using memory for 1015 states(state size: 32 bits, Memory_percentage_from_MM=1.00) found path length 7; 671 expanded; 0.0003s elapsed;
+			HARD-21 GAP-8 MBBDS(k=1) MBBDS using memory for 913 states(state size: 32 bits, Memory_percentage_from_MM=0.90) found path length 7; 671 expanded; 0.0003s elapsed;
+			HARD-21 GAP-8 MBBDS(k=1) MBBDS using memory for 761 states(state size: 32 bits, Memory_percentage_from_MM=0.75) found path length 7; 671 expanded; 0.0003s elapsed;
+			HARD-21 GAP-8 MBBDS(k=1) MBBDS using memory for 507 states(state size: 32 bits, Memory_percentage_from_MM=0.50) found path length 7; 671 expanded; 0.0003s elapsed;
+			HARD-21 GAP-8 MBBDS(k=1) MBBDS using memory for 253 states(state size: 32 bits, Memory_percentage_from_MM=0.25) found path length 7; 771 expanded; 0.0003s elapsed;
+			HARD-21 GAP-8 MBBDS(k=1) MBBDS using memory for 101 states(state size: 32 bits, Memory_percentage_from_MM=0.10) found path length 7; 1123 expanded; 0.0004s elapsed;
+		_IDMM_
+			HARD-21 GAP-8 IDMM found path length 7; 66560 expanded; 465920 generated; 0.0145s elapsed; Mid state: 2 1 0 5 3 4 6 7 
+			GAP-8 D-MM ; 45802 expanded;
+	Problem 23 of 100
+	Start state: 2 0 3 5 6 1 4 7 
+	Goal state: 0 1 2 3 4 5 6 7 
+	Initial heuristic 0
+		_A*_
+			GAP-8 A* found path length 6; 3185 expanded; 2849 necessary; using 9721 states in memory; 0.0039s elapsed
+			GAP-8 I-A* ; 7116 expanded;
+		_MM_
+			Hard-GAP-8 MM found path length 6; 65 expanded; 65 necessary; using 393 states in memory; 0.0001s elapsed
+			Hard-GAP-8 I-MM ; 83 expanded;
+		_IDA*_
+			Hard-GAP-8 IDA* found path length 0; 1 expanded; 7 generated; 0.0000s elapsed
+			Hard-GAP-8 D-A* ; 1 expanded;
+		_MBBDS_
+			HARD-22 GAP-8 MBBDS(k=1) MBBDS using memory for 393 states(state size: 32 bits, Memory_percentage_from_MM=1.00) found path length 6; 261 expanded; 0.0001s elapsed;
+			HARD-22 GAP-8 MBBDS(k=1) MBBDS using memory for 353 states(state size: 32 bits, Memory_percentage_from_MM=0.90) found path length 6; 261 expanded; 0.0001s elapsed;
+			HARD-22 GAP-8 MBBDS(k=1) MBBDS using memory for 294 states(state size: 32 bits, Memory_percentage_from_MM=0.75) found path length 6; 261 expanded; 0.0001s elapsed;
+			HARD-22 GAP-8 MBBDS(k=1) MBBDS using memory for 196 states(state size: 32 bits, Memory_percentage_from_MM=0.50) found path length 6; 261 expanded; 0.0001s elapsed;
+			HARD-22 GAP-8 MBBDS(k=1) MBBDS using memory for 98 states(state size: 32 bits, Memory_percentage_from_MM=0.25) found path length 6; 261 expanded; 0.0001s elapsed;
+			HARD-22 GAP-8 MBBDS(k=1) MBBDS using memory for 39 states(state size: 32 bits, Memory_percentage_from_MM=0.10) found path length 6; 369 expanded; 0.0001s elapsed;
+		_IDMM_
+			HARD-22 GAP-8 IDMM found path length 6; 22747 expanded; 159229 generated; 0.0049s elapsed; Mid state: 3 0 2 1 4 5 6 7 
+			GAP-8 D-MM ; 14475 expanded;
+	Problem 24 of 100
+	Start state: 6 5 0 2 1 4 3 7 
+	Goal state: 0 1 2 3 4 5 6 7 
+	Initial heuristic 0
+		_A*_
+			GAP-8 A* found path length 5; 1427 expanded; 844 necessary; using 5062 states in memory; 0.0018s elapsed
+			GAP-8 I-A* ; 2510 expanded;
+		_MM_
+			Hard-GAP-8 MM found path length 5; 19 expanded; 19 necessary; using 118 states in memory; 0.0000s elapsed
+			Hard-GAP-8 I-MM ; 37 expanded;
+		_IDA*_
+			Hard-GAP-8 IDA* found path length 0; 1 expanded; 7 generated; 0.0000s elapsed
+			Hard-GAP-8 D-A* ; 1 expanded;
+		_MBBDS_
+			HARD-23 GAP-8 MBBDS(k=1) MBBDS using memory for 118 states(state size: 32 bits, Memory_percentage_from_MM=1.00) found path length 5; 100 expanded; 0.0000s elapsed;
+			HARD-23 GAP-8 MBBDS(k=1) MBBDS using memory for 106 states(state size: 32 bits, Memory_percentage_from_MM=0.90) found path length 5; 100 expanded; 0.0000s elapsed;
+			HARD-23 GAP-8 MBBDS(k=1) MBBDS using memory for 88 states(state size: 32 bits, Memory_percentage_from_MM=0.75) found path length 5; 100 expanded; 0.0000s elapsed;
+			HARD-23 GAP-8 MBBDS(k=1) MBBDS using memory for 59 states(state size: 32 bits, Memory_percentage_from_MM=0.50) found path length 5; 100 expanded; 0.0000s elapsed;
+			HARD-23 GAP-8 MBBDS(k=1) MBBDS using memory for 29 states(state size: 32 bits, Memory_percentage_from_MM=0.25) found path length 5; 157 expanded; 0.0001s elapsed;
+			HARD-23 GAP-8 MBBDS(k=1) MBBDS using memory for 11 states(state size: 32 bits, Memory_percentage_from_MM=0.10) found path length 5; 240 expanded; 0.0001s elapsed;
+		_IDMM_
+			HARD-23 GAP-8 IDMM found path length 5; 2684 expanded; 18788 generated; 0.0006s elapsed; Mid state: 2 3 4 1 0 5 6 7 
+			GAP-8 D-MM ; 1140 expanded;
+	Problem 25 of 100
+	Start state: 3 2 0 1 4 7 5 6 
+	Goal state: 0 1 2 3 4 5 6 7 
+	Initial heuristic 1
+		_A*_
+			GAP-8 A* found path length 6; 2578 expanded; 1883 necessary; using 8951 states in memory; 0.0032s elapsed
+			GAP-8 I-A* ; 4915 expanded;
+		_MM_
+			Hard-GAP-8 MM found path length 6; 71 expanded; 71 necessary; using 429 states in memory; 0.0001s elapsed
+			Hard-GAP-8 I-MM ; 89 expanded;
+		_IDA*_
+			Hard-GAP-8 IDA* found path length 6; 5087 expanded; 35609 generated; 0.0011s elapsed
+			Hard-GAP-8 D-A* ; 4279 expanded;
+		_MBBDS_
+			HARD-24 GAP-8 MBBDS(k=1) MBBDS using memory for 429 states(state size: 32 bits, Memory_percentage_from_MM=1.00) found path length 6; 244 expanded; 0.0001s elapsed;
+			HARD-24 GAP-8 MBBDS(k=1) MBBDS using memory for 386 states(state size: 32 bits, Memory_percentage_from_MM=0.90) found path length 6; 194 expanded; 0.0001s elapsed;
+			HARD-24 GAP-8 MBBDS(k=1) MBBDS using memory for 321 states(state size: 32 bits, Memory_percentage_from_MM=0.75) found path length 6; 244 expanded; 0.0001s elapsed;
+			HARD-24 GAP-8 MBBDS(k=1) MBBDS using memory for 214 states(state size: 32 bits, Memory_percentage_from_MM=0.50) found path length 6; 244 expanded; 0.0001s elapsed;
+			HARD-24 GAP-8 MBBDS(k=1) MBBDS using memory for 107 states(state size: 32 bits, Memory_percentage_from_MM=0.25) found path length 6; 293 expanded; 0.0001s elapsed;
+			HARD-24 GAP-8 MBBDS(k=1) MBBDS using memory for 42 states(state size: 32 bits, Memory_percentage_from_MM=0.10) found path length 6; 401 expanded; 0.0001s elapsed;
+		_IDMM_
+			HARD-24 GAP-8 IDMM found path length 6; 5606 expanded; 39242 generated; 0.0012s elapsed; Mid state: 7 6 5 4 1 0 2 3 
+			GAP-8 D-MM ; 2394 expanded;
+	Problem 26 of 100
+	Start state: 2 4 0 7 1 3 5 6 
+	Goal state: 0 1 2 3 4 5 6 7 
+	Initial heuristic 1
+		_A*_
+			GAP-8 A* found path length 7; 8607 expanded; 6973 necessary; using 20891 states in memory; 0.0101s elapsed
+			GAP-8 I-A* ; 17926 expanded;
+		_MM_
+			Hard-GAP-8 MM found path length 7; 140 expanded; 140 necessary; using 822 states in memory; 0.0002s elapsed
+			Hard-GAP-8 I-MM ; 258 expanded;
+		_IDA*_
+			Hard-GAP-8 IDA* found path length 7; 66201 expanded; 463407 generated; 0.0137s elapsed
+			Hard-GAP-8 D-A* ; 55579 expanded;
+		_MBBDS_
+			HARD-25 GAP-8 MBBDS(k=1) MBBDS using memory for 822 states(state size: 32 bits, Memory_percentage_from_MM=1.00) found path length 7; 694 expanded; 0.0003s elapsed;
+			HARD-25 GAP-8 MBBDS(k=1) MBBDS using memory for 739 states(state size: 32 bits, Memory_percentage_from_MM=0.90) found path length 7; 694 expanded; 0.0003s elapsed;
+			HARD-25 GAP-8 MBBDS(k=1) MBBDS using memory for 616 states(state size: 32 bits, Memory_percentage_from_MM=0.75) found path length 7; 694 expanded; 0.0003s elapsed;
+			HARD-25 GAP-8 MBBDS(k=1) MBBDS using memory for 411 states(state size: 32 bits, Memory_percentage_from_MM=0.50) found path length 7; 794 expanded; 0.0003s elapsed;
+			HARD-25 GAP-8 MBBDS(k=1) MBBDS using memory for 205 states(state size: 32 bits, Memory_percentage_from_MM=0.25) found path length 7; 794 expanded; 0.0003s elapsed;
+			HARD-25 GAP-8 MBBDS(k=1) MBBDS using memory for 82 states(state size: 32 bits, Memory_percentage_from_MM=0.10) found path length 7; 1154 expanded; 0.0004s elapsed;
+		_IDMM_
+			HARD-25 GAP-8 IDMM found path length 7; 74286 expanded; 520002 generated; 0.0162s elapsed; Mid state: 0 7 1 2 3 4 5 6 
+			GAP-8 D-MM ; 53528 expanded;
+	Problem 27 of 100
+	Start state: 0 5 6 3 4 1 7 2 
+	Goal state: 0 1 2 3 4 5 6 7 
+	Initial heuristic 1
+		_A*_
+			GAP-8 A* found path length 7; 8136 expanded; 6977 necessary; using 20378 states in memory; 0.0097s elapsed
+			GAP-8 I-A* ; 17434 expanded;
+		_MM_
+			Hard-GAP-8 MM found path length 7; 113 expanded; 113 necessary; using 676 states in memory; 0.0002s elapsed
+			Hard-GAP-8 I-MM ; 231 expanded;
+		_IDA*_
+			Hard-GAP-8 IDA* found path length 7; 34800 expanded; 243600 generated; 0.0071s elapsed
+			Hard-GAP-8 D-A* ; 29132 expanded;
+		_MBBDS_
+			HARD-26 GAP-8 MBBDS(k=1) MBBDS using memory for 676 states(state size: 32 bits, Memory_percentage_from_MM=1.00) found path length 7; 588 expanded; 0.0003s elapsed;
+			HARD-26 GAP-8 MBBDS(k=1) MBBDS using memory for 608 states(state size: 32 bits, Memory_percentage_from_MM=0.90) found path length 7; 588 expanded; 0.0002s elapsed;
+			HARD-26 GAP-8 MBBDS(k=1) MBBDS using memory for 507 states(state size: 32 bits, Memory_percentage_from_MM=0.75) found path length 7; 588 expanded; 0.0003s elapsed;
+			HARD-26 GAP-8 MBBDS(k=1) MBBDS using memory for 338 states(state size: 32 bits, Memory_percentage_from_MM=0.50) found path length 7; 638 expanded; 0.0003s elapsed;
+			HARD-26 GAP-8 MBBDS(k=1) MBBDS using memory for 169 states(state size: 32 bits, Memory_percentage_from_MM=0.25) found path length 7; 964 expanded; 0.0003s elapsed;
+			HARD-26 GAP-8 MBBDS(k=1) MBBDS using memory for 67 states(state size: 32 bits, Memory_percentage_from_MM=0.10) found path length 7; 1450 expanded; 0.0005s elapsed;
+		_IDMM_
+			HARD-26 GAP-8 IDMM found path length 7; 42207 expanded; 295449 generated; 0.0093s elapsed; Mid state: 1 4 3 2 0 5 6 7 
+			GAP-8 D-MM ; 21004 expanded;
+	Problem 28 of 100
+	Start state: 1 0 5 3 6 7 2 4 
+	Goal state: 0 1 2 3 4 5 6 7 
+	Initial heuristic 1
+		_A*_
+			GAP-8 A* found path length 6; 2032 expanded; 1883 necessary; using 7511 states in memory; 0.0026s elapsed
+			GAP-8 I-A* ; 4369 expanded;
+		_MM_
+			Hard-GAP-8 MM found path length 6; 62 expanded; 62 necessary; using 375 states in memory; 0.0001s elapsed
+			Hard-GAP-8 I-MM ; 80 expanded;
+		_IDA*_
+			Hard-GAP-8 IDA* found path length 6; 7702 expanded; 53914 generated; 0.0016s elapsed
+			Hard-GAP-8 D-A* ; 6463 expanded;
+		_MBBDS_
+			HARD-27 GAP-8 MBBDS(k=1) MBBDS using memory for 375 states(state size: 32 bits, Memory_percentage_from_MM=1.00) found path length 6; 253 expanded; 0.0001s elapsed;
+			HARD-27 GAP-8 MBBDS(k=1) MBBDS using memory for 337 states(state size: 32 bits, Memory_percentage_from_MM=0.90) found path length 6; 253 expanded; 0.0001s elapsed;
+			HARD-27 GAP-8 MBBDS(k=1) MBBDS using memory for 281 states(state size: 32 bits, Memory_percentage_from_MM=0.75) found path length 6; 253 expanded; 0.0001s elapsed;
+			HARD-27 GAP-8 MBBDS(k=1) MBBDS using memory for 187 states(state size: 32 bits, Memory_percentage_from_MM=0.50) found path length 6; 253 expanded; 0.0001s elapsed;
+			HARD-27 GAP-8 MBBDS(k=1) MBBDS using memory for 93 states(state size: 32 bits, Memory_percentage_from_MM=0.25) found path length 6; 315 expanded; 0.0001s elapsed;
+			HARD-27 GAP-8 MBBDS(k=1) MBBDS using memory for 37 states(state size: 32 bits, Memory_percentage_from_MM=0.10) found path length 6; 361 expanded; 0.0001s elapsed;
+		_IDMM_
+			HARD-27 GAP-8 IDMM found path length 6; 8505 expanded; 59535 generated; 0.0019s elapsed; Mid state: 5 0 1 2 4 3 6 7 
+			GAP-8 D-MM ; 5293 expanded;
+	Problem 29 of 100
+	Start state: 4 0 3 5 6 2 7 1 
+	Goal state: 0 1 2 3 4 5 6 7 
+	Initial heuristic 1
+		_A*_
+			GAP-8 A* found path length 7; 8016 expanded; 6977 necessary; using 20221 states in memory; 0.0094s elapsed
+			GAP-8 I-A* ; 17314 expanded;
+		_MM_
+			Hard-GAP-8 MM found path length 7; 142 expanded; 142 necessary; using 832 states in memory; 0.0002s elapsed
+			Hard-GAP-8 I-MM ; 260 expanded;
+		_IDA*_
+			Hard-GAP-8 IDA* found path length 7; 95771 expanded; 670397 generated; 0.0196s elapsed
+			Hard-GAP-8 D-A* ; 80249 expanded;
+		_MBBDS_
+			HARD-28 GAP-8 MBBDS(k=1) MBBDS using memory for 832 states(state size: 32 bits, Memory_percentage_from_MM=1.00) found path length 7; 780 expanded; 0.0003s elapsed;
+			HARD-28 GAP-8 MBBDS(k=1) MBBDS using memory for 748 states(state size: 32 bits, Memory_percentage_from_MM=0.90) found path length 7; 780 expanded; 0.0003s elapsed;
+			HARD-28 GAP-8 MBBDS(k=1) MBBDS using memory for 624 states(state size: 32 bits, Memory_percentage_from_MM=0.75) found path length 7; 780 expanded; 0.0003s elapsed;
+			HARD-28 GAP-8 MBBDS(k=1) MBBDS using memory for 416 states(state size: 32 bits, Memory_percentage_from_MM=0.50) found path length 7; 880 expanded; 0.0004s elapsed;
+			HARD-28 GAP-8 MBBDS(k=1) MBBDS using memory for 208 states(state size: 32 bits, Memory_percentage_from_MM=0.25) found path length 7; 880 expanded; 0.0003s elapsed;
+			HARD-28 GAP-8 MBBDS(k=1) MBBDS using memory for 83 states(state size: 32 bits, Memory_percentage_from_MM=0.10) found path length 7; 1298 expanded; 0.0004s elapsed;
+		_IDMM_
+			HARD-28 GAP-8 IDMM found path length 7; 107999 expanded; 755993 generated; 0.0235s elapsed; Mid state: 7 6 5 4 0 3 2 1 
+			GAP-8 D-MM ; 87241 expanded;
+	Problem 30 of 100
+	Start state: 0 2 4 7 5 3 1 6 
+	Goal state: 0 1 2 3 4 5 6 7 
+	Initial heuristic 1
+		_A*_
+			GAP-8 A* found path length 8; 18683 expanded; 18322 necessary; using 33143 states in memory; 0.0209s elapsed
+			GAP-8 I-A* ; 46324 expanded;
+		_MM_
+			Hard-GAP-8 MM found path length 8; 465 expanded; 465 necessary; using 2389 states in memory; 0.0007s elapsed
+			Hard-GAP-8 I-MM ; 583 expanded;
+		_IDA*_
+			Hard-GAP-8 IDA* found path length 8; 331123 expanded; 2317861 generated; 0.0674s elapsed
+			Hard-GAP-8 D-A* ; 277547 expanded;
+		_MBBDS_
+			HARD-29 GAP-8 MBBDS(k=1) MBBDS using memory for 2389 states(state size: 32 bits, Memory_percentage_from_MM=1.00) found path length 8; 1559 expanded; 0.0007s elapsed;
+			HARD-29 GAP-8 MBBDS(k=1) MBBDS using memory for 2150 states(state size: 32 bits, Memory_percentage_from_MM=0.90) found path length 8; 1559 expanded; 0.0007s elapsed;
+			HARD-29 GAP-8 MBBDS(k=1) MBBDS using memory for 1791 states(state size: 32 bits, Memory_percentage_from_MM=0.75) found path length 8; 1559 expanded; 0.0007s elapsed;
+			HARD-29 GAP-8 MBBDS(k=1) MBBDS using memory for 1194 states(state size: 32 bits, Memory_percentage_from_MM=0.50) found path length 8; 1559 expanded; 0.0006s elapsed;
+			HARD-29 GAP-8 MBBDS(k=1) MBBDS using memory for 597 states(state size: 32 bits, Memory_percentage_from_MM=0.25) found path length 8; 1559 expanded; 0.0006s elapsed;
+			HARD-29 GAP-8 MBBDS(k=1) MBBDS using memory for 238 states(state size: 32 bits, Memory_percentage_from_MM=0.10) found path length 8; 2263 expanded; 0.0008s elapsed;
+		_IDMM_
+			HARD-29 GAP-8 IDMM found path length 8; 389541 expanded; 2726787 generated; 0.0853s elapsed; Mid state: 7 5 4 3 2 0 1 6 
+			GAP-8 D-MM ; 257696 expanded;
+	Problem 31 of 100
+	Start state: 2 0 7 6 5 3 1 4 
+	Goal state: 0 1 2 3 4 5 6 7 
+	Initial heuristic 1
+		_A*_
+			GAP-8 A* found path length 7; 7066 expanded; 6987 necessary; using 18672 states in memory; 0.0086s elapsed
+			GAP-8 I-A* ; 16401 expanded;
+		_MM_
+			Hard-GAP-8 MM found path length 7; 107 expanded; 107 necessary; using 643 states in memory; 0.0002s elapsed
+			Hard-GAP-8 I-MM ; 225 expanded;
+		_IDA*_
+			Hard-GAP-8 IDA* found path length 7; 29643 expanded; 207501 generated; 0.0060s elapsed
+			Hard-GAP-8 D-A* ; 24882 expanded;
+		_MBBDS_
+			HARD-30 GAP-8 MBBDS(k=1) MBBDS using memory for 643 states(state size: 32 bits, Memory_percentage_from_MM=1.00) found path length 7; 575 expanded; 0.0003s elapsed;
+			HARD-30 GAP-8 MBBDS(k=1) MBBDS using memory for 578 states(state size: 32 bits, Memory_percentage_from_MM=0.90) found path length 7; 575 expanded; 0.0002s elapsed;
+			HARD-30 GAP-8 MBBDS(k=1) MBBDS using memory for 482 states(state size: 32 bits, Memory_percentage_from_MM=0.75) found path length 7; 675 expanded; 0.0003s elapsed;
+			HARD-30 GAP-8 MBBDS(k=1) MBBDS using memory for 321 states(state size: 32 bits, Memory_percentage_from_MM=0.50) found path length 7; 675 expanded; 0.0003s elapsed;
+			HARD-30 GAP-8 MBBDS(k=1) MBBDS using memory for 160 states(state size: 32 bits, Memory_percentage_from_MM=0.25) found path length 7; 943 expanded; 0.0003s elapsed;
+			HARD-30 GAP-8 MBBDS(k=1) MBBDS using memory for 64 states(state size: 32 bits, Memory_percentage_from_MM=0.10) found path length 7; 1437 expanded; 0.0005s elapsed;
+		_IDMM_
+			HARD-30 GAP-8 IDMM found path length 7; 33328 expanded; 233296 generated; 0.0073s elapsed; Mid state: 7 6 5 4 3 1 0 2 
+			GAP-8 D-MM ; 12570 expanded;
+	Problem 32 of 100
+	Start state: 3 6 5 1 0 2 7 4 
+	Goal state: 0 1 2 3 4 5 6 7 
+	Initial heuristic 1
+		_A*_
+			GAP-8 A* found path length 7; 7033 expanded; 6977 necessary; using 18607 states in memory; 0.0085s elapsed
+			GAP-8 I-A* ; 16331 expanded;
+		_MM_
+			Hard-GAP-8 MM found path length 7; 204 expanded; 204 necessary; using 1151 states in memory; 0.0003s elapsed
+			Hard-GAP-8 I-MM ; 322 expanded;
+		_IDA*_
+			Hard-GAP-8 IDA* found path length 7; 32242 expanded; 225694 generated; 0.0066s elapsed
+			Hard-GAP-8 D-A* ; 27060 expanded;
+		_MBBDS_
+			HARD-31 GAP-8 MBBDS(k=1) MBBDS using memory for 1151 states(state size: 32 bits, Memory_percentage_from_MM=1.00) found path length 7; 585 expanded; 0.0003s elapsed;
+			HARD-31 GAP-8 MBBDS(k=1) MBBDS using memory for 1035 states(state size: 32 bits, Memory_percentage_from_MM=0.90) found path length 7; 585 expanded; 0.0003s elapsed;
+			HARD-31 GAP-8 MBBDS(k=1) MBBDS using memory for 863 states(state size: 32 bits, Memory_percentage_from_MM=0.75) found path length 7; 585 expanded; 0.0003s elapsed;
+			HARD-31 GAP-8 MBBDS(k=1) MBBDS using memory for 575 states(state size: 32 bits, Memory_percentage_from_MM=0.50) found path length 7; 585 expanded; 0.0002s elapsed;
+			HARD-31 GAP-8 MBBDS(k=1) MBBDS using memory for 287 states(state size: 32 bits, Memory_percentage_from_MM=0.25) found path length 7; 685 expanded; 0.0003s elapsed;
+			HARD-31 GAP-8 MBBDS(k=1) MBBDS using memory for 115 states(state size: 32 bits, Memory_percentage_from_MM=0.10) found path length 7; 1037 expanded; 0.0003s elapsed;
+		_IDMM_
+			HARD-31 GAP-8 IDMM found path length 7; 36358 expanded; 254506 generated; 0.0080s elapsed; Mid state: 6 5 1 0 2 3 4 7 
+			GAP-8 D-MM ; 15600 expanded;
+	Problem 33 of 100
+	Start state: 1 6 2 7 0 5 3 4 
+	Goal state: 0 1 2 3 4 5 6 7 
+	Initial heuristic 1
+		_A*_
+			GAP-8 A* found path length 7; 7732 expanded; 6973 necessary; using 19839 states in memory; 0.0093s elapsed
+			GAP-8 I-A* ; 17051 expanded;
+		_MM_
+			Hard-GAP-8 MM found path length 7; 237 expanded; 237 necessary; using 1306 states in memory; 0.0004s elapsed
+			Hard-GAP-8 I-MM ; 355 expanded;
+		_IDA*_
+			Hard-GAP-8 IDA* found path length 7; 86835 expanded; 607845 generated; 0.0176s elapsed
+			Hard-GAP-8 D-A* ; 72757 expanded;
+		_MBBDS_
+			HARD-32 GAP-8 MBBDS(k=1) MBBDS using memory for 1306 states(state size: 32 bits, Memory_percentage_from_MM=1.00) found path length 7; 751 expanded; 0.0004s elapsed;
+			HARD-32 GAP-8 MBBDS(k=1) MBBDS using memory for 1175 states(state size: 32 bits, Memory_percentage_from_MM=0.90) found path length 7; 751 expanded; 0.0003s elapsed;
+			HARD-32 GAP-8 MBBDS(k=1) MBBDS using memory for 979 states(state size: 32 bits, Memory_percentage_from_MM=0.75) found path length 7; 751 expanded; 0.0003s elapsed;
+			HARD-32 GAP-8 MBBDS(k=1) MBBDS using memory for 653 states(state size: 32 bits, Memory_percentage_from_MM=0.50) found path length 7; 751 expanded; 0.0003s elapsed;
+			HARD-32 GAP-8 MBBDS(k=1) MBBDS using memory for 326 states(state size: 32 bits, Memory_percentage_from_MM=0.25) found path length 7; 851 expanded; 0.0003s elapsed;
+			HARD-32 GAP-8 MBBDS(k=1) MBBDS using memory for 130 states(state size: 32 bits, Memory_percentage_from_MM=0.10) found path length 7; 964 expanded; 0.0003s elapsed;
+		_IDMM_
+			HARD-32 GAP-8 IDMM found path length 7; 98246 expanded; 687722 generated; 0.0212s elapsed; Mid state: 1 0 5 6 7 2 3 4 
+			GAP-8 D-MM ; 77488 expanded;
+	Problem 34 of 100
+	Start state: 3 6 0 4 1 5 2 7 
+	Goal state: 0 1 2 3 4 5 6 7 
+	Initial heuristic 0
+		_A*_
+			GAP-8 A* found path length 7; 8437 expanded; 7676 necessary; using 19953 states in memory; 0.0097s elapsed
+			GAP-8 I-A* ; 20043 expanded;
+		_MM_
+			Hard-GAP-8 MM found path length 7; 123 expanded; 123 necessary; using 735 states in memory; 0.0002s elapsed
+			Hard-GAP-8 I-MM ; 241 expanded;
+		_IDA*_
+			Hard-GAP-8 IDA* found path length 0; 1 expanded; 7 generated; 0.0000s elapsed
+			Hard-GAP-8 D-A* ; 1 expanded;
+		_MBBDS_
+			HARD-33 GAP-8 MBBDS(k=1) MBBDS using memory for 735 states(state size: 32 bits, Memory_percentage_from_MM=1.00) found path length 7; 668 expanded; 0.0003s elapsed;
+			HARD-33 GAP-8 MBBDS(k=1) MBBDS using memory for 661 states(state size: 32 bits, Memory_percentage_from_MM=0.90) found path length 7; 668 expanded; 0.0003s elapsed;
+			HARD-33 GAP-8 MBBDS(k=1) MBBDS using memory for 551 states(state size: 32 bits, Memory_percentage_from_MM=0.75) found path length 7; 668 expanded; 0.0003s elapsed;
+			HARD-33 GAP-8 MBBDS(k=1) MBBDS using memory for 367 states(state size: 32 bits, Memory_percentage_from_MM=0.50) found path length 7; 768 expanded; 0.0003s elapsed;
+			HARD-33 GAP-8 MBBDS(k=1) MBBDS using memory for 183 states(state size: 32 bits, Memory_percentage_from_MM=0.25) found path length 7; 960 expanded; 0.0003s elapsed;
+			HARD-33 GAP-8 MBBDS(k=1) MBBDS using memory for 73 states(state size: 32 bits, Memory_percentage_from_MM=0.10) found path length 7; 1178 expanded; 0.0004s elapsed;
+		_IDMM_
+			HARD-33 GAP-8 IDMM found path length 7; 119717 expanded; 838019 generated; 0.0259s elapsed; Mid state: 6 0 1 5 4 3 2 7 
+			GAP-8 D-MM ; 74855 expanded;
+	Problem 35 of 100
+	Start state: 5 7 0 4 3 2 6 1 
+	Goal state: 0 1 2 3 4 5 6 7 
+	Initial heuristic 1
+		_A*_
+			GAP-8 A* found path length 7; 7841 expanded; 6965 necessary; using 19981 states in memory; 0.0094s elapsed
+			GAP-8 I-A* ; 17140 expanded;
+		_MM_
+			Hard-GAP-8 MM found path length 7; 105 expanded; 105 necessary; using 631 states in memory; 0.0002s elapsed
+			Hard-GAP-8 I-MM ; 223 expanded;
+		_IDA*_
+			Hard-GAP-8 IDA* found path length 7; 23825 expanded; 166775 generated; 0.0049s elapsed
+			Hard-GAP-8 D-A* ; 19987 expanded;
+		_MBBDS_
+			HARD-34 GAP-8 MBBDS(k=1) MBBDS using memory for 631 states(state size: 32 bits, Memory_percentage_from_MM=1.00) found path length 7; 557 expanded; 0.0002s elapsed;
+			HARD-34 GAP-8 MBBDS(k=1) MBBDS using memory for 567 states(state size: 32 bits, Memory_percentage_from_MM=0.90) found path length 7; 557 expanded; 0.0002s elapsed;
+			HARD-34 GAP-8 MBBDS(k=1) MBBDS using memory for 473 states(state size: 32 bits, Memory_percentage_from_MM=0.75) found path length 7; 657 expanded; 0.0003s elapsed;
+			HARD-34 GAP-8 MBBDS(k=1) MBBDS using memory for 315 states(state size: 32 bits, Memory_percentage_from_MM=0.50) found path length 7; 657 expanded; 0.0003s elapsed;
+			HARD-34 GAP-8 MBBDS(k=1) MBBDS using memory for 157 states(state size: 32 bits, Memory_percentage_from_MM=0.25) found path length 7; 943 expanded; 0.0003s elapsed;
+			HARD-34 GAP-8 MBBDS(k=1) MBBDS using memory for 63 states(state size: 32 bits, Memory_percentage_from_MM=0.10) found path length 7; 1419 expanded; 0.0005s elapsed;
+		_IDMM_
+			HARD-34 GAP-8 IDMM found path length 7; 26724 expanded; 187068 generated; 0.0059s elapsed; Mid state: 5 4 3 2 6 1 0 7 
+			GAP-8 D-MM ; 5966 expanded;
+	Problem 36 of 100
+	Start state: 6 4 5 1 3 7 2 0 
+	Goal state: 0 1 2 3 4 5 6 7 
+	Initial heuristic 1
+		_A*_
+			GAP-8 A* found path length 8; 18558 expanded; 18346 necessary; using 33015 states in memory; 0.0209s elapsed
+			GAP-8 I-A* ; 46241 expanded;
+		_MM_
+			Hard-GAP-8 MM found path length 8; 437 expanded; 437 necessary; using 2254 states in memory; 0.0006s elapsed
+			Hard-GAP-8 I-MM ; 555 expanded;
+		_IDA*_
+			Hard-GAP-8 IDA* found path length 8; 393242 expanded; 2752694 generated; 0.0789s elapsed
+			Hard-GAP-8 D-A* ; 329008 expanded;
+		_MBBDS_
+			HARD-35 GAP-8 MBBDS(k=1) MBBDS using memory for 2254 states(state size: 32 bits, Memory_percentage_from_MM=1.00) found path length 8; 1586 expanded; 0.0007s elapsed;
+			HARD-35 GAP-8 MBBDS(k=1) MBBDS using memory for 2028 states(state size: 32 bits, Memory_percentage_from_MM=0.90) found path length 8; 1586 expanded; 0.0007s elapsed;
+			HARD-35 GAP-8 MBBDS(k=1) MBBDS using memory for 1690 states(state size: 32 bits, Memory_percentage_from_MM=0.75) found path length 8; 1586 expanded; 0.0007s elapsed;
+			HARD-35 GAP-8 MBBDS(k=1) MBBDS using memory for 1127 states(state size: 32 bits, Memory_percentage_from_MM=0.50) found path length 8; 1586 expanded; 0.0006s elapsed;
+			HARD-35 GAP-8 MBBDS(k=1) MBBDS using memory for 563 states(state size: 32 bits, Memory_percentage_from_MM=0.25) found path length 8; 1586 expanded; 0.0006s elapsed;
+			HARD-35 GAP-8 MBBDS(k=1) MBBDS using memory for 225 states(state size: 32 bits, Memory_percentage_from_MM=0.10) found path length 8; 2290 expanded; 0.0008s elapsed;
+		_IDMM_
+			HARD-35 GAP-8 IDMM found path length 8; 482087 expanded; 3374609 generated; 0.1038s elapsed; Mid state: 4 5 6 7 2 1 3 0 
+			GAP-8 D-MM ; 337181 expanded;
+	Problem 37 of 100
+	Start state: 5 2 1 6 0 3 7 4 
+	Goal state: 0 1 2 3 4 5 6 7 
+	Initial heuristic 1
+		_A*_
+			GAP-8 A* found path length 7; 7417 expanded; 6977 necessary; using 19376 states in memory; 0.0090s elapsed
+			GAP-8 I-A* ; 16715 expanded;
+		_MM_
+			Hard-GAP-8 MM found path length 7; 158 expanded; 158 necessary; using 918 states in memory; 0.0003s elapsed
+			Hard-GAP-8 I-MM ; 276 expanded;
+		_IDA*_
+			Hard-GAP-8 IDA* found path length 7; 33639 expanded; 235473 generated; 0.0068s elapsed
+			Hard-GAP-8 D-A* ; 28191 expanded;
+		_MBBDS_
+			HARD-36 GAP-8 MBBDS(k=1) MBBDS using memory for 918 states(state size: 32 bits, Memory_percentage_from_MM=1.00) found path length 7; 586 expanded; 0.0003s elapsed;
+			HARD-36 GAP-8 MBBDS(k=1) MBBDS using memory for 826 states(state size: 32 bits, Memory_percentage_from_MM=0.90) found path length 7; 586 expanded; 0.0003s elapsed;
+			HARD-36 GAP-8 MBBDS(k=1) MBBDS using memory for 688 states(state size: 32 bits, Memory_percentage_from_MM=0.75) found path length 7; 586 expanded; 0.0003s elapsed;
+			HARD-36 GAP-8 MBBDS(k=1) MBBDS using memory for 459 states(state size: 32 bits, Memory_percentage_from_MM=0.50) found path length 7; 686 expanded; 0.0003s elapsed;
+			HARD-36 GAP-8 MBBDS(k=1) MBBDS using memory for 229 states(state size: 32 bits, Memory_percentage_from_MM=0.25) found path length 7; 686 expanded; 0.0003s elapsed;
+			HARD-36 GAP-8 MBBDS(k=1) MBBDS using memory for 91 states(state size: 32 bits, Memory_percentage_from_MM=0.10) found path length 7; 1038 expanded; 0.0003s elapsed;
+		_IDMM_
+			HARD-36 GAP-8 IDMM found path length 7; 37917 expanded; 265419 generated; 0.0083s elapsed; Mid state: 6 0 1 2 5 4 3 7 
+			GAP-8 D-MM ; 17159 expanded;
+	Problem 38 of 100
+	Start state: 5 7 3 4 0 2 6 1 
+	Goal state: 0 1 2 3 4 5 6 7 
+	Initial heuristic 1
+		_A*_
+			GAP-8 A* found path length 8; 19495 expanded; 18335 necessary; using 33617 states in memory; 0.0212s elapsed
+			GAP-8 I-A* ; 47129 expanded;
+		_MM_
+			Hard-GAP-8 MM found path length 8; 557 expanded; 557 necessary; using 2806 states in memory; 0.0008s elapsed
+			Hard-GAP-8 I-MM ; 675 expanded;
+		_IDA*_
+			Hard-GAP-8 IDA* found path length 8; 343279 expanded; 2402953 generated; 0.0696s elapsed
+			Hard-GAP-8 D-A* ; 287605 expanded;
+		_MBBDS_
+			HARD-37 GAP-8 MBBDS(k=1) MBBDS using memory for 2806 states(state size: 32 bits, Memory_percentage_from_MM=1.00) found path length 8; 1025 expanded; 0.0005s elapsed;
+			HARD-37 GAP-8 MBBDS(k=1) MBBDS using memory for 2525 states(state size: 32 bits, Memory_percentage_from_MM=0.90) found path length 8; 1025 expanded; 0.0005s elapsed;
+			HARD-37 GAP-8 MBBDS(k=1) MBBDS using memory for 2104 states(state size: 32 bits, Memory_percentage_from_MM=0.75) found path length 8; 1565 expanded; 0.0007s elapsed;
+			HARD-37 GAP-8 MBBDS(k=1) MBBDS using memory for 1403 states(state size: 32 bits, Memory_percentage_from_MM=0.50) found path length 8; 1565 expanded; 0.0006s elapsed;
+			HARD-37 GAP-8 MBBDS(k=1) MBBDS using memory for 701 states(state size: 32 bits, Memory_percentage_from_MM=0.25) found path length 8; 1565 expanded; 0.0006s elapsed;
+			HARD-37 GAP-8 MBBDS(k=1) MBBDS using memory for 280 states(state size: 32 bits, Memory_percentage_from_MM=0.10) found path length 8; 1981 expanded; 0.0007s elapsed;
+		_IDMM_
+			HARD-37 GAP-8 IDMM found path length 8; 389500 expanded; 2726500 generated; 0.0837s elapsed; Mid state: 1 6 5 4 0 2 3 7 
+			GAP-8 D-MM ; 259720 expanded;
+	Problem 39 of 100
+	Start state: 0 4 3 5 7 1 6 2 
+	Goal state: 0 1 2 3 4 5 6 7 
+	Initial heuristic 1
+		_A*_
+			GAP-8 A* found path length 8; 18924 expanded; 18321 necessary; using 33306 states in memory; 0.0209s elapsed
+			GAP-8 I-A* ; 46571 expanded;
+		_MM_
+			Hard-GAP-8 MM found path length 8; 386 expanded; 386 necessary; using 1988 states in memory; 0.0006s elapsed
+			Hard-GAP-8 I-MM ; 504 expanded;
+		_IDA*_
+			Hard-GAP-8 IDA* found path length 8; 196138 expanded; 1372966 generated; 0.0393s elapsed
+			Hard-GAP-8 D-A* ; 164369 expanded;
+		_MBBDS_
+			HARD-38 GAP-8 MBBDS(k=1) MBBDS using memory for 1988 states(state size: 32 bits, Memory_percentage_from_MM=1.00) found path length 8; 1488 expanded; 0.0007s elapsed;
+			HARD-38 GAP-8 MBBDS(k=1) MBBDS using memory for 1789 states(state size: 32 bits, Memory_percentage_from_MM=0.90) found path length 8; 1488 expanded; 0.0006s elapsed;
+			HARD-38 GAP-8 MBBDS(k=1) MBBDS using memory for 1491 states(state size: 32 bits, Memory_percentage_from_MM=0.75) found path length 8; 1488 expanded; 0.0006s elapsed;
+			HARD-38 GAP-8 MBBDS(k=1) MBBDS using memory for 994 states(state size: 32 bits, Memory_percentage_from_MM=0.50) found path length 8; 1488 expanded; 0.0006s elapsed;
+			HARD-38 GAP-8 MBBDS(k=1) MBBDS using memory for 497 states(state size: 32 bits, Memory_percentage_from_MM=0.25) found path length 8; 1588 expanded; 0.0006s elapsed;
+			HARD-38 GAP-8 MBBDS(k=1) MBBDS using memory for 198 states(state size: 32 bits, Memory_percentage_from_MM=0.10) found path length 8; 2192 expanded; 0.0008s elapsed;
+		_IDMM_
+			HARD-38 GAP-8 IDMM found path length 8; 236292 expanded; 1654044 generated; 0.0517s elapsed; Mid state: 4 3 5 7 6 2 1 0 
+			GAP-8 D-MM ; 104447 expanded;
+	Problem 40 of 100
+	Start state: 7 5 4 6 3 2 1 0 
+	Goal state: 0 1 2 3 4 5 6 7 
+	Initial heuristic 1
+		_A*_
+			GAP-8 A* found path length 4; 407 expanded; 80 necessary; using 1959 states in memory; 0.0006s elapsed
+			GAP-8 I-A* ; 503 expanded;
+		_MM_
+			Hard-GAP-8 MM found path length 4; 10 expanded; 10 necessary; using 64 states in memory; 0.0000s elapsed
+			Hard-GAP-8 I-MM ; 12 expanded;
+		_IDA*_
+			Hard-GAP-8 IDA* found path length 4; 526 expanded; 3682 generated; 0.0001s elapsed
+			Hard-GAP-8 D-A* ; 438 expanded;
+		_MBBDS_
+			HARD-39 GAP-8 MBBDS(k=1) MBBDS using memory for 64 states(state size: 32 bits, Memory_percentage_from_MM=1.00) found path length 4; 43 expanded; 0.0000s elapsed;
+			HARD-39 GAP-8 MBBDS(k=1) MBBDS using memory for 57 states(state size: 32 bits, Memory_percentage_from_MM=0.90) found path length 4; 35 expanded; 0.0000s elapsed;
+			HARD-39 GAP-8 MBBDS(k=1) MBBDS using memory for 48 states(state size: 32 bits, Memory_percentage_from_MM=0.75) found path length 4; 35 expanded; 0.0000s elapsed;
+			HARD-39 GAP-8 MBBDS(k=1) MBBDS using memory for 32 states(state size: 32 bits, Memory_percentage_from_MM=0.50) found path length 4; 35 expanded; 0.0000s elapsed;
+			HARD-39 GAP-8 MBBDS(k=1) MBBDS using memory for 16 states(state size: 32 bits, Memory_percentage_from_MM=0.25) found path length 4; 46 expanded; 0.0000s elapsed;
+			HARD-39 GAP-8 MBBDS(k=1) MBBDS using memory for 6 states(state size: 32 bits, Memory_percentage_from_MM=0.10) found path length 4; 76 expanded; 0.0000s elapsed;
+		_IDMM_
+			HARD-39 GAP-8 IDMM found path length 4; 747 expanded; 5229 generated; 0.0002s elapsed; Mid state: 6 7 5 4 3 2 1 0 
+			GAP-8 D-MM ; 609 expanded;
+	Problem 41 of 100
+	Start state: 4 3 0 6 7 2 1 5 
+	Goal state: 0 1 2 3 4 5 6 7 
+	Initial heuristic 1
+		_A*_
+			GAP-8 A* found path length 6; 2138 expanded; 1888 necessary; using 7809 states in memory; 0.0028s elapsed
+			GAP-8 I-A* ; 4481 expanded;
+		_MM_
+			Hard-GAP-8 MM found path length 6; 63 expanded; 63 necessary; using 381 states in memory; 0.0001s elapsed
+			Hard-GAP-8 I-MM ; 81 expanded;
+		_IDA*_
+			Hard-GAP-8 IDA* found path length 6; 6451 expanded; 45157 generated; 0.0013s elapsed
+			Hard-GAP-8 D-A* ; 5428 expanded;
+		_MBBDS_
+			HARD-40 GAP-8 MBBDS(k=1) MBBDS using memory for 381 states(state size: 32 bits, Memory_percentage_from_MM=1.00) found path length 6; 249 expanded; 0.0001s elapsed;
+			HARD-40 GAP-8 MBBDS(k=1) MBBDS using memory for 342 states(state size: 32 bits, Memory_percentage_from_MM=0.90) found path length 6; 249 expanded; 0.0001s elapsed;
+			HARD-40 GAP-8 MBBDS(k=1) MBBDS using memory for 285 states(state size: 32 bits, Memory_percentage_from_MM=0.75) found path length 6; 199 expanded; 0.0001s elapsed;
+			HARD-40 GAP-8 MBBDS(k=1) MBBDS using memory for 190 states(state size: 32 bits, Memory_percentage_from_MM=0.50) found path length 6; 249 expanded; 0.0001s elapsed;
+			HARD-40 GAP-8 MBBDS(k=1) MBBDS using memory for 95 states(state size: 32 bits, Memory_percentage_from_MM=0.25) found path length 6; 249 expanded; 0.0001s elapsed;
+			HARD-40 GAP-8 MBBDS(k=1) MBBDS using memory for 38 states(state size: 32 bits, Memory_percentage_from_MM=0.10) found path length 6; 357 expanded; 0.0001s elapsed;
+		_IDMM_
+			HARD-40 GAP-8 IDMM found path length 6; 7107 expanded; 49749 generated; 0.0016s elapsed; Mid state: 7 6 2 1 0 3 4 5 
+			GAP-8 D-MM ; 3895 expanded;
+	Problem 42 of 100
+	Start state: 1 7 6 3 2 5 0 4 
+	Goal state: 0 1 2 3 4 5 6 7 
+	Initial heuristic 1
+		_A*_
+			GAP-8 A* found path length 7; 7591 expanded; 6965 necessary; using 19615 states in memory; 0.0092s elapsed
+			GAP-8 I-A* ; 16890 expanded;
+		_MM_
+			Hard-GAP-8 MM found path length 7; 134 expanded; 134 necessary; using 792 states in memory; 0.0002s elapsed
+			Hard-GAP-8 I-MM ; 252 expanded;
+		_IDA*_
+			Hard-GAP-8 IDA* found path length 7; 30301 expanded; 212107 generated; 0.0063s elapsed
+			Hard-GAP-8 D-A* ; 25432 expanded;
+		_MBBDS_
+			HARD-41 GAP-8 MBBDS(k=1) MBBDS using memory for 792 states(state size: 32 bits, Memory_percentage_from_MM=1.00) found path length 7; 578 expanded; 0.0003s elapsed;
+			HARD-41 GAP-8 MBBDS(k=1) MBBDS using memory for 712 states(state size: 32 bits, Memory_percentage_from_MM=0.90) found path length 7; 578 expanded; 0.0003s elapsed;
+			HARD-41 GAP-8 MBBDS(k=1) MBBDS using memory for 594 states(state size: 32 bits, Memory_percentage_from_MM=0.75) found path length 7; 578 expanded; 0.0002s elapsed;
+			HARD-41 GAP-8 MBBDS(k=1) MBBDS using memory for 396 states(state size: 32 bits, Memory_percentage_from_MM=0.50) found path length 7; 678 expanded; 0.0003s elapsed;
+			HARD-41 GAP-8 MBBDS(k=1) MBBDS using memory for 198 states(state size: 32 bits, Memory_percentage_from_MM=0.25) found path length 7; 678 expanded; 0.0003s elapsed;
+			HARD-41 GAP-8 MBBDS(k=1) MBBDS using memory for 79 states(state size: 32 bits, Memory_percentage_from_MM=0.10) found path length 7; 1088 expanded; 0.0004s elapsed;
+		_IDMM_
+			HARD-41 GAP-8 IDMM found path length 7; 34023 expanded; 238161 generated; 0.0074s elapsed; Mid state: 1 0 4 5 2 3 6 7 
+			GAP-8 D-MM ; 13265 expanded;
+	Problem 43 of 100
+	Start state: 3 1 5 6 0 4 2 7 
+	Goal state: 0 1 2 3 4 5 6 7 
+	Initial heuristic 0
+		_A*_
+			GAP-8 A* found path length 7; 7701 expanded; 7676 necessary; using 19185 states in memory; 0.0089s elapsed
+			GAP-8 I-A* ; 19307 expanded;
+		_MM_
+			Hard-GAP-8 MM found path length 7; 133 expanded; 133 necessary; using 786 states in memory; 0.0002s elapsed
+			Hard-GAP-8 I-MM ; 251 expanded;
+		_IDA*_
+			Hard-GAP-8 IDA* found path length 0; 1 expanded; 7 generated; 0.0000s elapsed
+			Hard-GAP-8 D-A* ; 1 expanded;
+		_MBBDS_
+			HARD-42 GAP-8 MBBDS(k=1) MBBDS using memory for 786 states(state size: 32 bits, Memory_percentage_from_MM=1.00) found path length 7; 646 expanded; 0.0003s elapsed;
+			HARD-42 GAP-8 MBBDS(k=1) MBBDS using memory for 707 states(state size: 32 bits, Memory_percentage_from_MM=0.90) found path length 7; 646 expanded; 0.0003s elapsed;
+			HARD-42 GAP-8 MBBDS(k=1) MBBDS using memory for 589 states(state size: 32 bits, Memory_percentage_from_MM=0.75) found path length 7; 646 expanded; 0.0003s elapsed;
+			HARD-42 GAP-8 MBBDS(k=1) MBBDS using memory for 393 states(state size: 32 bits, Memory_percentage_from_MM=0.50) found path length 7; 746 expanded; 0.0003s elapsed;
+			HARD-42 GAP-8 MBBDS(k=1) MBBDS using memory for 196 states(state size: 32 bits, Memory_percentage_from_MM=0.25) found path length 7; 746 expanded; 0.0003s elapsed;
+			HARD-42 GAP-8 MBBDS(k=1) MBBDS using memory for 78 states(state size: 32 bits, Memory_percentage_from_MM=0.10) found path length 7; 1114 expanded; 0.0004s elapsed;
+		_IDMM_
+			HARD-42 GAP-8 IDMM found path length 7; 101174 expanded; 708218 generated; 0.0219s elapsed; Mid state: 2 3 4 0 1 5 6 7 
+			GAP-8 D-MM ; 56312 expanded;
+	Problem 44 of 100
+	Start state: 0 4 1 3 2 5 7 6 
+	Goal state: 0 1 2 3 4 5 6 7 
+	Initial heuristic 1
+		_A*_
+			GAP-8 A* found path length 7; 8709 expanded; 6977 necessary; using 21030 states in memory; 0.0104s elapsed
+			GAP-8 I-A* ; 18007 expanded;
+		_MM_
+			Hard-GAP-8 MM found path length 7; 223 expanded; 223 necessary; using 1237 states in memory; 0.0004s elapsed
+			Hard-GAP-8 I-MM ; 341 expanded;
+		_IDA*_
+			Hard-GAP-8 IDA* found path length 7; 30316 expanded; 212212 generated; 0.0064s elapsed
+			Hard-GAP-8 D-A* ; 25438 expanded;
+		_MBBDS_
+			HARD-43 GAP-8 MBBDS(k=1) MBBDS using memory for 1237 states(state size: 32 bits, Memory_percentage_from_MM=1.00) found path length 7; 577 expanded; 0.0003s elapsed;
+			HARD-43 GAP-8 MBBDS(k=1) MBBDS using memory for 1113 states(state size: 32 bits, Memory_percentage_from_MM=0.90) found path length 7; 577 expanded; 0.0003s elapsed;
+			HARD-43 GAP-8 MBBDS(k=1) MBBDS using memory for 927 states(state size: 32 bits, Memory_percentage_from_MM=0.75) found path length 7; 577 expanded; 0.0003s elapsed;
+			HARD-43 GAP-8 MBBDS(k=1) MBBDS using memory for 618 states(state size: 32 bits, Memory_percentage_from_MM=0.50) found path length 7; 577 expanded; 0.0002s elapsed;
+			HARD-43 GAP-8 MBBDS(k=1) MBBDS using memory for 309 states(state size: 32 bits, Memory_percentage_from_MM=0.25) found path length 7; 677 expanded; 0.0003s elapsed;
+			HARD-43 GAP-8 MBBDS(k=1) MBBDS using memory for 123 states(state size: 32 bits, Memory_percentage_from_MM=0.10) found path length 7; 1029 expanded; 0.0003s elapsed;
+		_IDMM_
+			HARD-43 GAP-8 IDMM found path length 7; 36475 expanded; 255325 generated; 0.0080s elapsed; Mid state: 4 0 1 3 2 5 6 7 
+			GAP-8 D-MM ; 15272 expanded;
+	Problem 45 of 100
+	Start state: 0 2 1 3 6 4 5 7 
+	Goal state: 0 1 2 3 4 5 6 7 
+	Initial heuristic 0
+		_A*_
+			GAP-8 A* found path length 7; 7740 expanded; 7676 necessary; using 19231 states in memory; 0.0092s elapsed
+			GAP-8 I-A* ; 19346 expanded;
+		_MM_
+			Hard-GAP-8 MM found path length 7; 104 expanded; 104 necessary; using 625 states in memory; 0.0002s elapsed
+			Hard-GAP-8 I-MM ; 222 expanded;
+		_IDA*_
+			Hard-GAP-8 IDA* found path length 0; 1 expanded; 7 generated; 0.0000s elapsed
+			Hard-GAP-8 D-A* ; 1 expanded;
+		_MBBDS_
+			HARD-44 GAP-8 MBBDS(k=1) MBBDS using memory for 625 states(state size: 32 bits, Memory_percentage_from_MM=1.00) found path length 7; 597 expanded; 0.0003s elapsed;
+			HARD-44 GAP-8 MBBDS(k=1) MBBDS using memory for 562 states(state size: 32 bits, Memory_percentage_from_MM=0.90) found path length 7; 597 expanded; 0.0002s elapsed;
+			HARD-44 GAP-8 MBBDS(k=1) MBBDS using memory for 468 states(state size: 32 bits, Memory_percentage_from_MM=0.75) found path length 7; 647 expanded; 0.0003s elapsed;
+			HARD-44 GAP-8 MBBDS(k=1) MBBDS using memory for 312 states(state size: 32 bits, Memory_percentage_from_MM=0.50) found path length 7; 697 expanded; 0.0003s elapsed;
+			HARD-44 GAP-8 MBBDS(k=1) MBBDS using memory for 156 states(state size: 32 bits, Memory_percentage_from_MM=0.25) found path length 7; 951 expanded; 0.0003s elapsed;
+			HARD-44 GAP-8 MBBDS(k=1) MBBDS using memory for 62 states(state size: 32 bits, Memory_percentage_from_MM=0.10) found path length 7; 2515 expanded; 0.0008s elapsed;
+		_IDMM_
+			HARD-44 GAP-8 IDMM found path length 7; 68641 expanded; 480487 generated; 0.0149s elapsed; Mid state: 5 4 6 3 2 1 0 7 
+			GAP-8 D-MM ; 23334 expanded;
+	Problem 46 of 100
+	Start state: 3 6 2 5 0 4 7 1 
+	Goal state: 0 1 2 3 4 5 6 7 
+	Initial heuristic 1
+		_A*_
+			GAP-8 A* found path length 8; 19286 expanded; 18427 necessary; using 33399 states in memory; 0.0218s elapsed
+			GAP-8 I-A* ; 47011 expanded;
+		_MM_
+			Hard-GAP-8 MM found path length 8; 515 expanded; 515 necessary; using 2625 states in memory; 0.0008s elapsed
+			Hard-GAP-8 I-MM ; 633 expanded;
+		_IDA*_
+			Hard-GAP-8 IDA* found path length 8; 391145 expanded; 2738015 generated; 0.0807s elapsed
+			Hard-GAP-8 D-A* ; 327116 expanded;
+		_MBBDS_
+			HARD-45 GAP-8 MBBDS(k=1) MBBDS using memory for 2625 states(state size: 32 bits, Memory_percentage_from_MM=1.00) found path length 8; 982 expanded; 0.0005s elapsed;
+			HARD-45 GAP-8 MBBDS(k=1) MBBDS using memory for 2362 states(state size: 32 bits, Memory_percentage_from_MM=0.90) found path length 8; 1584 expanded; 0.0007s elapsed;
+			HARD-45 GAP-8 MBBDS(k=1) MBBDS using memory for 1968 states(state size: 32 bits, Memory_percentage_from_MM=0.75) found path length 8; 1584 expanded; 0.0007s elapsed;
+			HARD-45 GAP-8 MBBDS(k=1) MBBDS using memory for 1312 states(state size: 32 bits, Memory_percentage_from_MM=0.50) found path length 8; 1584 expanded; 0.0006s elapsed;
+			HARD-45 GAP-8 MBBDS(k=1) MBBDS using memory for 656 states(state size: 32 bits, Memory_percentage_from_MM=0.25) found path length 8; 1584 expanded; 0.0006s elapsed;
+			HARD-45 GAP-8 MBBDS(k=1) MBBDS using memory for 262 states(state size: 32 bits, Memory_percentage_from_MM=0.10) found path length 8; 1988 expanded; 0.0007s elapsed;
+		_IDMM_
+			HARD-45 GAP-8 IDMM found path length 8; 447091 expanded; 3129637 generated; 0.0954s elapsed; Mid state: 5 0 1 2 6 3 4 7 
+			GAP-8 D-MM ; 317311 expanded;
+	Problem 47 of 100
+	Start state: 1 5 0 4 2 7 6 3 
+	Goal state: 0 1 2 3 4 5 6 7 
+	Initial heuristic 1
+		_A*_
+			GAP-8 A* found path length 8; 18986 expanded; 18346 necessary; using 33324 states in memory; 0.0212s elapsed
+			GAP-8 I-A* ; 46669 expanded;
+		_MM_
+			Hard-GAP-8 MM found path length 8; 385 expanded; 385 necessary; using 1983 states in memory; 0.0006s elapsed
+			Hard-GAP-8 I-MM ; 503 expanded;
+		_IDA*_
+			Hard-GAP-8 IDA* found path length 8; 158549 expanded; 1109843 generated; 0.0326s elapsed
+			Hard-GAP-8 D-A* ; 132947 expanded;
+		_MBBDS_
+			HARD-46 GAP-8 MBBDS(k=1) MBBDS using memory for 1983 states(state size: 32 bits, Memory_percentage_from_MM=1.00) found path length 8; 1470 expanded; 0.0007s elapsed;
+			HARD-46 GAP-8 MBBDS(k=1) MBBDS using memory for 1784 states(state size: 32 bits, Memory_percentage_from_MM=0.90) found path length 8; 1470 expanded; 0.0006s elapsed;
+			HARD-46 GAP-8 MBBDS(k=1) MBBDS using memory for 1487 states(state size: 32 bits, Memory_percentage_from_MM=0.75) found path length 8; 1470 expanded; 0.0006s elapsed;
+			HARD-46 GAP-8 MBBDS(k=1) MBBDS using memory for 991 states(state size: 32 bits, Memory_percentage_from_MM=0.50) found path length 8; 1470 expanded; 0.0006s elapsed;
+			HARD-46 GAP-8 MBBDS(k=1) MBBDS using memory for 495 states(state size: 32 bits, Memory_percentage_from_MM=0.25) found path length 8; 1570 expanded; 0.0006s elapsed;
+			HARD-46 GAP-8 MBBDS(k=1) MBBDS using memory for 198 states(state size: 32 bits, Memory_percentage_from_MM=0.10) found path length 8; 2174 expanded; 0.0007s elapsed;
+		_IDMM_
+			HARD-46 GAP-8 IDMM found path length 8; 179245 expanded; 1254715 generated; 0.0394s elapsed; Mid state: 3 4 0 5 6 7 2 1 
+			GAP-8 D-MM ; 49465 expanded;
+	Problem 48 of 100
+	Start state: 2 7 5 4 3 1 0 6 
+	Goal state: 0 1 2 3 4 5 6 7 
+	Initial heuristic 1
+		_A*_
+			GAP-8 A* found path length 5; 633 expanded; 381 necessary; using 2832 states in memory; 0.0009s elapsed
+			GAP-8 I-A* ; 1086 expanded;
+		_MM_
+			Hard-GAP-8 MM found path length 5; 37 expanded; 37 necessary; using 226 states in memory; 0.0001s elapsed
+			Hard-GAP-8 I-MM ; 55 expanded;
+		_IDA*_
+			Hard-GAP-8 IDA* found path length 5; 1669 expanded; 11683 generated; 0.0003s elapsed
+			Hard-GAP-8 D-A* ; 1406 expanded;
+		_MBBDS_
+			HARD-47 GAP-8 MBBDS(k=1) MBBDS using memory for 226 states(state size: 32 bits, Memory_percentage_from_MM=1.00) found path length 5; 113 expanded; 0.0001s elapsed;
+			HARD-47 GAP-8 MBBDS(k=1) MBBDS using memory for 203 states(state size: 32 bits, Memory_percentage_from_MM=0.90) found path length 5; 113 expanded; 0.0001s elapsed;
+			HARD-47 GAP-8 MBBDS(k=1) MBBDS using memory for 169 states(state size: 32 bits, Memory_percentage_from_MM=0.75) found path length 5; 113 expanded; 0.0001s elapsed;
+			HARD-47 GAP-8 MBBDS(k=1) MBBDS using memory for 113 states(state size: 32 bits, Memory_percentage_from_MM=0.50) found path length 5; 113 expanded; 0.0001s elapsed;
+			HARD-47 GAP-8 MBBDS(k=1) MBBDS using memory for 56 states(state size: 32 bits, Memory_percentage_from_MM=0.25) found path length 5; 121 expanded; 0.0001s elapsed;
+			HARD-47 GAP-8 MBBDS(k=1) MBBDS using memory for 22 states(state size: 32 bits, Memory_percentage_from_MM=0.10) found path length 5; 187 expanded; 0.0001s elapsed;
+		_IDMM_
+			HARD-47 GAP-8 IDMM found path length 5; 1788 expanded; 12516 generated; 0.0004s elapsed; Mid state: 6 0 1 2 3 4 5 7 
+			GAP-8 D-MM ; 1302 expanded;
+	Problem 49 of 100
+	Start state: 3 4 2 0 5 6 1 7 
+	Goal state: 0 1 2 3 4 5 6 7 
+	Initial heuristic 0
+		_A*_
+			GAP-8 A* found path length 5; 1322 expanded; 844 necessary; using 4790 states in memory; 0.0017s elapsed
+			GAP-8 I-A* ; 2405 expanded;
+		_MM_
+			Hard-GAP-8 MM found path length 5; 50 expanded; 50 necessary; using 303 states in memory; 0.0001s elapsed
+			Hard-GAP-8 I-MM ; 68 expanded;
+		_IDA*_
+			Hard-GAP-8 IDA* found path length 0; 1 expanded; 7 generated; 0.0000s elapsed
+			Hard-GAP-8 D-A* ; 1 expanded;
+		_MBBDS_
+			HARD-48 GAP-8 MBBDS(k=1) MBBDS using memory for 303 states(state size: 32 bits, Memory_percentage_from_MM=1.00) found path length 5; 135 expanded; 0.0001s elapsed;
+			HARD-48 GAP-8 MBBDS(k=1) MBBDS using memory for 272 states(state size: 32 bits, Memory_percentage_from_MM=0.90) found path length 5; 135 expanded; 0.0001s elapsed;
+			HARD-48 GAP-8 MBBDS(k=1) MBBDS using memory for 227 states(state size: 32 bits, Memory_percentage_from_MM=0.75) found path length 5; 135 expanded; 0.0001s elapsed;
+			HARD-48 GAP-8 MBBDS(k=1) MBBDS using memory for 151 states(state size: 32 bits, Memory_percentage_from_MM=0.50) found path length 5; 135 expanded; 0.0001s elapsed;
+			HARD-48 GAP-8 MBBDS(k=1) MBBDS using memory for 75 states(state size: 32 bits, Memory_percentage_from_MM=0.25) found path length 5; 151 expanded; 0.0001s elapsed;
+			HARD-48 GAP-8 MBBDS(k=1) MBBDS using memory for 30 states(state size: 32 bits, Memory_percentage_from_MM=0.10) found path length 5; 160 expanded; 0.0001s elapsed;
+		_IDMM_
+			HARD-48 GAP-8 IDMM found path length 5; 7953 expanded; 55671 generated; 0.0018s elapsed; Mid state: 6 5 4 3 2 0 1 7 
+			GAP-8 D-MM ; 6409 expanded;
+	Problem 50 of 100
+	Start state: 1 7 0 3 5 6 4 2 
+	Goal state: 0 1 2 3 4 5 6 7 
+	Initial heuristic 1
+		_A*_
+			GAP-8 A* found path length 7; 7836 expanded; 6965 necessary; using 19973 states in memory; 0.0096s elapsed
+			GAP-8 I-A* ; 17135 expanded;
+		_MM_
+			Hard-GAP-8 MM found path length 7; 102 expanded; 102 necessary; using 614 states in memory; 0.0002s elapsed
+			Hard-GAP-8 I-MM ; 220 expanded;
+		_IDA*_
+			Hard-GAP-8 IDA* found path length 7; 43144 expanded; 302008 generated; 0.0091s elapsed
+			Hard-GAP-8 D-A* ; 36212 expanded;
+		_MBBDS_
+			HARD-49 GAP-8 MBBDS(k=1) MBBDS using memory for 614 states(state size: 32 bits, Memory_percentage_from_MM=1.00) found path length 7; 618 expanded; 0.0003s elapsed;
+			HARD-49 GAP-8 MBBDS(k=1) MBBDS using memory for 552 states(state size: 32 bits, Memory_percentage_from_MM=0.90) found path length 7; 618 expanded; 0.0003s elapsed;
+			HARD-49 GAP-8 MBBDS(k=1) MBBDS using memory for 460 states(state size: 32 bits, Memory_percentage_from_MM=0.75) found path length 7; 718 expanded; 0.0003s elapsed;
+			HARD-49 GAP-8 MBBDS(k=1) MBBDS using memory for 307 states(state size: 32 bits, Memory_percentage_from_MM=0.50) found path length 7; 718 expanded; 0.0003s elapsed;
+			HARD-49 GAP-8 MBBDS(k=1) MBBDS using memory for 153 states(state size: 32 bits, Memory_percentage_from_MM=0.25) found path length 7; 978 expanded; 0.0003s elapsed;
+			HARD-49 GAP-8 MBBDS(k=1) MBBDS using memory for 61 states(state size: 32 bits, Memory_percentage_from_MM=0.10) found path length 7; 1472 expanded; 0.0005s elapsed;
+		_IDMM_
+			HARD-49 GAP-8 IDMM found path length 7; 48524 expanded; 339668 generated; 0.0105s elapsed; Mid state: 0 3 4 5 6 7 1 2 
+			GAP-8 D-MM ; 27766 expanded;
+	Problem 51 of 100
+	Start state: 3 1 4 5 7 2 6 0 
+	Goal state: 0 1 2 3 4 5 6 7 
+	Initial heuristic 1
+		_A*_
+			GAP-8 A* found path length 7; 8488 expanded; 6983 necessary; using 20788 states in memory; 0.0102s elapsed
+			GAP-8 I-A* ; 17814 expanded;
+		_MM_
+			Hard-GAP-8 MM found path length 7; 168 expanded; 168 necessary; using 968 states in memory; 0.0003s elapsed
+			Hard-GAP-8 I-MM ; 286 expanded;
+		_IDA*_
+			Hard-GAP-8 IDA* found path length 7; 62020 expanded; 434140 generated; 0.0124s elapsed
+			Hard-GAP-8 D-A* ; 51965 expanded;
+		_MBBDS_
+			HARD-50 GAP-8 MBBDS(k=1) MBBDS using memory for 968 states(state size: 32 bits, Memory_percentage_from_MM=1.00) found path length 7; 674 expanded; 0.0003s elapsed;
+			HARD-50 GAP-8 MBBDS(k=1) MBBDS using memory for 871 states(state size: 32 bits, Memory_percentage_from_MM=0.90) found path length 7; 674 expanded; 0.0003s elapsed;
+			HARD-50 GAP-8 MBBDS(k=1) MBBDS using memory for 726 states(state size: 32 bits, Memory_percentage_from_MM=0.75) found path length 7; 674 expanded; 0.0003s elapsed;
+			HARD-50 GAP-8 MBBDS(k=1) MBBDS using memory for 484 states(state size: 32 bits, Memory_percentage_from_MM=0.50) found path length 7; 774 expanded; 0.0003s elapsed;
+			HARD-50 GAP-8 MBBDS(k=1) MBBDS using memory for 242 states(state size: 32 bits, Memory_percentage_from_MM=0.25) found path length 7; 774 expanded; 0.0003s elapsed;
+			HARD-50 GAP-8 MBBDS(k=1) MBBDS using memory for 96 states(state size: 32 bits, Memory_percentage_from_MM=0.10) found path length 7; 1126 expanded; 0.0004s elapsed;
+		_IDMM_
+			HARD-50 GAP-8 IDMM found path length 7; 77172 expanded; 540204 generated; 0.0167s elapsed; Mid state: 1 0 6 2 3 4 5 7 
+			GAP-8 D-MM ; 53060 expanded;
+	Problem 52 of 100
+	Start state: 7 4 3 1 0 2 6 5 
+	Goal state: 0 1 2 3 4 5 6 7 
+	Initial heuristic 1
+		_A*_
+			GAP-8 A* found path length 6; 2560 expanded; 2067 necessary; using 8921 states in memory; 0.0033s elapsed
+			GAP-8 I-A* ; 5182 expanded;
+		_MM_
+			Hard-GAP-8 MM found path length 6; 71 expanded; 71 necessary; using 429 states in memory; 0.0001s elapsed
+			Hard-GAP-8 I-MM ; 89 expanded;
+		_IDA*_
+			Hard-GAP-8 IDA* found path length 6; 7538 expanded; 52766 generated; 0.0015s elapsed
+			Hard-GAP-8 D-A* ; 6192 expanded;
+		_MBBDS_
+			HARD-51 GAP-8 MBBDS(k=1) MBBDS using memory for 429 states(state size: 32 bits, Memory_percentage_from_MM=1.00) found path length 6; 193 expanded; 0.0001s elapsed;
+			HARD-51 GAP-8 MBBDS(k=1) MBBDS using memory for 386 states(state size: 32 bits, Memory_percentage_from_MM=0.90) found path length 6; 243 expanded; 0.0001s elapsed;
+			HARD-51 GAP-8 MBBDS(k=1) MBBDS using memory for 321 states(state size: 32 bits, Memory_percentage_from_MM=0.75) found path length 6; 243 expanded; 0.0001s elapsed;
+			HARD-51 GAP-8 MBBDS(k=1) MBBDS using memory for 214 states(state size: 32 bits, Memory_percentage_from_MM=0.50) found path length 6; 243 expanded; 0.0001s elapsed;
+			HARD-51 GAP-8 MBBDS(k=1) MBBDS using memory for 107 states(state size: 32 bits, Memory_percentage_from_MM=0.25) found path length 6; 243 expanded; 0.0001s elapsed;
+			HARD-51 GAP-8 MBBDS(k=1) MBBDS using memory for 42 states(state size: 32 bits, Memory_percentage_from_MM=0.10) found path length 6; 351 expanded; 0.0001s elapsed;
+		_IDMM_
+			HARD-51 GAP-8 IDMM found path length 6; 8728 expanded; 61096 generated; 0.0019s elapsed; Mid state: 1 0 5 6 2 3 4 7 
+			GAP-8 D-MM ; 4812 expanded;
+	Problem 53 of 100
+	Start state: 3 1 7 6 5 0 4 2 
+	Goal state: 0 1 2 3 4 5 6 7 
+	Initial heuristic 1
+		_A*_
+			GAP-8 A* found path length 6; 2675 expanded; 1889 necessary; using 9142 states in memory; 0.0033s elapsed
+			GAP-8 I-A* ; 5023 expanded;
+		_MM_
+			Hard-GAP-8 MM found path length 6; 62 expanded; 62 necessary; using 375 states in memory; 0.0001s elapsed
+			Hard-GAP-8 I-MM ; 80 expanded;
+		_IDA*_
+			Hard-GAP-8 IDA* found path length 6; 7150 expanded; 50050 generated; 0.0015s elapsed
+			Hard-GAP-8 D-A* ; 6012 expanded;
+		_MBBDS_
+			HARD-52 GAP-8 MBBDS(k=1) MBBDS using memory for 375 states(state size: 32 bits, Memory_percentage_from_MM=1.00) found path length 6; 201 expanded; 0.0001s elapsed;
+			HARD-52 GAP-8 MBBDS(k=1) MBBDS using memory for 337 states(state size: 32 bits, Memory_percentage_from_MM=0.90) found path length 6; 251 expanded; 0.0001s elapsed;
+			HARD-52 GAP-8 MBBDS(k=1) MBBDS using memory for 281 states(state size: 32 bits, Memory_percentage_from_MM=0.75) found path length 6; 251 expanded; 0.0001s elapsed;
+			HARD-52 GAP-8 MBBDS(k=1) MBBDS using memory for 187 states(state size: 32 bits, Memory_percentage_from_MM=0.50) found path length 6; 251 expanded; 0.0001s elapsed;
+			HARD-52 GAP-8 MBBDS(k=1) MBBDS using memory for 93 states(state size: 32 bits, Memory_percentage_from_MM=0.25) found path length 6; 251 expanded; 0.0001s elapsed;
+			HARD-52 GAP-8 MBBDS(k=1) MBBDS using memory for 37 states(state size: 32 bits, Memory_percentage_from_MM=0.10) found path length 6; 367 expanded; 0.0001s elapsed;
+		_IDMM_
+			HARD-52 GAP-8 IDMM found path length 6; 7857 expanded; 54999 generated; 0.0017s elapsed; Mid state: 7 6 5 4 0 1 3 2 
+			GAP-8 D-MM ; 4645 expanded;
+	Problem 54 of 100
+	Start state: 6 0 3 7 1 5 2 4 
+	Goal state: 0 1 2 3 4 5 6 7 
+	Initial heuristic 1
+		_A*_
+			GAP-8 A* found path length 8; 19253 expanded; 18322 necessary; using 33508 states in memory; 0.0215s elapsed
+			GAP-8 I-A* ; 46894 expanded;
+		_MM_
+			Hard-GAP-8 MM found path length 8; 482 expanded; 482 necessary; using 2465 states in memory; 0.0007s elapsed
+			Hard-GAP-8 I-MM ; 600 expanded;
+		_IDA*_
+			Hard-GAP-8 IDA* found path length 8; 556297 expanded; 3894079 generated; 0.1145s elapsed
+			Hard-GAP-8 D-A* ; 465597 expanded;
+		_MBBDS_
+			HARD-53 GAP-8 MBBDS(k=1) MBBDS using memory for 2465 states(state size: 32 bits, Memory_percentage_from_MM=1.00) found path length 8; 1671 expanded; 0.0008s elapsed;
+			HARD-53 GAP-8 MBBDS(k=1) MBBDS using memory for 2218 states(state size: 32 bits, Memory_percentage_from_MM=0.90) found path length 8; 1671 expanded; 0.0007s elapsed;
+			HARD-53 GAP-8 MBBDS(k=1) MBBDS using memory for 1848 states(state size: 32 bits, Memory_percentage_from_MM=0.75) found path length 8; 1671 expanded; 0.0007s elapsed;
+			HARD-53 GAP-8 MBBDS(k=1) MBBDS using memory for 1232 states(state size: 32 bits, Memory_percentage_from_MM=0.50) found path length 8; 1671 expanded; 0.0007s elapsed;
+			HARD-53 GAP-8 MBBDS(k=1) MBBDS using memory for 616 states(state size: 32 bits, Memory_percentage_from_MM=0.25) found path length 8; 1671 expanded; 0.0006s elapsed;
+			HARD-53 GAP-8 MBBDS(k=1) MBBDS using memory for 246 states(state size: 32 bits, Memory_percentage_from_MM=0.10) found path length 8; 1961 expanded; 0.0007s elapsed;
+		_IDMM_
+			HARD-53 GAP-8 IDMM found path length 8; 632475 expanded; 4427325 generated; 0.1432s elapsed; Mid state: 7 6 0 1 5 2 3 4 
+			GAP-8 D-MM ; 502695 expanded;
+	Problem 55 of 100
+	Start state: 5 4 3 0 1 2 7 6 
+	Goal state: 0 1 2 3 4 5 6 7 
+	Initial heuristic 1
+		_A*_
+			GAP-8 A* found path length 4; 99 expanded; 62 necessary; using 552 states in memory; 0.0002s elapsed
+			GAP-8 I-A* ; 171 expanded;
+		_MM_
+			Hard-GAP-8 MM found path length 4; 16 expanded; 16 necessary; using 100 states in memory; 0.0000s elapsed
+			Hard-GAP-8 I-MM ; 18 expanded;
+		_IDA*_
+			Hard-GAP-8 IDA* found path length 4; 133 expanded; 931 generated; 0.0000s elapsed
+			Hard-GAP-8 D-A* ; 111 expanded;
+		_MBBDS_
+			HARD-54 GAP-8 MBBDS(k=1) MBBDS using memory for 100 states(state size: 32 bits, Memory_percentage_from_MM=1.00) found path length 4; 27 expanded; 0.0000s elapsed;
+			HARD-54 GAP-8 MBBDS(k=1) MBBDS using memory for 90 states(state size: 32 bits, Memory_percentage_from_MM=0.90) found path length 4; 27 expanded; 0.0000s elapsed;
+			HARD-54 GAP-8 MBBDS(k=1) MBBDS using memory for 75 states(state size: 32 bits, Memory_percentage_from_MM=0.75) found path length 4; 31 expanded; 0.0000s elapsed;
+			HARD-54 GAP-8 MBBDS(k=1) MBBDS using memory for 50 states(state size: 32 bits, Memory_percentage_from_MM=0.50) found path length 4; 31 expanded; 0.0000s elapsed;
+			HARD-54 GAP-8 MBBDS(k=1) MBBDS using memory for 25 states(state size: 32 bits, Memory_percentage_from_MM=0.25) found path length 4; 31 expanded; 0.0000s elapsed;
+			HARD-54 GAP-8 MBBDS(k=1) MBBDS using memory for 10 states(state size: 32 bits, Memory_percentage_from_MM=0.10) found path length 4; 52 expanded; 0.0000s elapsed;
+		_IDMM_
+			HARD-54 GAP-8 IDMM found path length 4; 150 expanded; 1050 generated; 0.0000s elapsed; Mid state: 6 5 4 3 0 1 2 7 
+			GAP-8 D-MM ; 84 expanded;
+	Problem 56 of 100
+	Start state: 3 4 1 2 7 0 5 6 
+	Goal state: 0 1 2 3 4 5 6 7 
+	Initial heuristic 1
+		_A*_
+			GAP-8 A* found path length 6; 2872 expanded; 1888 necessary; using 9524 states in memory; 0.0037s elapsed
+			GAP-8 I-A* ; 5215 expanded;
+		_MM_
+			Hard-GAP-8 MM found path length 6; 82 expanded; 82 necessary; using 495 states in memory; 0.0002s elapsed
+			Hard-GAP-8 I-MM ; 100 expanded;
+		_IDA*_
+			Hard-GAP-8 IDA* found path length 6; 15308 expanded; 107156 generated; 0.0034s elapsed
+			Hard-GAP-8 D-A* ; 12852 expanded;
+		_MBBDS_
+			HARD-55 GAP-8 MBBDS(k=1) MBBDS using memory for 495 states(state size: 32 bits, Memory_percentage_from_MM=1.00) found path length 6; 277 expanded; 0.0001s elapsed;
+			HARD-55 GAP-8 MBBDS(k=1) MBBDS using memory for 445 states(state size: 32 bits, Memory_percentage_from_MM=0.90) found path length 6; 277 expanded; 0.0001s elapsed;
+			HARD-55 GAP-8 MBBDS(k=1) MBBDS using memory for 371 states(state size: 32 bits, Memory_percentage_from_MM=0.75) found path length 6; 277 expanded; 0.0001s elapsed;
+			HARD-55 GAP-8 MBBDS(k=1) MBBDS using memory for 247 states(state size: 32 bits, Memory_percentage_from_MM=0.50) found path length 6; 277 expanded; 0.0001s elapsed;
+			HARD-55 GAP-8 MBBDS(k=1) MBBDS using memory for 123 states(state size: 32 bits, Memory_percentage_from_MM=0.25) found path length 6; 277 expanded; 0.0001s elapsed;
+			HARD-55 GAP-8 MBBDS(k=1) MBBDS using memory for 49 states(state size: 32 bits, Memory_percentage_from_MM=0.10) found path length 6; 330 expanded; 0.0001s elapsed;
+		_IDMM_
+			HARD-55 GAP-8 IDMM found path length 6; 17200 expanded; 120400 generated; 0.0037s elapsed; Mid state: 6 5 0 1 4 3 2 7 
+			GAP-8 D-MM ; 13988 expanded;
+	Problem 57 of 100
+	Start state: 5 2 3 0 1 4 6 7 
+	Goal state: 0 1 2 3 4 5 6 7 
+	Initial heuristic 0
+		_A*_
+			GAP-8 A* found path length 5; 1369 expanded; 844 necessary; using 4911 states in memory; 0.0018s elapsed
+			GAP-8 I-A* ; 2452 expanded;
+		_MM_
+			Hard-GAP-8 MM found path length 5; 26 expanded; 26 necessary; using 160 states in memory; 0.0000s elapsed
+			Hard-GAP-8 I-MM ; 44 expanded;
+		_IDA*_
+			Hard-GAP-8 IDA* found path length 0; 1 expanded; 7 generated; 0.0000s elapsed
+			Hard-GAP-8 D-A* ; 1 expanded;
+		_MBBDS_
+			HARD-56 GAP-8 MBBDS(k=1) MBBDS using memory for 160 states(state size: 32 bits, Memory_percentage_from_MM=1.00) found path length 5; 105 expanded; 0.0001s elapsed;
+			HARD-56 GAP-8 MBBDS(k=1) MBBDS using memory for 144 states(state size: 32 bits, Memory_percentage_from_MM=0.90) found path length 5; 105 expanded; 0.0001s elapsed;
+			HARD-56 GAP-8 MBBDS(k=1) MBBDS using memory for 120 states(state size: 32 bits, Memory_percentage_from_MM=0.75) found path length 5; 105 expanded; 0.0001s elapsed;
+			HARD-56 GAP-8 MBBDS(k=1) MBBDS using memory for 80 states(state size: 32 bits, Memory_percentage_from_MM=0.50) found path length 5; 113 expanded; 0.0001s elapsed;
+			HARD-56 GAP-8 MBBDS(k=1) MBBDS using memory for 40 states(state size: 32 bits, Memory_percentage_from_MM=0.25) found path length 5; 113 expanded; 0.0000s elapsed;
+			HARD-56 GAP-8 MBBDS(k=1) MBBDS using memory for 16 states(state size: 32 bits, Memory_percentage_from_MM=0.10) found path length 5; 237 expanded; 0.0001s elapsed;
+		_IDMM_
+			HARD-56 GAP-8 IDMM found path length 5; 3396 expanded; 23772 generated; 0.0008s elapsed; Mid state: 3 2 0 1 4 5 6 7 
+			GAP-8 D-MM ; 1852 expanded;
+	Problem 58 of 100
+	Start state: 5 4 7 6 2 3 0 1 
+	Goal state: 0 1 2 3 4 5 6 7 
+	Initial heuristic 1
+		_A*_
+			GAP-8 A* found path length 6; 2706 expanded; 1889 necessary; using 9201 states in memory; 0.0039s elapsed
+			GAP-8 I-A* ; 5054 expanded;
+		_MM_
+			Hard-GAP-8 MM found path length 6; 76 expanded; 76 necessary; using 459 states in memory; 0.0001s elapsed
+			Hard-GAP-8 I-MM ; 94 expanded;
+		_IDA*_
+			Hard-GAP-8 IDA* found path length 6; 4568 expanded; 31976 generated; 0.0010s elapsed
+			Hard-GAP-8 D-A* ; 3840 expanded;
+		_MBBDS_
+			HARD-57 GAP-8 MBBDS(k=1) MBBDS using memory for 459 states(state size: 32 bits, Memory_percentage_from_MM=1.00) found path length 6; 243 expanded; 0.0001s elapsed;
+			HARD-57 GAP-8 MBBDS(k=1) MBBDS using memory for 413 states(state size: 32 bits, Memory_percentage_from_MM=0.90) found path length 6; 193 expanded; 0.0001s elapsed;
+			HARD-57 GAP-8 MBBDS(k=1) MBBDS using memory for 344 states(state size: 32 bits, Memory_percentage_from_MM=0.75) found path length 6; 243 expanded; 0.0001s elapsed;
+			HARD-57 GAP-8 MBBDS(k=1) MBBDS using memory for 229 states(state size: 32 bits, Memory_percentage_from_MM=0.50) found path length 6; 243 expanded; 0.0001s elapsed;
+			HARD-57 GAP-8 MBBDS(k=1) MBBDS using memory for 114 states(state size: 32 bits, Memory_percentage_from_MM=0.25) found path length 6; 243 expanded; 0.0001s elapsed;
+			HARD-57 GAP-8 MBBDS(k=1) MBBDS using memory for 45 states(state size: 32 bits, Memory_percentage_from_MM=0.10) found path length 6; 351 expanded; 0.0001s elapsed;
+		_IDMM_
+			HARD-57 GAP-8 IDMM found path length 6; 5019 expanded; 35133 generated; 0.0011s elapsed; Mid state: 7 6 2 1 0 3 4 5 
+			GAP-8 D-MM ; 1807 expanded;
+	Problem 59 of 100
+	Start state: 4 0 6 3 5 2 1 7 
+	Goal state: 0 1 2 3 4 5 6 7 
+	Initial heuristic 0
+		_A*_
+			GAP-8 A* found path length 6; 3113 expanded; 2849 necessary; using 9581 states in memory; 0.0039s elapsed
+			GAP-8 I-A* ; 7044 expanded;
+		_MM_
+			Hard-GAP-8 MM found path length 6; 72 expanded; 72 necessary; using 435 states in memory; 0.0001s elapsed
+			Hard-GAP-8 I-MM ; 90 expanded;
+		_IDA*_
+			Hard-GAP-8 IDA* found path length 0; 1 expanded; 7 generated; 0.0000s elapsed
+			Hard-GAP-8 D-A* ; 1 expanded;
+		_MBBDS_
+			HARD-58 GAP-8 MBBDS(k=1) MBBDS using memory for 435 states(state size: 32 bits, Memory_percentage_from_MM=1.00) found path length 6; 275 expanded; 0.0001s elapsed;
+			HARD-58 GAP-8 MBBDS(k=1) MBBDS using memory for 391 states(state size: 32 bits, Memory_percentage_from_MM=0.90) found path length 6; 275 expanded; 0.0001s elapsed;
+			HARD-58 GAP-8 MBBDS(k=1) MBBDS using memory for 326 states(state size: 32 bits, Memory_percentage_from_MM=0.75) found path length 6; 275 expanded; 0.0001s elapsed;
+			HARD-58 GAP-8 MBBDS(k=1) MBBDS using memory for 217 states(state size: 32 bits, Memory_percentage_from_MM=0.50) found path length 6; 275 expanded; 0.0001s elapsed;
+			HARD-58 GAP-8 MBBDS(k=1) MBBDS using memory for 108 states(state size: 32 bits, Memory_percentage_from_MM=0.25) found path length 6; 275 expanded; 0.0001s elapsed;
+			HARD-58 GAP-8 MBBDS(k=1) MBBDS using memory for 43 states(state size: 32 bits, Memory_percentage_from_MM=0.10) found path length 6; 391 expanded; 0.0001s elapsed;
+		_IDMM_
+			HARD-58 GAP-8 IDMM found path length 6; 34060 expanded; 238420 generated; 0.0075s elapsed; Mid state: 4 3 5 2 1 0 6 7 
+			GAP-8 D-MM ; 25788 expanded;
+	Problem 60 of 100
+	Start state: 6 7 4 2 5 3 1 0 
+	Goal state: 0 1 2 3 4 5 6 7 
+	Initial heuristic 1
+		_A*_
+			GAP-8 A* found path length 6; 6314 expanded; 1881 necessary; using 17475 states in memory; 0.0097s elapsed
+			GAP-8 I-A* ; 8648 expanded;
+		_MM_
+			Hard-GAP-8 MM found path length 6; 83 expanded; 83 necessary; using 501 states in memory; 0.0002s elapsed
+			Hard-GAP-8 I-MM ; 101 expanded;
+		_IDA*_
+			Hard-GAP-8 IDA* found path length 6; 12444 expanded; 87108 generated; 0.0026s elapsed
+			Hard-GAP-8 D-A* ; 10466 expanded;
+		_MBBDS_
+			HARD-59 GAP-8 MBBDS(k=1) MBBDS using memory for 501 states(state size: 32 bits, Memory_percentage_from_MM=1.00) found path length 6; 219 expanded; 0.0001s elapsed;
+			HARD-59 GAP-8 MBBDS(k=1) MBBDS using memory for 450 states(state size: 32 bits, Memory_percentage_from_MM=0.90) found path length 6; 219 expanded; 0.0001s elapsed;
+			HARD-59 GAP-8 MBBDS(k=1) MBBDS using memory for 375 states(state size: 32 bits, Memory_percentage_from_MM=0.75) found path length 6; 269 expanded; 0.0001s elapsed;
+			HARD-59 GAP-8 MBBDS(k=1) MBBDS using memory for 250 states(state size: 32 bits, Memory_percentage_from_MM=0.50) found path length 6; 269 expanded; 0.0001s elapsed;
+			HARD-59 GAP-8 MBBDS(k=1) MBBDS using memory for 125 states(state size: 32 bits, Memory_percentage_from_MM=0.25) found path length 6; 269 expanded; 0.0001s elapsed;
+			HARD-59 GAP-8 MBBDS(k=1) MBBDS using memory for 50 states(state size: 32 bits, Memory_percentage_from_MM=0.10) found path length 6; 293 expanded; 0.0001s elapsed;
+		_IDMM_
+			HARD-59 GAP-8 IDMM found path length 6; 15951 expanded; 111657 generated; 0.0035s elapsed; Mid state: 4 7 6 5 3 2 1 0 
+			GAP-8 D-MM ; 11869 expanded;
+	Problem 61 of 100
+	Start state: 2 5 0 3 6 4 7 1 
+	Goal state: 0 1 2 3 4 5 6 7 
+	Initial heuristic 1
+		_A*_
+			GAP-8 A* found path length 8; 19367 expanded; 18427 necessary; using 33459 states in memory; 0.0235s elapsed
+			GAP-8 I-A* ; 47092 expanded;
+		_MM_
+			Hard-GAP-8 MM found path length 8; 398 expanded; 398 necessary; using 2052 states in memory; 0.0006s elapsed
+			Hard-GAP-8 I-MM ; 516 expanded;
+		_IDA*_
+			Hard-GAP-8 IDA* found path length 8; 218793 expanded; 1531551 generated; 0.0446s elapsed
+			Hard-GAP-8 D-A* ; 182823 expanded;
+		_MBBDS_
+			HARD-60 GAP-8 MBBDS(k=1) MBBDS using memory for 2052 states(state size: 32 bits, Memory_percentage_from_MM=1.00) found path length 8; 1495 expanded; 0.0007s elapsed;
+			HARD-60 GAP-8 MBBDS(k=1) MBBDS using memory for 1846 states(state size: 32 bits, Memory_percentage_from_MM=0.90) found path length 8; 1495 expanded; 0.0006s elapsed;
+			HARD-60 GAP-8 MBBDS(k=1) MBBDS using memory for 1539 states(state size: 32 bits, Memory_percentage_from_MM=0.75) found path length 8; 1495 expanded; 0.0006s elapsed;
+			HARD-60 GAP-8 MBBDS(k=1) MBBDS using memory for 1026 states(state size: 32 bits, Memory_percentage_from_MM=0.50) found path length 8; 1495 expanded; 0.0006s elapsed;
+			HARD-60 GAP-8 MBBDS(k=1) MBBDS using memory for 513 states(state size: 32 bits, Memory_percentage_from_MM=0.25) found path length 8; 1495 expanded; 0.0006s elapsed;
+			HARD-60 GAP-8 MBBDS(k=1) MBBDS using memory for 205 states(state size: 32 bits, Memory_percentage_from_MM=0.10) found path length 8; 2199 expanded; 0.0008s elapsed;
+		_IDMM_
+			HARD-60 GAP-8 IDMM found path length 8; 249998 expanded; 1749986 generated; 0.0539s elapsed; Mid state: 3 0 1 2 5 6 4 7 
+			GAP-8 D-MM ; 120218 expanded;
+	Problem 62 of 100
+	Start state: 6 4 2 0 5 3 1 7 
+	Goal state: 0 1 2 3 4 5 6 7 
+	Initial heuristic 0
+		_A*_
+			GAP-8 A* found path length 7; 8408 expanded; 7676 necessary; using 19924 states in memory; 0.0096s elapsed
+			GAP-8 I-A* ; 20014 expanded;
+		_MM_
+			Hard-GAP-8 MM found path length 7; 279 expanded; 279 necessary; using 1502 states in memory; 0.0004s elapsed
+			Hard-GAP-8 I-MM ; 397 expanded;
+		_IDA*_
+			Hard-GAP-8 IDA* found path length 0; 1 expanded; 7 generated; 0.0000s elapsed
+			Hard-GAP-8 D-A* ; 1 expanded;
+		_MBBDS_
+			HARD-61 GAP-8 MBBDS(k=1) MBBDS using memory for 1502 states(state size: 32 bits, Memory_percentage_from_MM=1.00) found path length 7; 610 expanded; 0.0003s elapsed;
+			HARD-61 GAP-8 MBBDS(k=1) MBBDS using memory for 1351 states(state size: 32 bits, Memory_percentage_from_MM=0.90) found path length 7; 610 expanded; 0.0003s elapsed;
+			HARD-61 GAP-8 MBBDS(k=1) MBBDS using memory for 1126 states(state size: 32 bits, Memory_percentage_from_MM=0.75) found path length 7; 610 expanded; 0.0003s elapsed;
+			HARD-61 GAP-8 MBBDS(k=1) MBBDS using memory for 751 states(state size: 32 bits, Memory_percentage_from_MM=0.50) found path length 7; 610 expanded; 0.0003s elapsed;
+			HARD-61 GAP-8 MBBDS(k=1) MBBDS using memory for 375 states(state size: 32 bits, Memory_percentage_from_MM=0.25) found path length 7; 710 expanded; 0.0003s elapsed;
+			HARD-61 GAP-8 MBBDS(k=1) MBBDS using memory for 150 states(state size: 32 bits, Memory_percentage_from_MM=0.10) found path length 7; 966 expanded; 0.0003s elapsed;
+		_IDMM_
+			HARD-61 GAP-8 IDMM found path length 7; 76385 expanded; 534695 generated; 0.0163s elapsed; Mid state: 2 1 0 5 3 4 6 7 
+			GAP-8 D-MM ; 31523 expanded;
+	Problem 63 of 100
+	Start state: 3 7 0 4 2 6 5 1 
+	Goal state: 0 1 2 3 4 5 6 7 
+	Initial heuristic 1
+		_A*_
+			GAP-8 A* found path length 8; 19306 expanded; 18335 necessary; using 33469 states in memory; 0.0221s elapsed
+			GAP-8 I-A* ; 46940 expanded;
+		_MM_
+			Hard-GAP-8 MM found path length 8; 382 expanded; 382 necessary; using 1965 states in memory; 0.0006s elapsed
+			Hard-GAP-8 I-MM ; 500 expanded;
+		_IDA*_
+			Hard-GAP-8 IDA* found path length 8; 448980 expanded; 3142860 generated; 0.0900s elapsed
+			Hard-GAP-8 D-A* ; 376173 expanded;
+		_MBBDS_
+			HARD-62 GAP-8 MBBDS(k=1) MBBDS using memory for 1965 states(state size: 32 bits, Memory_percentage_from_MM=1.00) found path length 8; 1621 expanded; 0.0007s elapsed;
+			HARD-62 GAP-8 MBBDS(k=1) MBBDS using memory for 1768 states(state size: 32 bits, Memory_percentage_from_MM=0.90) found path length 8; 1621 expanded; 0.0007s elapsed;
+			HARD-62 GAP-8 MBBDS(k=1) MBBDS using memory for 1473 states(state size: 32 bits, Memory_percentage_from_MM=0.75) found path length 8; 1621 expanded; 0.0007s elapsed;
+			HARD-62 GAP-8 MBBDS(k=1) MBBDS using memory for 982 states(state size: 32 bits, Memory_percentage_from_MM=0.50) found path length 8; 1621 expanded; 0.0006s elapsed;
+			HARD-62 GAP-8 MBBDS(k=1) MBBDS using memory for 491 states(state size: 32 bits, Memory_percentage_from_MM=0.25) found path length 8; 1721 expanded; 0.0006s elapsed;
+			HARD-62 GAP-8 MBBDS(k=1) MBBDS using memory for 196 states(state size: 32 bits, Memory_percentage_from_MM=0.10) found path length 8; 2325 expanded; 0.0008s elapsed;
+		_IDMM_
+			HARD-62 GAP-8 IDMM found path length 8; 509611 expanded; 3567277 generated; 0.1091s elapsed; Mid state: 4 0 1 5 6 2 3 7 
+			GAP-8 D-MM ; 379831 expanded;
+	Problem 64 of 100
+	Start state: 2 0 7 6 1 3 4 5 
+	Goal state: 0 1 2 3 4 5 6 7 
+	Initial heuristic 1
+		_A*_
+			GAP-8 A* found path length 5; 574 expanded; 387 necessary; using 2646 states in memory; 0.0008s elapsed
+			GAP-8 I-A* ; 1033 expanded;
+		_MM_
+			Hard-GAP-8 MM found path length 5; 40 expanded; 40 necessary; using 244 states in memory; 0.0001s elapsed
+			Hard-GAP-8 I-MM ; 58 expanded;
+		_IDA*_
+			Hard-GAP-8 IDA* found path length 5; 1733 expanded; 12131 generated; 0.0004s elapsed
+			Hard-GAP-8 D-A* ; 1461 expanded;
+		_MBBDS_
+			HARD-63 GAP-8 MBBDS(k=1) MBBDS using memory for 244 states(state size: 32 bits, Memory_percentage_from_MM=1.00) found path length 5; 114 expanded; 0.0001s elapsed;
+			HARD-63 GAP-8 MBBDS(k=1) MBBDS using memory for 219 states(state size: 32 bits, Memory_percentage_from_MM=0.90) found path length 5; 114 expanded; 0.0001s elapsed;
+			HARD-63 GAP-8 MBBDS(k=1) MBBDS using memory for 183 states(state size: 32 bits, Memory_percentage_from_MM=0.75) found path length 5; 114 expanded; 0.0001s elapsed;
+			HARD-63 GAP-8 MBBDS(k=1) MBBDS using memory for 122 states(state size: 32 bits, Memory_percentage_from_MM=0.50) found path length 5; 114 expanded; 0.0001s elapsed;
+			HARD-63 GAP-8 MBBDS(k=1) MBBDS using memory for 61 states(state size: 32 bits, Memory_percentage_from_MM=0.25) found path length 5; 130 expanded; 0.0001s elapsed;
+			HARD-63 GAP-8 MBBDS(k=1) MBBDS using memory for 24 states(state size: 32 bits, Memory_percentage_from_MM=0.10) found path length 5; 152 expanded; 0.0001s elapsed;
+		_IDMM_
+			HARD-63 GAP-8 IDMM found path length 5; 1843 expanded; 12901 generated; 0.0004s elapsed; Mid state: 5 4 3 2 0 1 6 7 
+			GAP-8 D-MM ; 1357 expanded;
+	Problem 65 of 100
+	Start state: 5 6 7 4 1 3 0 2 
+	Goal state: 0 1 2 3 4 5 6 7 
+	Initial heuristic 1
+		_A*_
+			GAP-8 A* found path length 6; 2278 expanded; 1889 necessary; using 8256 states in memory; 0.0029s elapsed
+			GAP-8 I-A* ; 4626 expanded;
+		_MM_
+			Hard-GAP-8 MM found path length 6; 65 expanded; 65 necessary; using 393 states in memory; 0.0001s elapsed
+			Hard-GAP-8 I-MM ; 83 expanded;
+		_IDA*_
+			Hard-GAP-8 IDA* found path length 6; 14584 expanded; 102088 generated; 0.0030s elapsed
+			Hard-GAP-8 D-A* ; 12237 expanded;
+		_MBBDS_
+			HARD-64 GAP-8 MBBDS(k=1) MBBDS using memory for 393 states(state size: 32 bits, Memory_percentage_from_MM=1.00) found path length 6; 274 expanded; 0.0001s elapsed;
+			HARD-64 GAP-8 MBBDS(k=1) MBBDS using memory for 353 states(state size: 32 bits, Memory_percentage_from_MM=0.90) found path length 6; 274 expanded; 0.0001s elapsed;
+			HARD-64 GAP-8 MBBDS(k=1) MBBDS using memory for 294 states(state size: 32 bits, Memory_percentage_from_MM=0.75) found path length 6; 274 expanded; 0.0001s elapsed;
+			HARD-64 GAP-8 MBBDS(k=1) MBBDS using memory for 196 states(state size: 32 bits, Memory_percentage_from_MM=0.50) found path length 6; 274 expanded; 0.0001s elapsed;
+			HARD-64 GAP-8 MBBDS(k=1) MBBDS using memory for 98 states(state size: 32 bits, Memory_percentage_from_MM=0.25) found path length 6; 274 expanded; 0.0001s elapsed;
+			HARD-64 GAP-8 MBBDS(k=1) MBBDS using memory for 39 states(state size: 32 bits, Memory_percentage_from_MM=0.10) found path length 6; 445 expanded; 0.0002s elapsed;
+		_IDMM_
+			HARD-64 GAP-8 IDMM found path length 6; 16246 expanded; 113722 generated; 0.0036s elapsed; Mid state: 3 0 2 1 4 5 6 7 
+			GAP-8 D-MM ; 13034 expanded;
+	Problem 66 of 100
+	Start state: 7 2 6 5 1 3 0 4 
+	Goal state: 0 1 2 3 4 5 6 7 
+	Initial heuristic 1
+		_A*_
+			GAP-8 A* found path length 7; 8183 expanded; 7184 necessary; using 20512 states in memory; 0.0096s elapsed
+			GAP-8 I-A* ; 17989 expanded;
+		_MM_
+			Hard-GAP-8 MM found path length 7; 119 expanded; 119 necessary; using 711 states in memory; 0.0002s elapsed
+			Hard-GAP-8 I-MM ; 237 expanded;
+		_IDA*_
+			Hard-GAP-8 IDA* found path length 7; 36780 expanded; 257460 generated; 0.0072s elapsed
+			Hard-GAP-8 D-A* ; 30330 expanded;
+		_MBBDS_
+			HARD-65 GAP-8 MBBDS(k=1) MBBDS using memory for 711 states(state size: 32 bits, Memory_percentage_from_MM=1.00) found path length 7; 565 expanded; 0.0003s elapsed;
+			HARD-65 GAP-8 MBBDS(k=1) MBBDS using memory for 639 states(state size: 32 bits, Memory_percentage_from_MM=0.90) found path length 7; 565 expanded; 0.0002s elapsed;
+			HARD-65 GAP-8 MBBDS(k=1) MBBDS using memory for 533 states(state size: 32 bits, Memory_percentage_from_MM=0.75) found path length 7; 565 expanded; 0.0002s elapsed;
+			HARD-65 GAP-8 MBBDS(k=1) MBBDS using memory for 355 states(state size: 32 bits, Memory_percentage_from_MM=0.50) found path length 7; 665 expanded; 0.0003s elapsed;
+			HARD-65 GAP-8 MBBDS(k=1) MBBDS using memory for 177 states(state size: 32 bits, Memory_percentage_from_MM=0.25) found path length 7; 665 expanded; 0.0002s elapsed;
+			HARD-65 GAP-8 MBBDS(k=1) MBBDS using memory for 71 states(state size: 32 bits, Memory_percentage_from_MM=0.10) found path length 7; 1435 expanded; 0.0005s elapsed;
+		_IDMM_
+			HARD-65 GAP-8 IDMM found path length 7; 42698 expanded; 298886 generated; 0.0092s elapsed; Mid state: 2 1 3 0 4 5 6 7 
+			GAP-8 D-MM ; 18752 expanded;
+	Problem 67 of 100
+	Start state: 4 2 7 6 0 5 1 3 
+	Goal state: 0 1 2 3 4 5 6 7 
+	Initial heuristic 1
+		_A*_
+			GAP-8 A* found path length 7; 8412 expanded; 6987 necessary; using 20687 states in memory; 0.0099s elapsed
+			GAP-8 I-A* ; 17747 expanded;
+		_MM_
+			Hard-GAP-8 MM found path length 7; 290 expanded; 290 necessary; using 1545 states in memory; 0.0004s elapsed
+			Hard-GAP-8 I-MM ; 408 expanded;
+		_IDA*_
+			Hard-GAP-8 IDA* found path length 7; 37290 expanded; 261030 generated; 0.0075s elapsed
+			Hard-GAP-8 D-A* ; 31280 expanded;
+		_MBBDS_
+			HARD-66 GAP-8 MBBDS(k=1) MBBDS using memory for 1545 states(state size: 32 bits, Memory_percentage_from_MM=1.00) found path length 7; 599 expanded; 0.0003s elapsed;
+			HARD-66 GAP-8 MBBDS(k=1) MBBDS using memory for 1390 states(state size: 32 bits, Memory_percentage_from_MM=0.90) found path length 7; 599 expanded; 0.0003s elapsed;
+			HARD-66 GAP-8 MBBDS(k=1) MBBDS using memory for 1158 states(state size: 32 bits, Memory_percentage_from_MM=0.75) found path length 7; 599 expanded; 0.0003s elapsed;
+			HARD-66 GAP-8 MBBDS(k=1) MBBDS using memory for 772 states(state size: 32 bits, Memory_percentage_from_MM=0.50) found path length 7; 599 expanded; 0.0003s elapsed;
+			HARD-66 GAP-8 MBBDS(k=1) MBBDS using memory for 386 states(state size: 32 bits, Memory_percentage_from_MM=0.25) found path length 7; 699 expanded; 0.0003s elapsed;
+			HARD-66 GAP-8 MBBDS(k=1) MBBDS using memory for 154 states(state size: 32 bits, Memory_percentage_from_MM=0.10) found path length 7; 959 expanded; 0.0003s elapsed;
+		_IDMM_
+			HARD-66 GAP-8 IDMM found path length 7; 41754 expanded; 292278 generated; 0.0091s elapsed; Mid state: 4 3 2 1 5 0 6 7 
+			GAP-8 D-MM ; 20996 expanded;
+	Problem 68 of 100
+	Start state: 7 2 1 6 5 4 3 0 
+	Goal state: 0 1 2 3 4 5 6 7 
+	Initial heuristic 1
+		_A*_
+			GAP-8 A* found path length 4; 132 expanded; 80 necessary; using 741 states in memory; 0.0002s elapsed
+			GAP-8 I-A* ; 228 expanded;
+		_MM_
+			Hard-GAP-8 MM found path length 4; 10 expanded; 10 necessary; using 64 states in memory; 0.0000s elapsed
+			Hard-GAP-8 I-MM ; 12 expanded;
+		_IDA*_
+			Hard-GAP-8 IDA* found path length 4; 168 expanded; 1176 generated; 0.0000s elapsed
+			Hard-GAP-8 D-A* ; 136 expanded;
+		_MBBDS_
+			HARD-67 GAP-8 MBBDS(k=1) MBBDS using memory for 64 states(state size: 32 bits, Memory_percentage_from_MM=1.00) found path length 4; 38 expanded; 0.0000s elapsed;
+			HARD-67 GAP-8 MBBDS(k=1) MBBDS using memory for 57 states(state size: 32 bits, Memory_percentage_from_MM=0.90) found path length 4; 30 expanded; 0.0000s elapsed;
+			HARD-67 GAP-8 MBBDS(k=1) MBBDS using memory for 48 states(state size: 32 bits, Memory_percentage_from_MM=0.75) found path length 4; 30 expanded; 0.0000s elapsed;
+			HARD-67 GAP-8 MBBDS(k=1) MBBDS using memory for 32 states(state size: 32 bits, Memory_percentage_from_MM=0.50) found path length 4; 30 expanded; 0.0000s elapsed;
+			HARD-67 GAP-8 MBBDS(k=1) MBBDS using memory for 16 states(state size: 32 bits, Memory_percentage_from_MM=0.25) found path length 4; 30 expanded; 0.0000s elapsed;
+			HARD-67 GAP-8 MBBDS(k=1) MBBDS using memory for 6 states(state size: 32 bits, Memory_percentage_from_MM=0.10) found path length 4; 71 expanded; 0.0000s elapsed;
+		_IDMM_
+			HARD-67 GAP-8 IDMM found path length 4; 243 expanded; 1701 generated; 0.0001s elapsed; Mid state: 6 5 4 3 0 1 2 7 
+			GAP-8 D-MM ; 105 expanded;
+	Problem 69 of 100
+	Start state: 5 4 2 3 6 7 1 0 
+	Goal state: 0 1 2 3 4 5 6 7 
+	Initial heuristic 1
+		_A*_
+			GAP-8 A* found path length 4; 134 expanded; 62 necessary; using 730 states in memory; 0.0002s elapsed
+			GAP-8 I-A* ; 206 expanded;
+		_MM_
+			Hard-GAP-8 MM found path length 4; 10 expanded; 10 necessary; using 64 states in memory; 0.0000s elapsed
+			Hard-GAP-8 I-MM ; 12 expanded;
+		_IDA*_
+			Hard-GAP-8 IDA* found path length 4; 358 expanded; 2506 generated; 0.0001s elapsed
+			Hard-GAP-8 D-A* ; 302 expanded;
+		_MBBDS_
+			HARD-68 GAP-8 MBBDS(k=1) MBBDS using memory for 64 states(state size: 32 bits, Memory_percentage_from_MM=1.00) found path length 4; 34 expanded; 0.0000s elapsed;
+			HARD-68 GAP-8 MBBDS(k=1) MBBDS using memory for 57 states(state size: 32 bits, Memory_percentage_from_MM=0.90) found path length 4; 34 expanded; 0.0000s elapsed;
+			HARD-68 GAP-8 MBBDS(k=1) MBBDS using memory for 48 states(state size: 32 bits, Memory_percentage_from_MM=0.75) found path length 4; 34 expanded; 0.0000s elapsed;
+			HARD-68 GAP-8 MBBDS(k=1) MBBDS using memory for 32 states(state size: 32 bits, Memory_percentage_from_MM=0.50) found path length 4; 34 expanded; 0.0000s elapsed;
+			HARD-68 GAP-8 MBBDS(k=1) MBBDS using memory for 16 states(state size: 32 bits, Memory_percentage_from_MM=0.25) found path length 4; 34 expanded; 0.0000s elapsed;
+			HARD-68 GAP-8 MBBDS(k=1) MBBDS using memory for 6 states(state size: 32 bits, Memory_percentage_from_MM=0.10) found path length 4; 58 expanded; 0.0000s elapsed;
+		_IDMM_
+			HARD-68 GAP-8 IDMM found path length 4; 495 expanded; 3465 generated; 0.0001s elapsed; Mid state: 2 3 4 5 6 7 1 0 
+			GAP-8 D-MM ; 394 expanded;
+	Problem 70 of 100
+	Start state: 1 7 3 4 0 6 5 2 
+	Goal state: 0 1 2 3 4 5 6 7 
+	Initial heuristic 1
+		_A*_
+			GAP-8 A* found path length 8; 19021 expanded; 18335 necessary; using 33307 states in memory; 0.0209s elapsed
+			GAP-8 I-A* ; 46655 expanded;
+		_MM_
+			Hard-GAP-8 MM found path length 8; 354 expanded; 354 necessary; using 1811 states in memory; 0.0005s elapsed
+			Hard-GAP-8 I-MM ; 472 expanded;
+		_IDA*_
+			Hard-GAP-8 IDA* found path length 8; 117672 expanded; 823704 generated; 0.0273s elapsed
+			Hard-GAP-8 D-A* ; 98556 expanded;
+		_MBBDS_
+			HARD-69 GAP-8 MBBDS(k=1) MBBDS using memory for 1811 states(state size: 32 bits, Memory_percentage_from_MM=1.00) found path length 8; 1448 expanded; 0.0008s elapsed;
+			HARD-69 GAP-8 MBBDS(k=1) MBBDS using memory for 1629 states(state size: 32 bits, Memory_percentage_from_MM=0.90) found path length 8; 1448 expanded; 0.0006s elapsed;
+			HARD-69 GAP-8 MBBDS(k=1) MBBDS using memory for 1358 states(state size: 32 bits, Memory_percentage_from_MM=0.75) found path length 8; 1448 expanded; 0.0007s elapsed;
+			HARD-69 GAP-8 MBBDS(k=1) MBBDS using memory for 905 states(state size: 32 bits, Memory_percentage_from_MM=0.50) found path length 8; 1448 expanded; 0.0007s elapsed;
+			HARD-69 GAP-8 MBBDS(k=1) MBBDS using memory for 452 states(state size: 32 bits, Memory_percentage_from_MM=0.25) found path length 8; 1851 expanded; 0.0009s elapsed;
+			HARD-69 GAP-8 MBBDS(k=1) MBBDS using memory for 181 states(state size: 32 bits, Memory_percentage_from_MM=0.10) found path length 8; 2455 expanded; 0.0009s elapsed;
+		_IDMM_
+			HARD-69 GAP-8 IDMM found path length 8; 133755 expanded; 936285 generated; 0.0304s elapsed; Mid state: 6 5 2 1 0 4 3 7 
+			GAP-8 D-MM ; 3975 expanded;
+	Problem 71 of 100
+	Start state: 5 4 1 6 3 2 0 7 
+	Goal state: 0 1 2 3 4 5 6 7 
+	Initial heuristic 0
+		_A*_
+			GAP-8 A* found path length 5; 1008 expanded; 844 necessary; using 3948 states in memory; 0.0013s elapsed
+			GAP-8 I-A* ; 2091 expanded;
+		_MM_
+			Hard-GAP-8 MM found path length 5; 34 expanded; 34 necessary; using 208 states in memory; 0.0001s elapsed
+			Hard-GAP-8 I-MM ; 52 expanded;
+		_IDA*_
+			Hard-GAP-8 IDA* found path length 0; 1 expanded; 7 generated; 0.0000s elapsed
+			Hard-GAP-8 D-A* ; 1 expanded;
+		_MBBDS_
+			HARD-70 GAP-8 MBBDS(k=1) MBBDS using memory for 208 states(state size: 32 bits, Memory_percentage_from_MM=1.00) found path length 5; 126 expanded; 0.0001s elapsed;
+			HARD-70 GAP-8 MBBDS(k=1) MBBDS using memory for 187 states(state size: 32 bits, Memory_percentage_from_MM=0.90) found path length 5; 126 expanded; 0.0001s elapsed;
+			HARD-70 GAP-8 MBBDS(k=1) MBBDS using memory for 156 states(state size: 32 bits, Memory_percentage_from_MM=0.75) found path length 5; 126 expanded; 0.0001s elapsed;
+			HARD-70 GAP-8 MBBDS(k=1) MBBDS using memory for 104 states(state size: 32 bits, Memory_percentage_from_MM=0.50) found path length 5; 126 expanded; 0.0001s elapsed;
+			HARD-70 GAP-8 MBBDS(k=1) MBBDS using memory for 52 states(state size: 32 bits, Memory_percentage_from_MM=0.25) found path length 5; 134 expanded; 0.0001s elapsed;
+			HARD-70 GAP-8 MBBDS(k=1) MBBDS using memory for 20 states(state size: 32 bits, Memory_percentage_from_MM=0.10) found path length 5; 192 expanded; 0.0001s elapsed;
+		_IDMM_
+			HARD-70 GAP-8 IDMM found path length 5; 6465 expanded; 45255 generated; 0.0014s elapsed; Mid state: 4 5 6 3 2 1 0 7 
+			GAP-8 D-MM ; 4921 expanded;
+	Problem 72 of 100
+	Start state: 5 2 0 7 3 6 1 4 
+	Goal state: 0 1 2 3 4 5 6 7 
+	Initial heuristic 1
+		_A*_
+			GAP-8 A* found path length 8; 18635 expanded; 18322 necessary; using 33117 states in memory; 0.0212s elapsed
+			GAP-8 I-A* ; 46276 expanded;
+		_MM_
+			Hard-GAP-8 MM found path length 8; 472 expanded; 472 necessary; using 2421 states in memory; 0.0007s elapsed
+			Hard-GAP-8 I-MM ; 590 expanded;
+		_IDA*_
+			Hard-GAP-8 IDA* found path length 8; 231864 expanded; 1623048 generated; 0.0473s elapsed
+			Hard-GAP-8 D-A* ; 194362 expanded;
+		_MBBDS_
+			HARD-71 GAP-8 MBBDS(k=1) MBBDS using memory for 2421 states(state size: 32 bits, Memory_percentage_from_MM=1.00) found path length 8; 1508 expanded; 0.0007s elapsed;
+			HARD-71 GAP-8 MBBDS(k=1) MBBDS using memory for 2178 states(state size: 32 bits, Memory_percentage_from_MM=0.90) found path length 8; 1508 expanded; 0.0007s elapsed;
+			HARD-71 GAP-8 MBBDS(k=1) MBBDS using memory for 1815 states(state size: 32 bits, Memory_percentage_from_MM=0.75) found path length 8; 1508 expanded; 0.0006s elapsed;
+			HARD-71 GAP-8 MBBDS(k=1) MBBDS using memory for 1210 states(state size: 32 bits, Memory_percentage_from_MM=0.50) found path length 8; 1508 expanded; 0.0006s elapsed;
+			HARD-71 GAP-8 MBBDS(k=1) MBBDS using memory for 605 states(state size: 32 bits, Memory_percentage_from_MM=0.25) found path length 8; 1508 expanded; 0.0006s elapsed;
+			HARD-71 GAP-8 MBBDS(k=1) MBBDS using memory for 242 states(state size: 32 bits, Memory_percentage_from_MM=0.10) found path length 8; 1911 expanded; 0.0007s elapsed;
+		_IDMM_
+			HARD-71 GAP-8 IDMM found path length 8; 262733 expanded; 1839131 generated; 0.0565s elapsed; Mid state: 2 1 0 7 3 6 5 4 
+			GAP-8 D-MM ; 132953 expanded;
+	Problem 73 of 100
+	Start state: 2 0 1 7 5 3 6 4 
+	Goal state: 0 1 2 3 4 5 6 7 
+	Initial heuristic 1
+		_A*_
+			GAP-8 A* found path length 7; 8761 expanded; 6973 necessary; using 21075 states in memory; 0.0104s elapsed
+			GAP-8 I-A* ; 18080 expanded;
+		_MM_
+			Hard-GAP-8 MM found path length 7; 260 expanded; 260 necessary; using 1412 states in memory; 0.0004s elapsed
+			Hard-GAP-8 I-MM ; 378 expanded;
+		_IDA*_
+			Hard-GAP-8 IDA* found path length 7; 61522 expanded; 430654 generated; 0.0140s elapsed
+			Hard-GAP-8 D-A* ; 51639 expanded;
+		_MBBDS_
+			HARD-72 GAP-8 MBBDS(k=1) MBBDS using memory for 1412 states(state size: 32 bits, Memory_percentage_from_MM=1.00) found path length 7; 679 expanded; 0.0003s elapsed;
+			HARD-72 GAP-8 MBBDS(k=1) MBBDS using memory for 1270 states(state size: 32 bits, Memory_percentage_from_MM=0.90) found path length 7; 679 expanded; 0.0003s elapsed;
+			HARD-72 GAP-8 MBBDS(k=1) MBBDS using memory for 1059 states(state size: 32 bits, Memory_percentage_from_MM=0.75) found path length 7; 679 expanded; 0.0003s elapsed;
+			HARD-72 GAP-8 MBBDS(k=1) MBBDS using memory for 706 states(state size: 32 bits, Memory_percentage_from_MM=0.50) found path length 7; 679 expanded; 0.0004s elapsed;
+			HARD-72 GAP-8 MBBDS(k=1) MBBDS using memory for 353 states(state size: 32 bits, Memory_percentage_from_MM=0.25) found path length 7; 779 expanded; 0.0003s elapsed;
+			HARD-72 GAP-8 MBBDS(k=1) MBBDS using memory for 141 states(state size: 32 bits, Memory_percentage_from_MM=0.10) found path length 7; 986 expanded; 0.0004s elapsed;
+		_IDMM_
+			HARD-72 GAP-8 IDMM found path length 7; 69157 expanded; 484099 generated; 0.0165s elapsed; Mid state: 4 5 6 3 2 0 1 7 
+			GAP-8 D-MM ; 48399 expanded;
+	Problem 74 of 100
+	Start state: 6 2 3 4 0 7 5 1 
+	Goal state: 0 1 2 3 4 5 6 7 
+	Initial heuristic 1
+		_A*_
+			GAP-8 A* found path length 7; 8468 expanded; 7000 necessary; using 20768 states in memory; 0.0101s elapsed
+			GAP-8 I-A* ; 17805 expanded;
+		_MM_
+			Hard-GAP-8 MM found path length 7; 115 expanded; 115 necessary; using 687 states in memory; 0.0002s elapsed
+			Hard-GAP-8 I-MM ; 233 expanded;
+		_IDA*_
+			Hard-GAP-8 IDA* found path length 7; 46976 expanded; 328832 generated; 0.0093s elapsed
+			Hard-GAP-8 D-A* ; 39387 expanded;
+		_MBBDS_
+			HARD-73 GAP-8 MBBDS(k=1) MBBDS using memory for 687 states(state size: 32 bits, Memory_percentage_from_MM=1.00) found path length 7; 629 expanded; 0.0003s elapsed;
+			HARD-73 GAP-8 MBBDS(k=1) MBBDS using memory for 618 states(state size: 32 bits, Memory_percentage_from_MM=0.90) found path length 7; 629 expanded; 0.0003s elapsed;
+			HARD-73 GAP-8 MBBDS(k=1) MBBDS using memory for 515 states(state size: 32 bits, Memory_percentage_from_MM=0.75) found path length 7; 629 expanded; 0.0002s elapsed;
+			HARD-73 GAP-8 MBBDS(k=1) MBBDS using memory for 343 states(state size: 32 bits, Memory_percentage_from_MM=0.50) found path length 7; 729 expanded; 0.0003s elapsed;
+			HARD-73 GAP-8 MBBDS(k=1) MBBDS using memory for 171 states(state size: 32 bits, Memory_percentage_from_MM=0.25) found path length 7; 943 expanded; 0.0003s elapsed;
+			HARD-73 GAP-8 MBBDS(k=1) MBBDS using memory for 68 states(state size: 32 bits, Memory_percentage_from_MM=0.10) found path length 7; 1491 expanded; 0.0005s elapsed;
+		_IDMM_
+			HARD-73 GAP-8 IDMM found path length 7; 52844 expanded; 369908 generated; 0.0114s elapsed; Mid state: 2 3 4 6 5 1 0 7 
+			GAP-8 D-MM ; 32086 expanded;
+	Problem 75 of 100
+	Start state: 2 4 6 5 1 7 3 0 
+	Goal state: 0 1 2 3 4 5 6 7 
+	Initial heuristic 1
+		_A*_
+			GAP-8 A* found path length 7; 15692 expanded; 7000 necessary; using 31064 states in memory; 0.0179s elapsed
+			GAP-8 I-A* ; 25029 expanded;
+		_MM_
+			Hard-GAP-8 MM found path length 7; 239 expanded; 239 necessary; using 1315 states in memory; 0.0004s elapsed
+			Hard-GAP-8 I-MM ; 357 expanded;
+		_IDA*_
+			Hard-GAP-8 IDA* found path length 7; 86991 expanded; 608937 generated; 0.0179s elapsed
+			Hard-GAP-8 D-A* ; 72890 expanded;
+		_MBBDS_
+			HARD-74 GAP-8 MBBDS(k=1) MBBDS using memory for 1315 states(state size: 32 bits, Memory_percentage_from_MM=1.00) found path length 7; 752 expanded; 0.0004s elapsed;
+			HARD-74 GAP-8 MBBDS(k=1) MBBDS using memory for 1183 states(state size: 32 bits, Memory_percentage_from_MM=0.90) found path length 7; 752 expanded; 0.0003s elapsed;
+			HARD-74 GAP-8 MBBDS(k=1) MBBDS using memory for 986 states(state size: 32 bits, Memory_percentage_from_MM=0.75) found path length 7; 752 expanded; 0.0003s elapsed;
+			HARD-74 GAP-8 MBBDS(k=1) MBBDS using memory for 657 states(state size: 32 bits, Memory_percentage_from_MM=0.50) found path length 7; 752 expanded; 0.0003s elapsed;
+			HARD-74 GAP-8 MBBDS(k=1) MBBDS using memory for 328 states(state size: 32 bits, Memory_percentage_from_MM=0.25) found path length 7; 852 expanded; 0.0003s elapsed;
+			HARD-74 GAP-8 MBBDS(k=1) MBBDS using memory for 131 states(state size: 32 bits, Memory_percentage_from_MM=0.10) found path length 7; 946 expanded; 0.0003s elapsed;
+		_IDMM_
+			HARD-74 GAP-8 IDMM found path length 7; 109197 expanded; 764379 generated; 0.0250s elapsed; Mid state: 3 7 6 5 4 2 1 0 
+			GAP-8 D-MM ; 85085 expanded;
+	Problem 76 of 100
+	Start state: 4 0 7 3 1 5 2 6 
+	Goal state: 0 1 2 3 4 5 6 7 
+	Initial heuristic 1
+		_A*_
+			GAP-8 A* found path length 8; 18373 expanded; 18328 necessary; using 32879 states in memory; 0.0215s elapsed
+			GAP-8 I-A* ; 46036 expanded;
+		_MM_
+			Hard-GAP-8 MM found path length 8; 488 expanded; 488 necessary; using 2497 states in memory; 0.0007s elapsed
+			Hard-GAP-8 I-MM ; 606 expanded;
+		_IDA*_
+			Hard-GAP-8 IDA* found path length 8; 394327 expanded; 2760289 generated; 0.0787s elapsed
+			Hard-GAP-8 D-A* ; 330456 expanded;
+		_MBBDS_
+			HARD-75 GAP-8 MBBDS(k=1) MBBDS using memory for 2497 states(state size: 32 bits, Memory_percentage_from_MM=1.00) found path length 8; 1023 expanded; 0.0006s elapsed;
+			HARD-75 GAP-8 MBBDS(k=1) MBBDS using memory for 2247 states(state size: 32 bits, Memory_percentage_from_MM=0.90) found path length 8; 1592 expanded; 0.0007s elapsed;
+			HARD-75 GAP-8 MBBDS(k=1) MBBDS using memory for 1872 states(state size: 32 bits, Memory_percentage_from_MM=0.75) found path length 8; 1592 expanded; 0.0007s elapsed;
+			HARD-75 GAP-8 MBBDS(k=1) MBBDS using memory for 1248 states(state size: 32 bits, Memory_percentage_from_MM=0.50) found path length 8; 1592 expanded; 0.0006s elapsed;
+			HARD-75 GAP-8 MBBDS(k=1) MBBDS using memory for 624 states(state size: 32 bits, Memory_percentage_from_MM=0.25) found path length 8; 1592 expanded; 0.0006s elapsed;
+			HARD-75 GAP-8 MBBDS(k=1) MBBDS using memory for 249 states(state size: 32 bits, Memory_percentage_from_MM=0.10) found path length 8; 2029 expanded; 0.0007s elapsed;
+		_IDMM_
+			HARD-75 GAP-8 IDMM found path length 8; 447156 expanded; 3130092 generated; 0.0954s elapsed; Mid state: 1 2 3 7 0 4 5 6 
+			GAP-8 D-MM ; 317376 expanded;
+	Problem 77 of 100
+	Start state: 7 4 0 2 3 1 6 5 
+	Goal state: 0 1 2 3 4 5 6 7 
+	Initial heuristic 1
+		_A*_
+			GAP-8 A* found path length 7; 7528 expanded; 7184 necessary; using 19576 states in memory; 0.0091s elapsed
+			GAP-8 I-A* ; 17334 expanded;
+		_MM_
+			Hard-GAP-8 MM found path length 7; 115 expanded; 115 necessary; using 687 states in memory; 0.0002s elapsed
+			Hard-GAP-8 I-MM ; 233 expanded;
+		_IDA*_
+			Hard-GAP-8 IDA* found path length 7; 26683 expanded; 186781 generated; 0.0053s elapsed
+			Hard-GAP-8 D-A* ; 22126 expanded;
+		_MBBDS_
+			HARD-76 GAP-8 MBBDS(k=1) MBBDS using memory for 687 states(state size: 32 bits, Memory_percentage_from_MM=1.00) found path length 7; 550 expanded; 0.0003s elapsed;
+			HARD-76 GAP-8 MBBDS(k=1) MBBDS using memory for 618 states(state size: 32 bits, Memory_percentage_from_MM=0.90) found path length 7; 550 expanded; 0.0002s elapsed;
+			HARD-76 GAP-8 MBBDS(k=1) MBBDS using memory for 515 states(state size: 32 bits, Memory_percentage_from_MM=0.75) found path length 7; 550 expanded; 0.0002s elapsed;
+			HARD-76 GAP-8 MBBDS(k=1) MBBDS using memory for 343 states(state size: 32 bits, Memory_percentage_from_MM=0.50) found path length 7; 650 expanded; 0.0002s elapsed;
+			HARD-76 GAP-8 MBBDS(k=1) MBBDS using memory for 171 states(state size: 32 bits, Memory_percentage_from_MM=0.25) found path length 7; 947 expanded; 0.0003s elapsed;
+			HARD-76 GAP-8 MBBDS(k=1) MBBDS using memory for 68 states(state size: 32 bits, Memory_percentage_from_MM=0.10) found path length 7; 1412 expanded; 0.0004s elapsed;
+		_IDMM_
+			HARD-76 GAP-8 IDMM found path length 7; 30618 expanded; 214326 generated; 0.0067s elapsed; Mid state: 1 6 5 4 3 2 0 7 
+			GAP-8 D-MM ; 6672 expanded;
+	Problem 78 of 100
+	Start state: 4 1 2 5 0 7 3 6 
+	Goal state: 0 1 2 3 4 5 6 7 
+	Initial heuristic 1
+		_A*_
+			GAP-8 A* found path length 8; 19276 expanded; 18346 necessary; using 33497 states in memory; 0.0332s elapsed
+			GAP-8 I-A* ; 46959 expanded;
+		_MM_
+			Hard-GAP-8 MM found path length 8; 353 expanded; 353 necessary; using 1805 states in memory; 0.0007s elapsed
+			Hard-GAP-8 I-MM ; 471 expanded;
+		_IDA*_
+			Hard-GAP-8 IDA* found path length 8; 220611 expanded; 1544277 generated; 0.0737s elapsed
+			Hard-GAP-8 D-A* ; 184901 expanded;
+		_MBBDS_
+			HARD-77 GAP-8 MBBDS(k=1) MBBDS using memory for 1805 states(state size: 32 bits, Memory_percentage_from_MM=1.00) found path length 8; 1502 expanded; 0.0008s elapsed;
+			HARD-77 GAP-8 MBBDS(k=1) MBBDS using memory for 1624 states(state size: 32 bits, Memory_percentage_from_MM=0.90) found path length 8; 1502 expanded; 0.0007s elapsed;
+			HARD-77 GAP-8 MBBDS(k=1) MBBDS using memory for 1353 states(state size: 32 bits, Memory_percentage_from_MM=0.75) found path length 8; 1502 expanded; 0.0008s elapsed;
+			HARD-77 GAP-8 MBBDS(k=1) MBBDS using memory for 902 states(state size: 32 bits, Memory_percentage_from_MM=0.50) found path length 8; 1502 expanded; 0.0008s elapsed;
+			HARD-77 GAP-8 MBBDS(k=1) MBBDS using memory for 451 states(state size: 32 bits, Memory_percentage_from_MM=0.25) found path length 8; 1602 expanded; 0.0007s elapsed;
+			HARD-77 GAP-8 MBBDS(k=1) MBBDS using memory for 180 states(state size: 32 bits, Memory_percentage_from_MM=0.10) found path length 8; 2206 expanded; 0.0010s elapsed;
+		_IDMM_
+			HARD-77 GAP-8 IDMM found path length 8; 249833 expanded; 1748831 generated; 0.0709s elapsed; Mid state: 4 3 7 0 1 2 5 6 
+			GAP-8 D-MM ; 120053 expanded;
+	Problem 79 of 100
+	Start state: 7 1 2 0 3 4 5 6 
+	Goal state: 0 1 2 3 4 5 6 7 
+	Initial heuristic 1
+		_A*_
+			GAP-8 A* found path length 4; 175 expanded; 80 necessary; using 930 states in memory; 0.0003s elapsed
+			GAP-8 I-A* ; 271 expanded;
+		_MM_
+			Hard-GAP-8 MM found path length 4; 16 expanded; 16 necessary; using 100 states in memory; 0.0000s elapsed
+			Hard-GAP-8 I-MM ; 18 expanded;
+		_IDA*_
+			Hard-GAP-8 IDA* found path length 4; 129 expanded; 903 generated; 0.0000s elapsed
+			Hard-GAP-8 D-A* ; 105 expanded;
+		_MBBDS_
+			HARD-78 GAP-8 MBBDS(k=1) MBBDS using memory for 100 states(state size: 32 bits, Memory_percentage_from_MM=1.00) found path length 4; 27 expanded; 0.0000s elapsed;
+			HARD-78 GAP-8 MBBDS(k=1) MBBDS using memory for 90 states(state size: 32 bits, Memory_percentage_from_MM=0.90) found path length 4; 27 expanded; 0.0000s elapsed;
+			HARD-78 GAP-8 MBBDS(k=1) MBBDS using memory for 75 states(state size: 32 bits, Memory_percentage_from_MM=0.75) found path length 4; 30 expanded; 0.0000s elapsed;
+			HARD-78 GAP-8 MBBDS(k=1) MBBDS using memory for 50 states(state size: 32 bits, Memory_percentage_from_MM=0.50) found path length 4; 30 expanded; 0.0000s elapsed;
+			HARD-78 GAP-8 MBBDS(k=1) MBBDS using memory for 25 states(state size: 32 bits, Memory_percentage_from_MM=0.25) found path length 4; 30 expanded; 0.0000s elapsed;
+			HARD-78 GAP-8 MBBDS(k=1) MBBDS using memory for 10 states(state size: 32 bits, Memory_percentage_from_MM=0.10) found path length 4; 51 expanded; 0.0000s elapsed;
+		_IDMM_
+			HARD-78 GAP-8 IDMM found path length 4; 136 expanded; 952 generated; 0.0000s elapsed; Mid state: 1 2 0 3 4 5 6 7 
+			GAP-8 D-MM ; 33 expanded;
+	Problem 80 of 100
+	Start state: 3 1 2 7 5 4 6 0 
+	Goal state: 0 1 2 3 4 5 6 7 
+	Initial heuristic 1
+		_A*_
+			GAP-8 A* found path length 7; 9913 expanded; 6973 necessary; using 23374 states in memory; 0.0143s elapsed
+			GAP-8 I-A* ; 19232 expanded;
+		_MM_
+			Hard-GAP-8 MM found path length 7; 102 expanded; 102 necessary; using 614 states in memory; 0.0002s elapsed
+			Hard-GAP-8 I-MM ; 220 expanded;
+		_IDA*_
+			Hard-GAP-8 IDA* found path length 7; 43061 expanded; 301427 generated; 0.0088s elapsed
+			Hard-GAP-8 D-A* ; 36144 expanded;
+		_MBBDS_
+			HARD-79 GAP-8 MBBDS(k=1) MBBDS using memory for 614 states(state size: 32 bits, Memory_percentage_from_MM=1.00) found path length 7; 618 expanded; 0.0003s elapsed;
+			HARD-79 GAP-8 MBBDS(k=1) MBBDS using memory for 552 states(state size: 32 bits, Memory_percentage_from_MM=0.90) found path length 7; 618 expanded; 0.0003s elapsed;
+			HARD-79 GAP-8 MBBDS(k=1) MBBDS using memory for 460 states(state size: 32 bits, Memory_percentage_from_MM=0.75) found path length 7; 718 expanded; 0.0003s elapsed;
+			HARD-79 GAP-8 MBBDS(k=1) MBBDS using memory for 307 states(state size: 32 bits, Memory_percentage_from_MM=0.50) found path length 7; 718 expanded; 0.0003s elapsed;
+			HARD-79 GAP-8 MBBDS(k=1) MBBDS using memory for 153 states(state size: 32 bits, Memory_percentage_from_MM=0.25) found path length 7; 945 expanded; 0.0003s elapsed;
+			HARD-79 GAP-8 MBBDS(k=1) MBBDS using memory for 61 states(state size: 32 bits, Memory_percentage_from_MM=0.10) found path length 7; 1480 expanded; 0.0005s elapsed;
+		_IDMM_
+			HARD-79 GAP-8 IDMM found path length 7; 53137 expanded; 371959 generated; 0.0114s elapsed; Mid state: 1 2 7 6 5 4 3 0 
+			GAP-8 D-MM ; 29025 expanded;
+	Problem 81 of 100
+	Start state: 1 7 6 3 2 0 4 5 
+	Goal state: 0 1 2 3 4 5 6 7 
+	Initial heuristic 1
+		_A*_
+			GAP-8 A* found path length 5; 640 expanded; 381 necessary; using 2857 states in memory; 0.0008s elapsed
+			GAP-8 I-A* ; 1093 expanded;
+		_MM_
+			Hard-GAP-8 MM found path length 5; 37 expanded; 37 necessary; using 226 states in memory; 0.0001s elapsed
+			Hard-GAP-8 I-MM ; 55 expanded;
+		_IDA*_
+			Hard-GAP-8 IDA* found path length 5; 1677 expanded; 11739 generated; 0.0004s elapsed
+			Hard-GAP-8 D-A* ; 1413 expanded;
+		_MBBDS_
+			HARD-80 GAP-8 MBBDS(k=1) MBBDS using memory for 226 states(state size: 32 bits, Memory_percentage_from_MM=1.00) found path length 5; 113 expanded; 0.0001s elapsed;
+			HARD-80 GAP-8 MBBDS(k=1) MBBDS using memory for 203 states(state size: 32 bits, Memory_percentage_from_MM=0.90) found path length 5; 113 expanded; 0.0001s elapsed;
+			HARD-80 GAP-8 MBBDS(k=1) MBBDS using memory for 169 states(state size: 32 bits, Memory_percentage_from_MM=0.75) found path length 5; 113 expanded; 0.0001s elapsed;
+			HARD-80 GAP-8 MBBDS(k=1) MBBDS using memory for 113 states(state size: 32 bits, Memory_percentage_from_MM=0.50) found path length 5; 113 expanded; 0.0001s elapsed;
+			HARD-80 GAP-8 MBBDS(k=1) MBBDS using memory for 56 states(state size: 32 bits, Memory_percentage_from_MM=0.25) found path length 5; 121 expanded; 0.0001s elapsed;
+			HARD-80 GAP-8 MBBDS(k=1) MBBDS using memory for 22 states(state size: 32 bits, Memory_percentage_from_MM=0.10) found path length 5; 179 expanded; 0.0001s elapsed;
+		_IDMM_
+			HARD-80 GAP-8 IDMM found path length 5; 1801 expanded; 12607 generated; 0.0004s elapsed; Mid state: 5 4 0 1 2 3 6 7 
+			GAP-8 D-MM ; 1315 expanded;
+	Problem 82 of 100
+	Start state: 1 0 7 2 4 6 3 5 
+	Goal state: 0 1 2 3 4 5 6 7 
+	Initial heuristic 1
+		_A*_
+			GAP-8 A* found path length 7; 8350 expanded; 6987 necessary; using 20620 states in memory; 0.0101s elapsed
+			GAP-8 I-A* ; 17685 expanded;
+		_MM_
+			Hard-GAP-8 MM found path length 7; 105 expanded; 105 necessary; using 631 states in memory; 0.0002s elapsed
+			Hard-GAP-8 I-MM ; 223 expanded;
+		_IDA*_
+			Hard-GAP-8 IDA* found path length 7; 90130 expanded; 630910 generated; 0.0183s elapsed
+			Hard-GAP-8 D-A* ; 75520 expanded;
+		_MBBDS_
+			HARD-81 GAP-8 MBBDS(k=1) MBBDS using memory for 631 states(state size: 32 bits, Memory_percentage_from_MM=1.00) found path length 7; 761 expanded; 0.0003s elapsed;
+			HARD-81 GAP-8 MBBDS(k=1) MBBDS using memory for 567 states(state size: 32 bits, Memory_percentage_from_MM=0.90) found path length 7; 761 expanded; 0.0003s elapsed;
+			HARD-81 GAP-8 MBBDS(k=1) MBBDS using memory for 473 states(state size: 32 bits, Memory_percentage_from_MM=0.75) found path length 7; 811 expanded; 0.0003s elapsed;
+			HARD-81 GAP-8 MBBDS(k=1) MBBDS using memory for 315 states(state size: 32 bits, Memory_percentage_from_MM=0.50) found path length 7; 861 expanded; 0.0003s elapsed;
+			HARD-81 GAP-8 MBBDS(k=1) MBBDS using memory for 157 states(state size: 32 bits, Memory_percentage_from_MM=0.25) found path length 7; 954 expanded; 0.0003s elapsed;
+			HARD-81 GAP-8 MBBDS(k=1) MBBDS using memory for 63 states(state size: 32 bits, Memory_percentage_from_MM=0.10) found path length 7; 1271 expanded; 0.0004s elapsed;
+		_IDMM_
+			HARD-81 GAP-8 IDMM found path length 7; 101681 expanded; 711767 generated; 0.0220s elapsed; Mid state: 3 6 5 4 2 1 0 7 
+			GAP-8 D-MM ; 80923 expanded;
+	Problem 83 of 100
+	Start state: 1 7 4 2 3 0 5 6 
+	Goal state: 0 1 2 3 4 5 6 7 
+	Initial heuristic 1
+		_A*_
+			GAP-8 A* found path length 6; 2898 expanded; 1881 necessary; using 9562 states in memory; 0.0036s elapsed
+			GAP-8 I-A* ; 5232 expanded;
+		_MM_
+			Hard-GAP-8 MM found path length 6; 71 expanded; 71 necessary; using 429 states in memory; 0.0001s elapsed
+			Hard-GAP-8 I-MM ; 89 expanded;
+		_IDA*_
+			Hard-GAP-8 IDA* found path length 6; 11492 expanded; 80444 generated; 0.0024s elapsed
+			Hard-GAP-8 D-A* ; 9663 expanded;
+		_MBBDS_
+			HARD-82 GAP-8 MBBDS(k=1) MBBDS using memory for 429 states(state size: 32 bits, Memory_percentage_from_MM=1.00) found path length 6; 265 expanded; 0.0001s elapsed;
+			HARD-82 GAP-8 MBBDS(k=1) MBBDS using memory for 386 states(state size: 32 bits, Memory_percentage_from_MM=0.90) found path length 6; 265 expanded; 0.0001s elapsed;
+			HARD-82 GAP-8 MBBDS(k=1) MBBDS using memory for 321 states(state size: 32 bits, Memory_percentage_from_MM=0.75) found path length 6; 265 expanded; 0.0001s elapsed;
+			HARD-82 GAP-8 MBBDS(k=1) MBBDS using memory for 214 states(state size: 32 bits, Memory_percentage_from_MM=0.50) found path length 6; 265 expanded; 0.0001s elapsed;
+			HARD-82 GAP-8 MBBDS(k=1) MBBDS using memory for 107 states(state size: 32 bits, Memory_percentage_from_MM=0.25) found path length 6; 265 expanded; 0.0001s elapsed;
+			HARD-82 GAP-8 MBBDS(k=1) MBBDS using memory for 42 states(state size: 32 bits, Memory_percentage_from_MM=0.10) found path length 6; 381 expanded; 0.0001s elapsed;
+		_IDMM_
+			HARD-82 GAP-8 IDMM found path length 6; 12792 expanded; 89544 generated; 0.0028s elapsed; Mid state: 7 4 3 2 1 0 5 6 
+			GAP-8 D-MM ; 9580 expanded;
+	Problem 84 of 100
+	Start state: 6 0 7 5 1 2 3 4 
+	Goal state: 0 1 2 3 4 5 6 7 
+	Initial heuristic 1
+		_A*_
+			GAP-8 A* found path length 5; 469 expanded; 387 necessary; using 2230 states in memory; 0.0006s elapsed
+			GAP-8 I-A* ; 928 expanded;
+		_MM_
+			Hard-GAP-8 MM found path length 5; 31 expanded; 31 necessary; using 190 states in memory; 0.0001s elapsed
+			Hard-GAP-8 I-MM ; 49 expanded;
+		_IDA*_
+			Hard-GAP-8 IDA* found path length 5; 2298 expanded; 16086 generated; 0.0005s elapsed
+			Hard-GAP-8 D-A* ; 1932 expanded;
+		_MBBDS_
+			HARD-83 GAP-8 MBBDS(k=1) MBBDS using memory for 190 states(state size: 32 bits, Memory_percentage_from_MM=1.00) found path length 5; 124 expanded; 0.0001s elapsed;
+			HARD-83 GAP-8 MBBDS(k=1) MBBDS using memory for 171 states(state size: 32 bits, Memory_percentage_from_MM=0.90) found path length 5; 124 expanded; 0.0001s elapsed;
+			HARD-83 GAP-8 MBBDS(k=1) MBBDS using memory for 142 states(state size: 32 bits, Memory_percentage_from_MM=0.75) found path length 5; 124 expanded; 0.0001s elapsed;
+			HARD-83 GAP-8 MBBDS(k=1) MBBDS using memory for 95 states(state size: 32 bits, Memory_percentage_from_MM=0.50) found path length 5; 124 expanded; 0.0001s elapsed;
+			HARD-83 GAP-8 MBBDS(k=1) MBBDS using memory for 47 states(state size: 32 bits, Memory_percentage_from_MM=0.25) found path length 5; 132 expanded; 0.0001s elapsed;
+			HARD-83 GAP-8 MBBDS(k=1) MBBDS using memory for 19 states(state size: 32 bits, Memory_percentage_from_MM=0.10) found path length 5; 190 expanded; 0.0001s elapsed;
+		_IDMM_
+			HARD-83 GAP-8 IDMM found path length 5; 2431 expanded; 17017 generated; 0.0005s elapsed; Mid state: 1 2 3 4 5 6 0 7 
+			GAP-8 D-MM ; 1945 expanded;
+	Problem 85 of 100
+	Start state: 3 2 6 0 5 1 7 4 
+	Goal state: 0 1 2 3 4 5 6 7 
+	Initial heuristic 1
+		_A*_
+			GAP-8 A* found path length 8; 19288 expanded; 18427 necessary; using 33400 states in memory; 0.0212s elapsed
+			GAP-8 I-A* ; 47013 expanded;
+		_MM_
+			Hard-GAP-8 MM found path length 8; 397 expanded; 397 necessary; using 2046 states in memory; 0.0006s elapsed
+			Hard-GAP-8 I-MM ; 515 expanded;
+		_IDA*_
+			Hard-GAP-8 IDA* found path length 8; 199829 expanded; 1398803 generated; 0.0404s elapsed
+			Hard-GAP-8 D-A* ; 167414 expanded;
+		_MBBDS_
+			HARD-84 GAP-8 MBBDS(k=1) MBBDS using memory for 2046 states(state size: 32 bits, Memory_percentage_from_MM=1.00) found path length 8; 1491 expanded; 0.0007s elapsed;
+			HARD-84 GAP-8 MBBDS(k=1) MBBDS using memory for 1841 states(state size: 32 bits, Memory_percentage_from_MM=0.90) found path length 8; 1491 expanded; 0.0006s elapsed;
+			HARD-84 GAP-8 MBBDS(k=1) MBBDS using memory for 1534 states(state size: 32 bits, Memory_percentage_from_MM=0.75) found path length 8; 1491 expanded; 0.0006s elapsed;
+			HARD-84 GAP-8 MBBDS(k=1) MBBDS using memory for 1023 states(state size: 32 bits, Memory_percentage_from_MM=0.50) found path length 8; 1491 expanded; 0.0006s elapsed;
+			HARD-84 GAP-8 MBBDS(k=1) MBBDS using memory for 511 states(state size: 32 bits, Memory_percentage_from_MM=0.25) found path length 8; 1491 expanded; 0.0005s elapsed;
+			HARD-84 GAP-8 MBBDS(k=1) MBBDS using memory for 204 states(state size: 32 bits, Memory_percentage_from_MM=0.10) found path length 8; 2195 expanded; 0.0007s elapsed;
+		_IDMM_
+			HARD-84 GAP-8 IDMM found path length 8; 226748 expanded; 1587236 generated; 0.0489s elapsed; Mid state: 6 0 5 1 2 3 4 7 
+			GAP-8 D-MM ; 96968 expanded;
+	Problem 86 of 100
+	Start state: 1 5 0 2 3 6 4 7 
+	Goal state: 0 1 2 3 4 5 6 7 
+	Initial heuristic 0
+		_A*_
+			GAP-8 A* found path length 6; 3200 expanded; 2849 necessary; using 9750 states in memory; 0.0039s elapsed
+			GAP-8 I-A* ; 7131 expanded;
+		_MM_
+			Hard-GAP-8 MM found path length 6; 71 expanded; 71 necessary; using 429 states in memory; 0.0001s elapsed
+			Hard-GAP-8 I-MM ; 89 expanded;
+		_IDA*_
+			Hard-GAP-8 IDA* found path length 0; 1 expanded; 7 generated; 0.0000s elapsed
+			Hard-GAP-8 D-A* ; 1 expanded;
+		_MBBDS_
+			HARD-85 GAP-8 MBBDS(k=1) MBBDS using memory for 429 states(state size: 32 bits, Memory_percentage_from_MM=1.00) found path length 6; 279 expanded; 0.0001s elapsed;
+			HARD-85 GAP-8 MBBDS(k=1) MBBDS using memory for 386 states(state size: 32 bits, Memory_percentage_from_MM=0.90) found path length 6; 279 expanded; 0.0001s elapsed;
+			HARD-85 GAP-8 MBBDS(k=1) MBBDS using memory for 321 states(state size: 32 bits, Memory_percentage_from_MM=0.75) found path length 6; 279 expanded; 0.0001s elapsed;
+			HARD-85 GAP-8 MBBDS(k=1) MBBDS using memory for 214 states(state size: 32 bits, Memory_percentage_from_MM=0.50) found path length 6; 279 expanded; 0.0001s elapsed;
+			HARD-85 GAP-8 MBBDS(k=1) MBBDS using memory for 107 states(state size: 32 bits, Memory_percentage_from_MM=0.25) found path length 6; 279 expanded; 0.0001s elapsed;
+			HARD-85 GAP-8 MBBDS(k=1) MBBDS using memory for 42 states(state size: 32 bits, Memory_percentage_from_MM=0.10) found path length 6; 395 expanded; 0.0001s elapsed;
+		_IDMM_
+			HARD-85 GAP-8 IDMM found path length 6; 38630 expanded; 270410 generated; 0.0083s elapsed; Mid state: 3 2 1 0 5 6 4 7 
+			GAP-8 D-MM ; 30358 expanded;
+	Problem 87 of 100
+	Start state: 7 3 6 2 1 5 4 0 
+	Goal state: 0 1 2 3 4 5 6 7 
+	Initial heuristic 1
+		_A*_
+			GAP-8 A* found path length 6; 2526 expanded; 2067 necessary; using 8828 states in memory; 0.0031s elapsed
+			GAP-8 I-A* ; 5148 expanded;
+		_MM_
+			Hard-GAP-8 MM found path length 6; 77 expanded; 77 necessary; using 465 states in memory; 0.0001s elapsed
+			Hard-GAP-8 I-MM ; 95 expanded;
+		_IDA*_
+			Hard-GAP-8 IDA* found path length 6; 7507 expanded; 52549 generated; 0.0015s elapsed
+			Hard-GAP-8 D-A* ; 6167 expanded;
+		_MBBDS_
+			HARD-86 GAP-8 MBBDS(k=1) MBBDS using memory for 465 states(state size: 32 bits, Memory_percentage_from_MM=1.00) found path length 6; 193 expanded; 0.0001s elapsed;
+			HARD-86 GAP-8 MBBDS(k=1) MBBDS using memory for 418 states(state size: 32 bits, Memory_percentage_from_MM=0.90) found path length 6; 243 expanded; 0.0001s elapsed;
+			HARD-86 GAP-8 MBBDS(k=1) MBBDS using memory for 348 states(state size: 32 bits, Memory_percentage_from_MM=0.75) found path length 6; 243 expanded; 0.0001s elapsed;
+			HARD-86 GAP-8 MBBDS(k=1) MBBDS using memory for 232 states(state size: 32 bits, Memory_percentage_from_MM=0.50) found path length 6; 243 expanded; 0.0001s elapsed;
+			HARD-86 GAP-8 MBBDS(k=1) MBBDS using memory for 116 states(state size: 32 bits, Memory_percentage_from_MM=0.25) found path length 6; 243 expanded; 0.0001s elapsed;
+			HARD-86 GAP-8 MBBDS(k=1) MBBDS using memory for 46 states(state size: 32 bits, Memory_percentage_from_MM=0.10) found path length 6; 351 expanded; 0.0001s elapsed;
+		_IDMM_
+			HARD-86 GAP-8 IDMM found path length 6; 9610 expanded; 67270 generated; 0.0021s elapsed; Mid state: 2 1 0 4 5 6 3 7 
+			GAP-8 D-MM ; 4824 expanded;
+	Problem 88 of 100
+	Start state: 2 3 7 5 4 0 6 1 
+	Goal state: 0 1 2 3 4 5 6 7 
+	Initial heuristic 1
+		_A*_
+			GAP-8 A* found path length 7; 7680 expanded; 6987 necessary; using 19758 states in memory; 0.0091s elapsed
+			GAP-8 I-A* ; 17015 expanded;
+		_MM_
+			Hard-GAP-8 MM found path length 7; 163 expanded; 163 necessary; using 943 states in memory; 0.0003s elapsed
+			Hard-GAP-8 I-MM ; 281 expanded;
+		_IDA*_
+			Hard-GAP-8 IDA* found path length 7; 32573 expanded; 228011 generated; 0.0066s elapsed
+			Hard-GAP-8 D-A* ; 27346 expanded;
+		_MBBDS_
+			HARD-87 GAP-8 MBBDS(k=1) MBBDS using memory for 943 states(state size: 32 bits, Memory_percentage_from_MM=1.00) found path length 7; 586 expanded; 0.0003s elapsed;
+			HARD-87 GAP-8 MBBDS(k=1) MBBDS using memory for 848 states(state size: 32 bits, Memory_percentage_from_MM=0.90) found path length 7; 586 expanded; 0.0003s elapsed;
+			HARD-87 GAP-8 MBBDS(k=1) MBBDS using memory for 707 states(state size: 32 bits, Memory_percentage_from_MM=0.75) found path length 7; 586 expanded; 0.0002s elapsed;
+			HARD-87 GAP-8 MBBDS(k=1) MBBDS using memory for 471 states(state size: 32 bits, Memory_percentage_from_MM=0.50) found path length 7; 636 expanded; 0.0003s elapsed;
+			HARD-87 GAP-8 MBBDS(k=1) MBBDS using memory for 235 states(state size: 32 bits, Memory_percentage_from_MM=0.25) found path length 7; 686 expanded; 0.0003s elapsed;
+			HARD-87 GAP-8 MBBDS(k=1) MBBDS using memory for 94 states(state size: 32 bits, Memory_percentage_from_MM=0.10) found path length 7; 1038 expanded; 0.0003s elapsed;
+		_IDMM_
+			HARD-87 GAP-8 IDMM found path length 7; 36577 expanded; 256039 generated; 0.0079s elapsed; Mid state: 7 5 4 3 2 1 0 6 
+			GAP-8 D-MM ; 15819 expanded;
+	Problem 89 of 100
+	Start state: 5 6 0 3 7 4 1 2 
+	Goal state: 0 1 2 3 4 5 6 7 
+	Initial heuristic 1
+		_A*_
+			GAP-8 A* found path length 6; 1980 expanded; 1888 necessary; using 7297 states in memory; 0.0025s elapsed
+			GAP-8 I-A* ; 4323 expanded;
+		_MM_
+			Hard-GAP-8 MM found path length 6; 73 expanded; 73 necessary; using 441 states in memory; 0.0001s elapsed
+			Hard-GAP-8 I-MM ; 91 expanded;
+		_IDA*_
+			Hard-GAP-8 IDA* found path length 6; 11580 expanded; 81060 generated; 0.0024s elapsed
+			Hard-GAP-8 D-A* ; 9713 expanded;
+		_MBBDS_
+			HARD-88 GAP-8 MBBDS(k=1) MBBDS using memory for 441 states(state size: 32 bits, Memory_percentage_from_MM=1.00) found path length 6; 264 expanded; 0.0001s elapsed;
+			HARD-88 GAP-8 MBBDS(k=1) MBBDS using memory for 396 states(state size: 32 bits, Memory_percentage_from_MM=0.90) found path length 6; 214 expanded; 0.0001s elapsed;
+			HARD-88 GAP-8 MBBDS(k=1) MBBDS using memory for 330 states(state size: 32 bits, Memory_percentage_from_MM=0.75) found path length 6; 264 expanded; 0.0001s elapsed;
+			HARD-88 GAP-8 MBBDS(k=1) MBBDS using memory for 220 states(state size: 32 bits, Memory_percentage_from_MM=0.50) found path length 6; 264 expanded; 0.0001s elapsed;
+			HARD-88 GAP-8 MBBDS(k=1) MBBDS using memory for 110 states(state size: 32 bits, Memory_percentage_from_MM=0.25) found path length 6; 264 expanded; 0.0001s elapsed;
+			HARD-88 GAP-8 MBBDS(k=1) MBBDS using memory for 44 states(state size: 32 bits, Memory_percentage_from_MM=0.10) found path length 6; 380 expanded; 0.0001s elapsed;
+		_IDMM_
+			HARD-88 GAP-8 IDMM found path length 6; 12908 expanded; 90356 generated; 0.0028s elapsed; Mid state: 4 5 6 7 3 0 1 2 
+			GAP-8 D-MM ; 9696 expanded;
+	Problem 90 of 100
+	Start state: 5 1 0 4 2 7 3 6 
+	Goal state: 0 1 2 3 4 5 6 7 
+	Initial heuristic 1
+		_A*_
+			GAP-8 A* found path length 8; 19215 expanded; 18346 necessary; using 33465 states in memory; 0.0215s elapsed
+			GAP-8 I-A* ; 46898 expanded;
+		_MM_
+			Hard-GAP-8 MM found path length 8; 404 expanded; 404 necessary; using 2084 states in memory; 0.0006s elapsed
+			Hard-GAP-8 I-MM ; 522 expanded;
+		_IDA*_
+			Hard-GAP-8 IDA* found path length 8; 221149 expanded; 1548043 generated; 0.0447s elapsed
+			Hard-GAP-8 D-A* ; 185356 expanded;
+		_MBBDS_
+			HARD-89 GAP-8 MBBDS(k=1) MBBDS using memory for 2084 states(state size: 32 bits, Memory_percentage_from_MM=1.00) found path length 8; 1502 expanded; 0.0007s elapsed;
+			HARD-89 GAP-8 MBBDS(k=1) MBBDS using memory for 1875 states(state size: 32 bits, Memory_percentage_from_MM=0.90) found path length 8; 1502 expanded; 0.0006s elapsed;
+			HARD-89 GAP-8 MBBDS(k=1) MBBDS using memory for 1563 states(state size: 32 bits, Memory_percentage_from_MM=0.75) found path length 8; 1502 expanded; 0.0006s elapsed;
+			HARD-89 GAP-8 MBBDS(k=1) MBBDS using memory for 1042 states(state size: 32 bits, Memory_percentage_from_MM=0.50) found path length 8; 1502 expanded; 0.0006s elapsed;
+			HARD-89 GAP-8 MBBDS(k=1) MBBDS using memory for 521 states(state size: 32 bits, Memory_percentage_from_MM=0.25) found path length 8; 1502 expanded; 0.0006s elapsed;
+			HARD-89 GAP-8 MBBDS(k=1) MBBDS using memory for 208 states(state size: 32 bits, Memory_percentage_from_MM=0.10) found path length 8; 2206 expanded; 0.0007s elapsed;
+		_IDMM_
+			HARD-89 GAP-8 IDMM found path length 8; 250316 expanded; 1752212 generated; 0.0549s elapsed; Mid state: 3 7 2 1 0 4 5 6 
+			GAP-8 D-MM ; 120536 expanded;
+	Problem 91 of 100
+	Start state: 3 2 0 6 5 1 7 4 
+	Goal state: 0 1 2 3 4 5 6 7 
+	Initial heuristic 1
+		_A*_
+			GAP-8 A* found path length 7; 8409 expanded; 6977 necessary; using 20689 states in memory; 0.0099s elapsed
+			GAP-8 I-A* ; 17707 expanded;
+		_MM_
+			Hard-GAP-8 MM found path length 7; 147 expanded; 147 necessary; using 861 states in memory; 0.0002s elapsed
+			Hard-GAP-8 I-MM ; 265 expanded;
+		_IDA*_
+			Hard-GAP-8 IDA* found path length 7; 32578 expanded; 228046 generated; 0.0066s elapsed
+			Hard-GAP-8 D-A* ; 27332 expanded;
+		_MBBDS_
+			HARD-90 GAP-8 MBBDS(k=1) MBBDS using memory for 861 states(state size: 32 bits, Memory_percentage_from_MM=1.00) found path length 7; 585 expanded; 0.0003s elapsed;
+			HARD-90 GAP-8 MBBDS(k=1) MBBDS using memory for 774 states(state size: 32 bits, Memory_percentage_from_MM=0.90) found path length 7; 585 expanded; 0.0003s elapsed;
+			HARD-90 GAP-8 MBBDS(k=1) MBBDS using memory for 645 states(state size: 32 bits, Memory_percentage_from_MM=0.75) found path length 7; 585 expanded; 0.0002s elapsed;
+			HARD-90 GAP-8 MBBDS(k=1) MBBDS using memory for 430 states(state size: 32 bits, Memory_percentage_from_MM=0.50) found path length 7; 685 expanded; 0.0003s elapsed;
+			HARD-90 GAP-8 MBBDS(k=1) MBBDS using memory for 215 states(state size: 32 bits, Memory_percentage_from_MM=0.25) found path length 7; 685 expanded; 0.0003s elapsed;
+			HARD-90 GAP-8 MBBDS(k=1) MBBDS using memory for 86 states(state size: 32 bits, Memory_percentage_from_MM=0.10) found path length 7; 1037 expanded; 0.0003s elapsed;
+		_IDMM_
+			HARD-90 GAP-8 IDMM found path length 7; 36758 expanded; 257306 generated; 0.0080s elapsed; Mid state: 6 5 1 0 2 3 4 7 
+			GAP-8 D-MM ; 16000 expanded;
+	Problem 92 of 100
+	Start state: 7 6 2 4 1 0 5 3 
+	Goal state: 0 1 2 3 4 5 6 7 
+	Initial heuristic 1
+		_A*_
+			GAP-8 A* found path length 6; 2390 expanded; 2067 necessary; using 8473 states in memory; 0.0030s elapsed
+			GAP-8 I-A* ; 5012 expanded;
+		_MM_
+			Hard-GAP-8 MM found path length 6; 82 expanded; 82 necessary; using 495 states in memory; 0.0001s elapsed
+			Hard-GAP-8 I-MM ; 100 expanded;
+		_IDA*_
+			Hard-GAP-8 IDA* found path length 6; 5757 expanded; 40299 generated; 0.0012s elapsed
+			Hard-GAP-8 D-A* ; 4750 expanded;
+		_MBBDS_
+			HARD-91 GAP-8 MBBDS(k=1) MBBDS using memory for 495 states(state size: 32 bits, Memory_percentage_from_MM=1.00) found path length 6; 241 expanded; 0.0001s elapsed;
+			HARD-91 GAP-8 MBBDS(k=1) MBBDS using memory for 445 states(state size: 32 bits, Memory_percentage_from_MM=0.90) found path length 6; 241 expanded; 0.0001s elapsed;
+			HARD-91 GAP-8 MBBDS(k=1) MBBDS using memory for 371 states(state size: 32 bits, Memory_percentage_from_MM=0.75) found path length 6; 241 expanded; 0.0001s elapsed;
+			HARD-91 GAP-8 MBBDS(k=1) MBBDS using memory for 247 states(state size: 32 bits, Memory_percentage_from_MM=0.50) found path length 6; 241 expanded; 0.0001s elapsed;
+			HARD-91 GAP-8 MBBDS(k=1) MBBDS using memory for 123 states(state size: 32 bits, Memory_percentage_from_MM=0.25) found path length 6; 241 expanded; 0.0001s elapsed;
+			HARD-91 GAP-8 MBBDS(k=1) MBBDS using memory for 49 states(state size: 32 bits, Memory_percentage_from_MM=0.10) found path length 6; 314 expanded; 0.0001s elapsed;
+		_IDMM_
+			HARD-91 GAP-8 IDMM found path length 6; 6601 expanded; 46207 generated; 0.0014s elapsed; Mid state: 5 0 1 4 3 2 6 7 
+			GAP-8 D-MM ; 2685 expanded;
+	Problem 93 of 100
+	Start state: 5 3 1 2 7 4 6 0 
+	Goal state: 0 1 2 3 4 5 6 7 
+	Initial heuristic 1
+		_A*_
+			GAP-8 A* found path length 7; 18158 expanded; 6983 necessary; using 32748 states in memory; 0.0198s elapsed
+			GAP-8 I-A* ; 27484 expanded;
+		_MM_
+			Hard-GAP-8 MM found path length 7; 220 expanded; 220 necessary; using 1225 states in memory; 0.0003s elapsed
+			Hard-GAP-8 I-MM ; 338 expanded;
+		_IDA*_
+			Hard-GAP-8 IDA* found path length 7; 52502 expanded; 367514 generated; 0.0105s elapsed
+			Hard-GAP-8 D-A* ; 44081 expanded;
+		_MBBDS_
+			HARD-92 GAP-8 MBBDS(k=1) MBBDS using memory for 1225 states(state size: 32 bits, Memory_percentage_from_MM=1.00) found path length 7; 650 expanded; 0.0003s elapsed;
+			HARD-92 GAP-8 MBBDS(k=1) MBBDS using memory for 1102 states(state size: 32 bits, Memory_percentage_from_MM=0.90) found path length 7; 650 expanded; 0.0003s elapsed;
+			HARD-92 GAP-8 MBBDS(k=1) MBBDS using memory for 918 states(state size: 32 bits, Memory_percentage_from_MM=0.75) found path length 7; 650 expanded; 0.0003s elapsed;
+			HARD-92 GAP-8 MBBDS(k=1) MBBDS using memory for 612 states(state size: 32 bits, Memory_percentage_from_MM=0.50) found path length 7; 650 expanded; 0.0003s elapsed;
+			HARD-92 GAP-8 MBBDS(k=1) MBBDS using memory for 306 states(state size: 32 bits, Memory_percentage_from_MM=0.25) found path length 7; 750 expanded; 0.0003s elapsed;
+			HARD-92 GAP-8 MBBDS(k=1) MBBDS using memory for 122 states(state size: 32 bits, Memory_percentage_from_MM=0.10) found path length 7; 1102 expanded; 0.0004s elapsed;
+		_IDMM_
+			HARD-92 GAP-8 IDMM found path length 7; 64917 expanded; 454419 generated; 0.0141s elapsed; Mid state: 4 3 5 6 7 2 1 0 
+			GAP-8 D-MM ; 40805 expanded;
+	Problem 94 of 100
+	Start state: 4 5 6 2 3 7 1 0 
+	Goal state: 0 1 2 3 4 5 6 7 
+	Initial heuristic 1
+		_A*_
+			GAP-8 A* found path length 5; 1489 expanded; 382 necessary; using 5936 states in memory; 0.0019s elapsed
+			GAP-8 I-A* ; 1943 expanded;
+		_MM_
+			Hard-GAP-8 MM found path length 5; 30 expanded; 30 necessary; using 184 states in memory; 0.0000s elapsed
+			Hard-GAP-8 I-MM ; 48 expanded;
+		_IDA*_
+			Hard-GAP-8 IDA* found path length 5; 1522 expanded; 10654 generated; 0.0003s elapsed
+			Hard-GAP-8 D-A* ; 1278 expanded;
+		_MBBDS_
+			HARD-93 GAP-8 MBBDS(k=1) MBBDS using memory for 184 states(state size: 32 bits, Memory_percentage_from_MM=1.00) found path length 5; 107 expanded; 0.0001s elapsed;
+			HARD-93 GAP-8 MBBDS(k=1) MBBDS using memory for 165 states(state size: 32 bits, Memory_percentage_from_MM=0.90) found path length 5; 107 expanded; 0.0001s elapsed;
+			HARD-93 GAP-8 MBBDS(k=1) MBBDS using memory for 138 states(state size: 32 bits, Memory_percentage_from_MM=0.75) found path length 5; 107 expanded; 0.0000s elapsed;
+			HARD-93 GAP-8 MBBDS(k=1) MBBDS using memory for 92 states(state size: 32 bits, Memory_percentage_from_MM=0.50) found path length 5; 107 expanded; 0.0000s elapsed;
+			HARD-93 GAP-8 MBBDS(k=1) MBBDS using memory for 46 states(state size: 32 bits, Memory_percentage_from_MM=0.25) found path length 5; 115 expanded; 0.0000s elapsed;
+			HARD-93 GAP-8 MBBDS(k=1) MBBDS using memory for 18 states(state size: 32 bits, Memory_percentage_from_MM=0.10) found path length 5; 173 expanded; 0.0001s elapsed;
+		_IDMM_
+			HARD-93 GAP-8 IDMM found path length 5; 2011 expanded; 14077 generated; 0.0004s elapsed; Mid state: 4 5 6 7 3 2 1 0 
+			GAP-8 D-MM ; 1345 expanded;
+	Problem 95 of 100
+	Start state: 3 5 2 4 1 7 0 6 
+	Goal state: 0 1 2 3 4 5 6 7 
+	Initial heuristic 1
+		_A*_
+			GAP-8 A* found path length 8; 18416 expanded; 18346 necessary; using 32878 states in memory; 0.0201s elapsed
+			GAP-8 I-A* ; 46099 expanded;
+		_MM_
+			Hard-GAP-8 MM found path length 8; 484 expanded; 484 necessary; using 2474 states in memory; 0.0007s elapsed
+			Hard-GAP-8 I-MM ; 602 expanded;
+		_IDA*_
+			Hard-GAP-8 IDA* found path length 8; 608300 expanded; 4258100 generated; 0.1246s elapsed
+			Hard-GAP-8 D-A* ; 509115 expanded;
+		_MBBDS_
+			HARD-94 GAP-8 MBBDS(k=1) MBBDS using memory for 2474 states(state size: 32 bits, Memory_percentage_from_MM=1.00) found path length 8; 1696 expanded; 0.0008s elapsed;
+			HARD-94 GAP-8 MBBDS(k=1) MBBDS using memory for 2226 states(state size: 32 bits, Memory_percentage_from_MM=0.90) found path length 8; 1696 expanded; 0.0007s elapsed;
+			HARD-94 GAP-8 MBBDS(k=1) MBBDS using memory for 1855 states(state size: 32 bits, Memory_percentage_from_MM=0.75) found path length 8; 1696 expanded; 0.0007s elapsed;
+			HARD-94 GAP-8 MBBDS(k=1) MBBDS using memory for 1237 states(state size: 32 bits, Memory_percentage_from_MM=0.50) found path length 8; 1696 expanded; 0.0007s elapsed;
+			HARD-94 GAP-8 MBBDS(k=1) MBBDS using memory for 618 states(state size: 32 bits, Memory_percentage_from_MM=0.25) found path length 8; 1696 expanded; 0.0006s elapsed;
+			HARD-94 GAP-8 MBBDS(k=1) MBBDS using memory for 247 states(state size: 32 bits, Memory_percentage_from_MM=0.10) found path length 8; 1898 expanded; 0.0006s elapsed;
+		_IDMM_
+			HARD-94 GAP-8 IDMM found path length 8; 693698 expanded; 4855886 generated; 0.1537s elapsed; Mid state: 5 4 3 2 1 7 0 6 
+			GAP-8 D-MM ; 563918 expanded;
+	Problem 96 of 100
+	Start state: 3 7 2 5 0 6 4 1 
+	Goal state: 0 1 2 3 4 5 6 7 
+	Initial heuristic 1
+		_A*_
+			GAP-8 A* found path length 8; 19123 expanded; 18335 necessary; using 33363 states in memory; 0.0213s elapsed
+			GAP-8 I-A* ; 46757 expanded;
+		_MM_
+			Hard-GAP-8 MM found path length 8; 463 expanded; 463 necessary; using 2380 states in memory; 0.0007s elapsed
+			Hard-GAP-8 I-MM ; 581 expanded;
+		_IDA*_
+			Hard-GAP-8 IDA* found path length 8; 624237 expanded; 4369659 generated; 0.1262s elapsed
+			Hard-GAP-8 D-A* ; 522700 expanded;
+		_MBBDS_
+			HARD-95 GAP-8 MBBDS(k=1) MBBDS using memory for 2380 states(state size: 32 bits, Memory_percentage_from_MM=1.00) found path length 8; 1708 expanded; 0.0008s elapsed;
+			HARD-95 GAP-8 MBBDS(k=1) MBBDS using memory for 2142 states(state size: 32 bits, Memory_percentage_from_MM=0.90) found path length 8; 1708 expanded; 0.0007s elapsed;
+			HARD-95 GAP-8 MBBDS(k=1) MBBDS using memory for 1785 states(state size: 32 bits, Memory_percentage_from_MM=0.75) found path length 8; 1708 expanded; 0.0007s elapsed;
+			HARD-95 GAP-8 MBBDS(k=1) MBBDS using memory for 1190 states(state size: 32 bits, Memory_percentage_from_MM=0.50) found path length 8; 1708 expanded; 0.0007s elapsed;
+			HARD-95 GAP-8 MBBDS(k=1) MBBDS using memory for 595 states(state size: 32 bits, Memory_percentage_from_MM=0.25) found path length 8; 1708 expanded; 0.0006s elapsed;
+			HARD-95 GAP-8 MBBDS(k=1) MBBDS using memory for 238 states(state size: 32 bits, Memory_percentage_from_MM=0.10) found path length 8; 1954 expanded; 0.0007s elapsed;
+		_IDMM_
+			HARD-95 GAP-8 IDMM found path length 8; 711809 expanded; 4982663 generated; 0.1535s elapsed; Mid state: 6 0 5 4 1 2 3 7 
+			GAP-8 D-MM ; 582029 expanded;
+	Problem 97 of 100
+	Start state: 4 6 5 7 1 0 3 2 
+	Goal state: 0 1 2 3 4 5 6 7 
+	Initial heuristic 1
+		_A*_
+			GAP-8 A* found path length 7; 8445 expanded; 6973 necessary; using 20720 states in memory; 0.0100s elapsed
+			GAP-8 I-A* ; 17764 expanded;
+		_MM_
+			Hard-GAP-8 MM found path length 7; 103 expanded; 103 necessary; using 620 states in memory; 0.0002s elapsed
+			Hard-GAP-8 I-MM ; 221 expanded;
+		_IDA*_
+			Hard-GAP-8 IDA* found path length 7; 45818 expanded; 320726 generated; 0.0094s elapsed
+			Hard-GAP-8 D-A* ; 38459 expanded;
+		_MBBDS_
+			HARD-96 GAP-8 MBBDS(k=1) MBBDS using memory for 620 states(state size: 32 bits, Memory_percentage_from_MM=1.00) found path length 7; 629 expanded; 0.0003s elapsed;
+			HARD-96 GAP-8 MBBDS(k=1) MBBDS using memory for 558 states(state size: 32 bits, Memory_percentage_from_MM=0.90) found path length 7; 629 expanded; 0.0003s elapsed;
+			HARD-96 GAP-8 MBBDS(k=1) MBBDS using memory for 465 states(state size: 32 bits, Memory_percentage_from_MM=0.75) found path length 7; 679 expanded; 0.0003s elapsed;
+			HARD-96 GAP-8 MBBDS(k=1) MBBDS using memory for 310 states(state size: 32 bits, Memory_percentage_from_MM=0.50) found path length 7; 729 expanded; 0.0003s elapsed;
+			HARD-96 GAP-8 MBBDS(k=1) MBBDS using memory for 155 states(state size: 32 bits, Memory_percentage_from_MM=0.25) found path length 7; 944 expanded; 0.0003s elapsed;
+			HARD-96 GAP-8 MBBDS(k=1) MBBDS using memory for 62 states(state size: 32 bits, Memory_percentage_from_MM=0.10) found path length 7; 1491 expanded; 0.0005s elapsed;
+		_IDMM_
+			HARD-96 GAP-8 IDMM found path length 7; 51562 expanded; 360934 generated; 0.0112s elapsed; Mid state: 0 1 2 3 4 6 5 7 
+			GAP-8 D-MM ; 30804 expanded;
+	Problem 98 of 100
+	Start state: 5 7 1 4 0 6 2 3 
+	Goal state: 0 1 2 3 4 5 6 7 
+	Initial heuristic 1
+		_A*_
+			GAP-8 A* found path length 7; 7784 expanded; 6965 necessary; using 19896 states in memory; 0.0091s elapsed
+			GAP-8 I-A* ; 17083 expanded;
+		_MM_
+			Hard-GAP-8 MM found path length 7; 112 expanded; 112 necessary; using 670 states in memory; 0.0002s elapsed
+			Hard-GAP-8 I-MM ; 230 expanded;
+		_IDA*_
+			Hard-GAP-8 IDA* found path length 7; 91466 expanded; 640262 generated; 0.0186s elapsed
+			Hard-GAP-8 D-A* ; 76776 expanded;
+		_MBBDS_
+			HARD-97 GAP-8 MBBDS(k=1) MBBDS using memory for 670 states(state size: 32 bits, Memory_percentage_from_MM=1.00) found path length 7; 774 expanded; 0.0003s elapsed;
+			HARD-97 GAP-8 MBBDS(k=1) MBBDS using memory for 603 states(state size: 32 bits, Memory_percentage_from_MM=0.90) found path length 7; 774 expanded; 0.0003s elapsed;
+			HARD-97 GAP-8 MBBDS(k=1) MBBDS using memory for 502 states(state size: 32 bits, Memory_percentage_from_MM=0.75) found path length 7; 874 expanded; 0.0003s elapsed;
+			HARD-97 GAP-8 MBBDS(k=1) MBBDS using memory for 335 states(state size: 32 bits, Memory_percentage_from_MM=0.50) found path length 7; 874 expanded; 0.0003s elapsed;
+			HARD-97 GAP-8 MBBDS(k=1) MBBDS using memory for 167 states(state size: 32 bits, Memory_percentage_from_MM=0.25) found path length 7; 971 expanded; 0.0003s elapsed;
+			HARD-97 GAP-8 MBBDS(k=1) MBBDS using memory for 67 states(state size: 32 bits, Memory_percentage_from_MM=0.10) found path length 7; 1636 expanded; 0.0005s elapsed;
+		_IDMM_
+			HARD-97 GAP-8 IDMM found path length 7; 103191 expanded; 722337 generated; 0.0223s elapsed; Mid state: 0 4 5 6 7 1 2 3 
+			GAP-8 D-MM ; 82433 expanded;
+	Problem 99 of 100
+	Start state: 4 0 1 6 2 5 3 7 
+	Goal state: 0 1 2 3 4 5 6 7 
+	Initial heuristic 0
+		_A*_
+			GAP-8 A* found path length 6; 3049 expanded; 2849 necessary; using 9456 states in memory; 0.0037s elapsed
+			GAP-8 I-A* ; 6980 expanded;
+		_MM_
+			Hard-GAP-8 MM found path length 6; 96 expanded; 96 necessary; using 578 states in memory; 0.0001s elapsed
+			Hard-GAP-8 I-MM ; 114 expanded;
+		_IDA*_
+			Hard-GAP-8 IDA* found path length 0; 1 expanded; 7 generated; 0.0000s elapsed
+			Hard-GAP-8 D-A* ; 1 expanded;
+		_MBBDS_
+			HARD-98 GAP-8 MBBDS(k=1) MBBDS using memory for 578 states(state size: 32 bits, Memory_percentage_from_MM=1.00) found path length 6; 168 expanded; 0.0001s elapsed;
+			HARD-98 GAP-8 MBBDS(k=1) MBBDS using memory for 520 states(state size: 32 bits, Memory_percentage_from_MM=0.90) found path length 6; 168 expanded; 0.0001s elapsed;
+			HARD-98 GAP-8 MBBDS(k=1) MBBDS using memory for 433 states(state size: 32 bits, Memory_percentage_from_MM=0.75) found path length 6; 212 expanded; 0.0001s elapsed;
+			HARD-98 GAP-8 MBBDS(k=1) MBBDS using memory for 289 states(state size: 32 bits, Memory_percentage_from_MM=0.50) found path length 6; 212 expanded; 0.0001s elapsed;
+			HARD-98 GAP-8 MBBDS(k=1) MBBDS using memory for 144 states(state size: 32 bits, Memory_percentage_from_MM=0.25) found path length 6; 262 expanded; 0.0001s elapsed;
+			HARD-98 GAP-8 MBBDS(k=1) MBBDS using memory for 57 states(state size: 32 bits, Memory_percentage_from_MM=0.10) found path length 6; 318 expanded; 0.0001s elapsed;
+		_IDMM_
+			HARD-98 GAP-8 IDMM found path length 6; 23952 expanded; 167664 generated; 0.0052s elapsed; Mid state: 1 0 4 5 6 2 3 7 
+			GAP-8 D-MM ; 15680 expanded;
+	Problem 100 of 100
+	Start state: 7 0 6 3 2 1 5 4 
+	Goal state: 0 1 2 3 4 5 6 7 
+	Initial heuristic 1
+		_A*_
+			GAP-8 A* found path length 6; 3245 expanded; 2067 necessary; using 10305 states in memory; 0.0039s elapsed
+			GAP-8 I-A* ; 5867 expanded;
+		_MM_
+			Hard-GAP-8 MM found path length 6; 61 expanded; 61 necessary; using 369 states in memory; 0.0001s elapsed
+			Hard-GAP-8 I-MM ; 79 expanded;
+		_IDA*_
+			Hard-GAP-8 IDA* found path length 6; 4589 expanded; 32123 generated; 0.0009s elapsed
+			Hard-GAP-8 D-A* ; 3804 expanded;
+		_MBBDS_
+			HARD-99 GAP-8 MBBDS(k=1) MBBDS using memory for 369 states(state size: 32 bits, Memory_percentage_from_MM=1.00) found path length 6; 240 expanded; 0.0001s elapsed;
+			HARD-99 GAP-8 MBBDS(k=1) MBBDS using memory for 332 states(state size: 32 bits, Memory_percentage_from_MM=0.90) found path length 6; 240 expanded; 0.0001s elapsed;
+			HARD-99 GAP-8 MBBDS(k=1) MBBDS using memory for 276 states(state size: 32 bits, Memory_percentage_from_MM=0.75) found path length 6; 240 expanded; 0.0001s elapsed;
+			HARD-99 GAP-8 MBBDS(k=1) MBBDS using memory for 184 states(state size: 32 bits, Memory_percentage_from_MM=0.50) found path length 6; 240 expanded; 0.0001s elapsed;
+			HARD-99 GAP-8 MBBDS(k=1) MBBDS using memory for 92 states(state size: 32 bits, Memory_percentage_from_MM=0.25) found path length 6; 240 expanded; 0.0001s elapsed;
+			HARD-99 GAP-8 MBBDS(k=1) MBBDS using memory for 36 states(state size: 32 bits, Memory_percentage_from_MM=0.10) found path length 6; 421 expanded; 0.0001s elapsed;
+		_IDMM_
+			HARD-99 GAP-8 IDMM found path length 6; 5178 expanded; 36246 generated; 0.0011s elapsed; Mid state: 0 4 5 1 2 3 6 7 
+			GAP-8 D-MM ; 1262 expanded;
+completed!

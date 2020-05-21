@@ -15,18 +15,10 @@
  ../../../../algorithms/BucketOpenClosed.h \
  ../../../../algorithms/AStarOpenClosed.h \
  ../../../../generic/GenericSearchAlgorithm.h \
- ../../../../utils/StatCollection.h ../../../../generic/NBS.h \
- ../../../../algorithms/BDOpenClosed.h \
- ../../../../algorithms/BDIndexOpenClosed.h \
- ../../../../algorithms/BDIndexOpenClosed.h \
- ../../../../algorithms/NBSQueue.h ../../../../algorithms/BDOpenClosed.h \
- ../../../../generic/IDAStar.h ../../../../utils/vectorCache.h \
- ../../../../generic/MM.h ../../../../apps/bidirectional/BSStar.h \
- ../../../../envutil/PancakeInstances.h \
- ../../../../generic/WeightedVertexGraph.h \
- ../../../../generic/TemplateAStar.h ../../../../utils/SVGUtil.h \
- ../../../../utils/Graphics.h ../../../../utils/StringUtils.h \
- ../../../../generic/HeuristicError.h ../../../../search/Heuristic.h \
- ../../../../generic/MBBDS.h ../../../../generic/PancakeHasher.h \
- ../../../../generic/MurmurHash3.h ../../../../generic/IDMM.h \
+ ../../../../utils/StatCollection.h ../../../../generic/IDAStar.h \
+ ../../../../utils/vectorCache.h ../../../../generic/MM.h \
+ ../../../../envutil/PancakeInstances.h ../../../../generic/MBBDS.h \
+ ../../../../generic/PancakeHasher.h ../../../../generic/MurmurHash3.h \
+ ../../../../generic/FullMBBDS.h ../../../../generic/MM.h \
+ ../../../../generic/IDMM.h ../../../../generic/IDMM.h \
  ../../../../generic/MbbdsBloomFilter.h

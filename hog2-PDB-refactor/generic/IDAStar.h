@@ -75,6 +75,7 @@ private:
 	Heuristic<state> *heuristic;
 	std::vector<uint64_t> gCostHistogram;
 	unsigned long dAstarExpansions = 0;
+	unsigned long dAstarLastIterExpansions = 0;
 
 #ifdef DO_LOGGING
 public:
@@ -93,16 +94,17 @@ bool IDAStar<state, action, verbose>::GetPath(SearchEnvironment<state, action> *
 	if (!storedHeuristic)
 		heuristic = env;
 	nextBound = 0;
-	nodesExpanded = nodesTouched = 0;
+	nodesExpanded = nodesTouched = dAstarLastIterExpansions = 0;
 	thePath.resize(0);
 	UpdateNextBound(0, heuristic->HCost(from, to));
 	goal = to;
 	thePath.push_back(from);
 	unsigned long nodesExpandedSoFar = 0;
-	unsigned long lastIterationExpansions = 0;
+	unsigned long previousIterationExpansions = 0;
 	auto startTime = std::chrono::steady_clock::now();
 	while (true) //thePath.size() == 0)
 	{
+		dAstarLastIterExpansions = 0;
 		auto currentTime = std::chrono::steady_clock::now();
 		std::chrono::duration<double> elapsed_seconds = currentTime-startTime;
 		if(elapsed_seconds.count() >= secondsLimit){
@@ -114,20 +116,20 @@ bool IDAStar<state, action, verbose>::GetPath(SearchEnvironment<state, action> *
 		if (verbose)
 			printf("\t\tStarting iteration with bound %1.1f: ", nextBound, nodesExpanded);
 		double res = DoIteration(env, from, from, thePath, nextBound, 0, 0);
-		lastIterationExpansions = nodesExpanded-nodesExpandedSoFar;
 		if (verbose)
-			printf("Nodes expanded: %llu(%llu)\n", lastIterationExpansions, nodesExpanded);
+			printf("Nodes expanded: %llu(%llu)\n", nodesExpanded-nodesExpandedSoFar, nodesExpanded);
 		if (res == 0){
-			/*if (verbose)
+			if (verbose){
 				printf("\t\tStarting iteration with bound %f. ", nextBound, nodesExpanded);
-			if (verbose)
-				printf("Nodes expanded: %llu(%llu)\n", nodesExpanded-nodesExpandedSoFar, nodesExpanded);*/
+				printf("Nodes expanded: %llu(%llu)\n", nodesExpanded-nodesExpandedSoFar, nodesExpanded);
+			}
 			break;
 		}
+		previousIterationExpansions = nodesExpanded-nodesExpandedSoFar;
 		nodesExpandedSoFar = nodesExpanded;
 		PrintGHistogram();
 	}
-	dAstarExpansions = lastIterationExpansions;
+	dAstarExpansions = previousIterationExpansions + dAstarLastIterExpansions;
 	PrintGHistogram();
 	return true;
 }
@@ -189,6 +191,9 @@ double IDAStar<state, action, verbose>::DoIteration(SearchEnvironment<state, act
 	env->GetSuccessors(currState, neighbors);
 	nodesTouched += neighbors.size();
 	nodesExpanded++;
+	if(g+h == bound){
+		dAstarLastIterExpansions++;
+	}
 	gCostHistogram[g]++;
 
 	for (unsigned int x = 0; x < neighbors.size(); x++)
