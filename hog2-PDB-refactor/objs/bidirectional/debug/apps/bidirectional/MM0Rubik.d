@@ -19,5 +19,6 @@
  ../../../../utils/MMapUtil.h ../../../../utils/MinBloom.h \
  ../../../../utils/FourBitArray.h ../../../../generic/IDAStar.h \
  ../../../../utils/FPUtil.h ../../../../utils/vectorCache.h \
+ ../../../../algorithms/AStarOpenClosed.h \
  ../../../../generic/ParallelIDAStar.h \
  ../../../../apps/bidirectional/MM0Rubik.h

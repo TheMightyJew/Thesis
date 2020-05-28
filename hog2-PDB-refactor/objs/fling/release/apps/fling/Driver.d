@@ -16,5 +16,6 @@
  ../../../../simulation/SimulationInfo.h \
  ../../../../simulation/EpisodicSimulation.h \
  ../../../../generic/IDAStar.h ../../../../utils/vectorCache.h \
+ ../../../../algorithms/AStarOpenClosed.h \
  ../../../../environments/Fling.h ../../../../generic/BFS.h \
  ../../../../utils/TextOverlay.h ../../../../utils/Graphics.h

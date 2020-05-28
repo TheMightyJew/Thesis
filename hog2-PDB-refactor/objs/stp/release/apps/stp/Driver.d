@@ -27,6 +27,7 @@
  ../../../../utils/MR1Permutation.h \
  ../../../../environments/GraphEnvironment.h \
  ../../../../generic/IDAStar.h ../../../../utils/vectorCache.h \
+ ../../../../algorithms/AStarOpenClosed.h \
  ../../../../generic/ParallelIDAStar.h ../../../../envutil/STPInstances.h \
  ../../../../environments/MNAgentPuzzle.h \
  ../../../../environments/SequenceAlignment.h ../../../../generic/BFS.h \

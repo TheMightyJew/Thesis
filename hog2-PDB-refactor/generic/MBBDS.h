@@ -26,10 +26,14 @@ public:
 	double getPathLength()	{ return pathLength; }
 	uint64_t GetNodesExpanded() { return nodesExpanded; }
 	uint64_t GetNodesTouched() { return nodesTouched; }
+	uint64_t GetNecessaryExpansions() { return necessaryExpansions; }
 	double getLastBound() { return backwardBound+forwardBound; }
+	int getIterationNum() { return iteration_num; }
 	void ResetNodeCount() { nodesExpanded = nodesTouched = 0; }
 private:
-	unsigned long nodesExpanded, nodesTouched, statesQuantityBound;
+	unsigned long nodesExpanded, nodesTouched, statesQuantityBound, necessaryExpansions, lastIterBoundExpansions;
+;
+	int iteration_num;
 	BloomFilter previousBloomfilter;
 	BloomFilter currentBloomfilter;
 	bool listReady;
@@ -70,7 +74,7 @@ bool MBBDS<state, action, BloomFilter, verbose>::GetMidState(SearchEnvironment<s
 	bool forwardSearch;
 	int saturationIncreased = 0;
 	int saturationMaxIncreasements = 100;
-	int iteration_num = 0;
+	iteration_num = 0;
 	double bound;
 	firstRun = true;
 	forwardSearch = true;
@@ -80,6 +84,7 @@ bool MBBDS<state, action, BloomFilter, verbose>::GetMidState(SearchEnvironment<s
 	double last_saturation = 1;
 	auto startTime = std::chrono::steady_clock::now();
 	while(true){
+		lastIterBoundExpansions = 0;
 		if (verbose){
 			printf("Bounds: %f and %f\n", forwardBound, backwardBound);
 		}
@@ -116,6 +121,7 @@ bool MBBDS<state, action, BloomFilter, verbose>::GetMidState(SearchEnvironment<s
 			iteration_num++;
 			if (solved) {
 				pathLength = backwardBound + forwardBound;
+				necessaryExpansions = nodesExpanded - lastIterBoundExpansions;
 				return true;
 			}
 			if (listReady) {// no solution found
@@ -200,6 +206,9 @@ bool MBBDS<state, action, BloomFilter, verbose>::DoIteration(SearchEnvironment<s
 	env->GetSuccessors(currState, neighbors);
 	nodesTouched += neighbors.size();
 	nodesExpanded++;
+	if(g + h == backwardBound + forwardBound){
+		lastIterBoundExpansions++;
+	}
 	for (unsigned int x = 0; x < neighbors.size(); x++)
 	{
 		if (neighbors[x] == parent) {

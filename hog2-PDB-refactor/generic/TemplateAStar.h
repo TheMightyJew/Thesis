@@ -80,7 +80,7 @@ public:
 	}
 	virtual ~TemplateAStar() {}
 	void GetPath(environment *env, const state& from, const state& to, std::vector<state> &thePath);
-	bool GetPathTime(environment *env, const state& from, const state& to, std::vector<state> &thePath, int secondsLimit=600);
+	bool GetPathTime(environment *env, const state& from, const state& to, std::vector<state> &thePath, int secondsLimit=600, bool boundExists=false, unsigned long statesBound=0);
 	void GetPath(environment *, const state&, const state&, std::vector<action> & );
 	
 	openList openClosedList;
@@ -165,6 +165,7 @@ public:
 	double GetWeight() { return weight; }
 	unsigned long getIAstarExpansions() { return iAstarExpansions; }
 	unsigned long getMemoryStatesUse() { return memoryStatesUse; }
+	std::vector<AStarOpenClosedDataWithF<state>> getOpenList() { return openClosedList.getOpenList(); }
 private:
 	uint64_t nodesTouched, nodesExpanded;
 	
@@ -187,7 +188,8 @@ private:
 	Constraint<state> *theConstraint;
 	std::vector<unsigned long> fCounts;
 	unsigned long iAstarExpansions = 0;
-	unsigned long memoryStatesUse = 0;
+	unsigned long memoryStatesUse = 0, statesBound=0;
+	bool boundExists=false;
 	
 	double lastF = 0;
 	uint64_t nodesExpandedInThisF = 0;
@@ -221,8 +223,10 @@ const char *TemplateAStar<state,action,environment,openList>::GetName()
  * between from and to when the function returns, if one exists. 
  */
 template <class state, class action, class environment, class openList>
-bool TemplateAStar<state,action,environment,openList>::GetPathTime(environment *_env, const state& from, const state& to, std::vector<state> &thePath, int secondsLimit)
+bool TemplateAStar<state,action,environment,openList>::GetPathTime(environment *_env, const state& from, const state& to, std::vector<state> &thePath, int secondsLimit, bool boundExists, unsigned long statesBound)
 {
+	this->boundExists = boundExists;
+	this->statesBound = statesBound;
 	if (!InitializeSearch(_env, from, to, thePath))
   	{	
   		return false;
@@ -231,10 +235,9 @@ bool TemplateAStar<state,action,environment,openList>::GetPathTime(environment *
   	while (!DoSingleSearchStep(thePath))
 	{
 		memoryStatesUse = maxNum;
-		
 		auto currentTime = std::chrono::steady_clock::now();
 		std::chrono::duration<double> elapsed_seconds = currentTime-startTime;
-		if(elapsed_seconds.count() >= secondsLimit){
+		if(elapsed_seconds.count() >= secondsLimit || (boundExists && memoryStatesUse>statesBound)){
 			return false;
 		}
 	}
@@ -429,9 +432,12 @@ bool TemplateAStar<state,action,environment,openList>::DoSingleSearchStep(std::v
 			}
 		}
 	}
-	if(GetNumItems()> maxNum)
+	if(GetNumItems() > maxNum){
 		maxNum = GetNumItems();
-	
+		if(boundExists && maxNum>statesBound){
+			return false;
+		}
+	}
 	if (useBPMX) // propagate best child to parent
 	{
 		if (!directed)

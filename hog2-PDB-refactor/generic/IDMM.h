@@ -33,6 +33,7 @@ private:
 	
 	state originGoal;
 	state originStart;
+	unsigned long dMMLastIterExpansions = 0;
 
 
 
@@ -50,9 +51,10 @@ bool IDMM<state, action, verbose>::GetMidState(SearchEnvironment<state, action>*
 	backwardBound = (int)(startingFBound / 2);
 	forwardBound = startingFBound - backwardBound;
 	unsigned long nodesExpandedSoFar = 0;
-	unsigned long lastIterationExpansions = 0;
+	unsigned long previousIterationExpansions = 0;
 	auto startTime = std::chrono::steady_clock::now();
 	while (true){
+		dMMLastIterExpansions = 0;
 		auto currentTime = std::chrono::steady_clock::now();
 		std::chrono::duration<double> elapsed_seconds = currentTime-startTime;
 		if(elapsed_seconds.count() >= secondsLimit){
@@ -62,13 +64,11 @@ bool IDMM<state, action, verbose>::GetMidState(SearchEnvironment<state, action>*
 			printf("\t\tBounds: %1.1f and %1.1f: ", forwardBound, backwardBound);
 		}
 		bool solved = DoIterationForward(env, originStart, originStart, 0, midState);
-		lastIterationExpansions = nodesExpanded-nodesExpandedSoFar;
 		if(verbose){
-			printf("Nodes expanded: %d(%d)\n", lastIterationExpansions, nodesExpanded);
+			printf("Nodes expanded: %d(%d)\n", nodesExpanded-nodesExpandedSoFar, nodesExpanded);
 		}
-		nodesExpandedSoFar = nodesExpanded;
 		if (solved) {
-			dMMExpansions = lastIterationExpansions;
+			dMMExpansions = previousIterationExpansions + dMMLastIterExpansions;
 			pathLength = backwardBound + forwardBound;
 			return true;
 		}
@@ -80,6 +80,8 @@ bool IDMM<state, action, verbose>::GetMidState(SearchEnvironment<state, action>*
 				forwardBound++;
 			}			
 		}
+		previousIterationExpansions = nodesExpanded-nodesExpandedSoFar;
+		nodesExpandedSoFar = nodesExpanded;
 	}
 	return false;
 }
@@ -107,6 +109,9 @@ bool IDMM<state, action, verbose>::DoIterationForward(SearchEnvironment<state, a
 	env->GetSuccessors(currState, neighbors);
 	nodesTouched += neighbors.size();
 	nodesExpanded++;
+	if(g + h == forwardBound+backwardBound){
+		dMMLastIterExpansions++;
+	}
 	for (unsigned int x = 0; x < neighbors.size(); x++)
 	{
 		if (neighbors[x] == parent) {
@@ -137,6 +142,9 @@ bool IDMM<state, action, verbose>::DoIterationBackward(SearchEnvironment<state, 
 	env->GetSuccessors(currState, neighbors);
 	nodesTouched += neighbors.size();
 	nodesExpanded++;
+	if(g + originalH == forwardBound+backwardBound){
+		dMMLastIterExpansions++;
+	}
 	for (unsigned int x = 0; x < neighbors.size(); x++)
 	{
 		if (neighbors[x] == parent) {

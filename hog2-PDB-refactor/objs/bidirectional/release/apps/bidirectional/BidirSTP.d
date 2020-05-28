@@ -25,7 +25,7 @@
  ../../../../algorithms/BDIndexOpenClosed.h \
  ../../../../algorithms/NBSQueue.h ../../../../algorithms/BDOpenClosed.h \
  ../../../../generic/IDAStar.h ../../../../utils/vectorCache.h \
- ../../../../generic/MM.h ../../../../algorithms/AStarOpenClosed.h \
+ ../../../../algorithms/AStarOpenClosed.h ../../../../generic/MM.h \
  ../../../../apps/bidirectional/BSStar.h \
  ../../../../generic/TemplateAStar.h ../../../../search/Constraint.h \
  ../../../../algorithms/BucketOpenClosed.h \

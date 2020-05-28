@@ -17,6 +17,7 @@
  ../../../../simulation/EpisodicSimulation.h ../../../../utils/Plot2D.h \
  ../../../../utils/Graphics.h ../../../../generic/RandomUnit.h \
  ../../../../simulation/Unit.h ../../../../generic/IDAStar.h \
- ../../../../utils/vectorCache.h ../../../../generic/IncrementalDFID.h \
+ ../../../../utils/vectorCache.h ../../../../algorithms/AStarOpenClosed.h \
+ ../../../../generic/IncrementalDFID.h \
  ../../../../generic/IncrementalBFS.h ../../../../utils/SVGUtil.h \
  ../../../../environments/NaryTree.h
