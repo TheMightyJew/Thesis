@@ -432,12 +432,6 @@ bool TemplateAStar<state,action,environment,openList>::DoSingleSearchStep(std::v
 			}
 		}
 	}
-	if(GetNumItems() > maxNum){
-		maxNum = GetNumItems();
-		if(boundExists && maxNum>statesBound){
-			return false;
-		}
-	}
 	if (useBPMX) // propagate best child to parent
 	{
 		if (!directed)
@@ -546,7 +540,12 @@ bool TemplateAStar<state,action,environment,openList>::DoSingleSearchStep(std::v
 				}
 		}
 	}
-		
+	if(GetNumItems() > maxNum){
+		maxNum = GetNumItems();
+		if(boundExists && maxNum>statesBound){
+			return false;
+		}
+	}
 	return false;
 }
 

@@ -45,7 +45,7 @@ private:
 	double DoIteration(SearchEnvironment<state, action> *env,
 					   state parent, state currState,
 					   std::vector<state> &thePath, double bound, double g,
-					   double maxH);
+					   double maxH, double currStateH=0);
 	double DoIteration(SearchEnvironment<state, action> *env,
 					   action forbiddenAction, state &currState,
 					   std::vector<action> &thePath, double bound, double g,
@@ -100,7 +100,18 @@ bool IDAStar<state, action, verbose>::GetPath(SearchEnvironment<state, action> *
 	nextBound = 0;
 	nodesExpanded = nodesTouched = dAstarLastIterExpansions = 0;
 	thePath.resize(0);
-	UpdateNextBound(0, heuristic->HCost(from, to));
+	if(readyOpenList){
+		double minF = 0;
+		for(AStarOpenClosedDataWithF<state> openState : openList){
+			if(minF == 0 || minF > openState.f){
+					minF = openState.f;
+			}
+		}
+		UpdateNextBound(0, minF);
+	}
+	else{
+		UpdateNextBound(0, heuristic->HCost(from, to));
+	}
 	goal = to;
 	thePath.push_back(from);
 	unsigned long nodesExpandedSoFar = 0;
@@ -123,7 +134,7 @@ bool IDAStar<state, action, verbose>::GetPath(SearchEnvironment<state, action> *
 		if(readyOpenList){
 			double currentBound = nextBound;
 			for(AStarOpenClosedDataWithF<state> openState : openList){
-				res = DoIteration(env, openState.data, openState.data, thePath, currentBound, openState.g, 0);
+				res = DoIteration(env, openState.data, openState.data, thePath, currentBound, openState.g, openState.h);
 				if(res == 0 && solved){
 					solLength = env->GetPathLength(thePath) + openState.g;
 					break;
@@ -188,9 +199,9 @@ template <class state, class action, bool verbose>
 double IDAStar<state, action, verbose>::DoIteration(SearchEnvironment<state, action> *env,
 										   state parent, state currState,
 										   std::vector<state> &thePath, double bound, double g,
-										   double maxH)
+										   double maxH, double currStateH)
 {
-	double h = heuristic->HCost(currState, goal);
+	double h = std::max(heuristic->HCost(currState, goal), currStateH);
 	// path max
 	if (usePathMax && fless(h, maxH))
 		h = maxH;
@@ -223,6 +234,7 @@ double IDAStar<state, action, verbose>::DoIteration(SearchEnvironment<state, act
 		double childH = DoIteration(env, currState, neighbors[x], thePath, bound,
 																g+edgeCost, maxH - edgeCost);
 		if (env->GoalTest(thePath.back(), goal) && g+edgeCost<=bound){
+			solved = true;
 			return 0;
 		}
 		thePath.pop_back();
