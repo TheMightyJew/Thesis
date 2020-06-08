@@ -5,7 +5,7 @@
 //  Created by Nathan Sturtevant on 2/7/17.
 //  Copyright © 2017 University of Denver. All rights reserved.
 //
-
+#include <algorithm>
 #include "BidirPancake.h"
 #include "PancakePuzzle.h"
 #include "TemplateAStar.h"
@@ -26,7 +26,7 @@
 using namespace std;
 
 
-void StevenTest(int gap, int problems_num, bool randomPancake);
+void StevenTest(int gap=0, int problems_num=1, bool randomPancake=true, vector<int> skipVector = vector<int>());
 
 int all_problems_num = 100;
 unsigned long MMstatesQuantityBound = 1000000;
@@ -63,11 +63,7 @@ void TestPancake()
 	cout << "running..." << endl;
 	myfile.open (filename);
 	
-	//StevenTest(8,4,false);
-	StevenTest(0,100,false);
-	StevenTest(1,100,false);
-	StevenTest(2,100,false);
-	StevenTest(3,100,false);
+	StevenTest(3, 100, false, {5, 23, 32, 43, 60, 63, 73});
 	
 	myfile << "completed!" << endl;
 	myfile.close();
@@ -75,7 +71,7 @@ void TestPancake()
 	exit(0);
 }
 
-void StevenTest(int gap=0, int problems_num=1, bool randomPancake=true)
+void StevenTest(int gap, int problems_num, bool randomPancake, vector<int> skipVector)
 {
 	const int pancakes_num = 16;
 	srandom(2017218);
@@ -97,6 +93,9 @@ void StevenTest(int gap=0, int problems_num=1, bool randomPancake=true)
 	myfile << boost::format("TestPancakeHard:(Pancakes: %d, Gap: %d, Random: %d, Hard: %d)\n") % pancakes_num % gap % randomPancake % (!randomPancake);
 	for (int count = 0; count < problems_num; count++)
 	{
+		if(std::find(skipVector.begin(), skipVector.end(), count+1) != skipVector.end()) {
+			continue;
+		}
 		goal.Reset();
 		original.Reset();
 		if(randomPancake){
