@@ -224,6 +224,7 @@ void StevenTest(int gap=0, int problems_num=1, bool randomPancake=true)
 					}
 					else{
 						myfile << boost::format("\t\t\tHard-GAP-%d A*+IDA* IDA* using memory for %1.0llu states(state size: %d bits, Memory_percentage_from_MM=%1.2f) failed after %1.4fs\n") % gap % statesQuantityBoundforASPIDAS % stateSize % percentage % t1.GetElapsedTime();
+						break;
 					}	
 				}
 			}
