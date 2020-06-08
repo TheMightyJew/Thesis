@@ -63,7 +63,11 @@ void TestPancake()
 	cout << "running..." << endl;
 	myfile.open (filename);
 	
+	StevenTest(0, 100, false);
+	StevenTest(1, 100, false);
+	StevenTest(2, 100, false);
 	StevenTest(3, 100, false, {5, 23, 32, 43, 60, 63, 73});
+
 	
 	myfile << "completed!" << endl;
 	myfile.close();
@@ -200,7 +204,7 @@ void StevenTest(int gap, int problems_num, bool randomPancake, vector<int> skipV
 		if (AstarPIDAstarRun){
 			myfile << "\t\t_Astar+IDAstar_\n";
 			for(double percentage : percentages){
-				unsigned long statesQuantityBoundforASPIDAS = ASTARstatesQuantityBound*percentage;
+				unsigned long statesQuantityBoundforASPIDAS = min(MMstatesQuantityBound, ASTARstatesQuantityBound)*percentage;
 				TemplateAStar<PancakePuzzleState<pancakes_num>, PancakePuzzleAction, PancakePuzzle<pancakes_num>> astar;
 				goal.Reset();
 				start = original;
@@ -239,7 +243,7 @@ void StevenTest(int gap, int problems_num, bool randomPancake, vector<int> skipV
 					unsigned long nodesExpanded;
 					for(double percentage : percentages){
 						timer.StartTimer();
-						unsigned long statesQuantityBoundforMBBDS = MMstatesQuantityBound*percentage;
+						unsigned long statesQuantityBoundforMBBDS = min(MMstatesQuantityBound, ASTARstatesQuantityBound)*percentage;
 						solved = false;
 						unsigned long nodesExpanded = 0;
 						double lastBound = 0;
