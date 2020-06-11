@@ -11,12 +11,16 @@
 #include <iostream>
 #include <unordered_set>
 #include "SearchEnvironment.h"
+#include "AStarOpenClosed.h"
+#include "MM.h"
+
+
 
 template <class state, class action, bool verbose = true>
 class IDMM {
 public:
 	virtual ~IDMM() {}
-	bool GetMidState(SearchEnvironment<state, action>* env, state fromState, state toState, state &midState, int secondsLimit=600, double startingFBound=0);
+	bool GetMidState(SearchEnvironment<state, action>* env, state fromState, state toState, state &midState, int secondsLimit=600, double startingFBound=0, bool readyOpenLists=false, AStarOpenClosed<state, MMCompare<state>> forwardList = AStarOpenClosed<state, MMCompare<state>>(), AStarOpenClosed<state, MMCompare<state>> backwardList = AStarOpenClosed<state, MMCompare<state>>());
 	double getPathLength()	{ return pathLength; }
 	uint64_t GetNodesExpanded() { return nodesExpanded; }
 	uint64_t GetNodesTouched() { return nodesTouched; }
@@ -34,18 +38,37 @@ private:
 	state originGoal;
 	state originStart;
 	unsigned long dMMLastIterExpansions = 0;
-
+	
+	AStarOpenClosed<state, MMCompare<state>, AStarOpenClosedData<state>> forwardList;
+	std::vector<AStarOpenClosedData<state>> forwardOpenList;
+	AStarOpenClosed<state, MMCompare<state>, AStarOpenClosedData<state>> backwardList;
+	std::vector<AStarOpenClosedData<state>> backwardOpenList;
+	bool readyOpenLists;
 
 
 };
 
 template <class state, class action, bool verbose>
 bool IDMM<state, action, verbose>::GetMidState(SearchEnvironment<state, action>* env,
-	state fromState, state toState, state &midState, int secondsLimit, double startingFBound)
+	state fromState, state toState, state &midState, int secondsLimit, double startingFBound, bool readyOpenLists, AStarOpenClosed<state, MMCompare<state>, AStarOpenClosedData<state>> forwardList, AStarOpenClosed<state, MMCompare<state>, AStarOpenClosedData<state>> backwardList)
 {
+	this->readyOpenLists = readyOpenLists;
+	this->forwardList = forwardList;
+	this->forwardOpenList = forwardList.getOpenList();
+	this->backwardList = backwardList;
+	this->backwardOpenList = backwardList.getOpenList();
 	nodesExpanded = nodesTouched = 0;
 	originStart = fromState;
 	originGoal = toState;
+	if(readyOpenLists){
+		double minF = 0;
+		for(AStarOpenClosedData<state> openState : forwardOpenList){
+			if(minF == 0 || minF > openState.g+openState.h){
+					minF = openState.g+openState.h;
+			}
+		}
+		startingFBound = std::max(minF, startingFBound); 
+	}
 	double initialHeuristic = env->HCost(fromState, toState);
 	startingFBound = std::max(initialHeuristic, startingFBound); 
 	backwardBound = (int)(startingFBound / 2);
@@ -63,7 +86,18 @@ bool IDMM<state, action, verbose>::GetMidState(SearchEnvironment<state, action>*
 		if (verbose){
 			printf("\t\tBounds: %1.1f and %1.1f: ", forwardBound, backwardBound);
 		}
-		bool solved = DoIterationForward(env, originStart, originStart, 0, midState);
+		bool solved;
+		if(readyOpenLists){
+			for(AStarOpenClosedData<state> openState : forwardOpenList){
+				solved = DoIterationForward(env, openState.data, openState.data, openState.g, midState);
+				if(solved){
+					break;
+				}
+			}
+		}
+		else{
+			solved = DoIterationForward(env, originStart, originStart, 0, midState);
+		}
 		if(verbose){
 			printf("Nodes expanded: %d(%d)\n", nodesExpanded-nodesExpandedSoFar, nodesExpanded);
 		}
@@ -97,7 +131,16 @@ bool IDMM<state, action, verbose>::DoIterationForward(SearchEnvironment<state, a
 		return false;
 	}
 	else if (g == forwardBound) {
-		if (DoIterationBackward(env, originGoal, originGoal, 0, midState, currState)) {
+		if(readyOpenLists){
+			for(AStarOpenClosedData<state> openState : backwardOpenList){
+				if (DoIterationBackward(env, openState.data, openState.data, openState.g, midState, currState)) {
+					midState = currState;
+					return true;
+				}
+			}
+			return false;
+		}
+		else if (DoIterationBackward(env, originGoal, originGoal, 0, midState, currState)) {
 			midState = currState;
 			return true;
 		}
@@ -114,7 +157,8 @@ bool IDMM<state, action, verbose>::DoIterationForward(SearchEnvironment<state, a
 	}
 	for (unsigned int x = 0; x < neighbors.size(); x++)
 	{
-		if (neighbors[x] == parent) {
+		uint64_t childID;
+		if (neighbors[x] == parent || forwardList.Lookup(env->GetStateHash(neighbors[x]), childID) == kClosedList) {//check if exists in the closed list
 			continue;
 		}
 		double edgeCost = env->GCost(currState, neighbors[x]);
@@ -147,7 +191,8 @@ bool IDMM<state, action, verbose>::DoIterationBackward(SearchEnvironment<state, 
 	}
 	for (unsigned int x = 0; x < neighbors.size(); x++)
 	{
-		if (neighbors[x] == parent) {
+		uint64_t childID;
+		if (neighbors[x] == parent || backwardList.Lookup(env->GetStateHash(neighbors[x]), childID) == kClosedList) {//check if exists in the closed list
 			continue;
 		}
 		double edgeCost = env->GCost(currState, neighbors[x]);

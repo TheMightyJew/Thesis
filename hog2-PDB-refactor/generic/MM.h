@@ -57,8 +57,10 @@ public:
 	void ResetNodeCount() { nodesExpanded = nodesTouched = uniqueNodesExpanded = 0; }
 	
 	inline const int GetNumForwardItems() { return forwardQueue.size(); }
+	priorityQueue GetForwardItems() { return forwardQueue; }
 	inline const AStarOpenClosedData<state> &GetForwardItem(unsigned int which) { return forwardQueue.Lookat(which); }
 	inline const int GetNumBackwardItems() { return backwardQueue.size(); }
+	priorityQueue GetBackwardItems() { return backwardQueue; }
 	inline const AStarOpenClosedData<state> &GetBackwardItem(unsigned int which) { return backwardQueue.Lookat(which); }
 		
 	uint64_t GetUniqueNodesExpanded() const { return uniqueNodesExpanded; }
