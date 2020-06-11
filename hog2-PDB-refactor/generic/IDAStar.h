@@ -33,6 +33,7 @@ public:
 				 std::vector<action> &thePath);
 
 	uint64_t GetNodesExpanded() { return nodesExpanded; }
+	uint64_t GetNecessaryExpansions() { return necessaryExpansions; }
 	uint64_t GetNodesTouched() { return nodesTouched; }
 	void ResetNodeCount() { nodesExpanded = nodesTouched = 0; }
 	void SetUseBDPathMax(bool val) { usePathMax = val; }
@@ -80,6 +81,7 @@ private:
 	std::vector<uint64_t> gCostHistogram;
 	unsigned long dAstarExpansions = 0;
 	unsigned long dAstarLastIterExpansions = 0;
+	unsigned long necessaryExpansions = 0;
 
 #ifdef DO_LOGGING
 public:
@@ -102,12 +104,22 @@ bool IDAStar<state, action, verbose>::GetPath(SearchEnvironment<state, action> *
 	thePath.resize(0);
 	if(readyOpenList){
 		double minF = 0;
+		double maxF = 0;
 		for(AStarOpenClosedDataWithF<state> openState : openList){
 			if(minF == 0 || minF > openState.f){
 					minF = openState.f;
 			}
+			if(maxF == 0 || maxF < openState.f){
+					maxF = openState.f;
+			}
 		}
 		UpdateNextBound(0, minF);
+		
+		for(AStarOpenClosedDataWithF<state> openState : openList){
+			if(maxF > openState.f){
+				necessaryExpansions++;
+			}
+		}
 	}
 	else{
 		UpdateNextBound(0, heuristic->HCost(from, to));
@@ -151,6 +163,7 @@ bool IDAStar<state, action, verbose>::GetPath(SearchEnvironment<state, action> *
 				printf("\t\tStarting iteration with bound %f. ", nextBound, nodesExpanded);
 				printf("Nodes expanded: %llu(%llu)\n", nodesExpanded-nodesExpandedSoFar, nodesExpanded);
 			}
+			necessaryExpansions += nodesExpandedSoFar;
 			break;
 		}
 		previousIterationExpansions = nodesExpanded-nodesExpandedSoFar;

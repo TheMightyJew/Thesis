@@ -23,6 +23,7 @@ public:
 	bool GetMidState(SearchEnvironment<state, action>* env, state fromState, state toState, state &midState, int secondsLimit=600, double startingFBound=0, bool readyOpenLists=false, AStarOpenClosed<state, MMCompare<state>> forwardList = AStarOpenClosed<state, MMCompare<state>>(), AStarOpenClosed<state, MMCompare<state>> backwardList = AStarOpenClosed<state, MMCompare<state>>());
 	double getPathLength()	{ return pathLength; }
 	uint64_t GetNodesExpanded() { return nodesExpanded; }
+	uint64_t GetNecessaryExpansions() { return necessaryExpansions; }
 	uint64_t GetNodesTouched() { return nodesTouched; }
 	void ResetNodeCount() { nodesExpanded = nodesTouched = 0; }
 	unsigned long getDMMExpansions() { return dMMExpansions; }
@@ -38,6 +39,7 @@ private:
 	state originGoal;
 	state originStart;
 	unsigned long dMMLastIterExpansions = 0;
+	unsigned long necessaryExpansions = 0;
 	
 	AStarOpenClosed<state, MMCompare<state>, AStarOpenClosedData<state>> forwardList;
 	std::vector<AStarOpenClosedData<state>> forwardOpenList;
@@ -68,6 +70,7 @@ bool IDMM<state, action, verbose>::GetMidState(SearchEnvironment<state, action>*
 			}
 		}
 		startingFBound = std::max(minF, startingFBound); 
+		//necessaryExpansions = 
 	}
 	double initialHeuristic = env->HCost(fromState, toState);
 	startingFBound = std::max(initialHeuristic, startingFBound); 
@@ -103,6 +106,7 @@ bool IDMM<state, action, verbose>::GetMidState(SearchEnvironment<state, action>*
 		}
 		if (solved) {
 			dMMExpansions = previousIterationExpansions + dMMLastIterExpansions;
+			necessaryExpansions += nodesExpandedSoFar;
 			pathLength = backwardBound + forwardBound;
 			return true;
 		}
