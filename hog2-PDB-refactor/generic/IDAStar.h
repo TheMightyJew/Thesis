@@ -16,6 +16,7 @@
 #include <ext/hash_map>
 #include "FPUtil.h"
 #include "vectorCache.h"
+#include "TemplateAStar.h"
 #include "AStarOpenClosed.h"
 
 //#define DO_LOGGING
@@ -28,7 +29,7 @@ public:
 	IDAStar() { useHashTable = usePathMax = false; storedHeuristic = false;}
 	virtual ~IDAStar() {}
 	bool GetPath(SearchEnvironment<state, action> *env, state from, state to,
-							 std::vector<state> &thePath, int secondsLimit=600, bool readyOpenList=false, std::vector<AStarOpenClosedDataWithF<state>> openList=std::vector<AStarOpenClosedDataWithF<state>>());
+							 std::vector<state> &thePath, int secondsLimit=600, bool readyStatesList=false, AStarOpenClosed<state, AStarCompareWithF<state>, AStarOpenClosedDataWithF<state>> statesList=AStarOpenClosed<state, AStarCompareWithF<state>, AStarOpenClosedDataWithF<state>>());
 	bool GetPath(SearchEnvironment<state, action> *env, state from, state to,
 				 std::vector<action> &thePath);
 
@@ -82,6 +83,9 @@ private:
 	unsigned long dAstarExpansions = 0;
 	unsigned long dAstarLastIterExpansions = 0;
 	unsigned long necessaryExpansions = 0;
+	AStarOpenClosed<state, AStarCompareWithF<state>, AStarOpenClosedDataWithF<state>> statesList;
+	std::vector<AStarOpenClosedDataWithF<state>> openList;
+	bool readyStatesList;
 
 #ifdef DO_LOGGING
 public:
@@ -92,7 +96,7 @@ public:
 template <class state, class action, bool verbose>
 bool IDAStar<state, action, verbose>::GetPath(SearchEnvironment<state, action> *env,
 									 state from, state to,
-									 std::vector<state> &thePath, int secondsLimit, bool readyOpenList, std::vector<AStarOpenClosedDataWithF<state>> openList)
+									 std::vector<state> &thePath, int secondsLimit, bool readyStatesList, AStarOpenClosed<state, AStarCompareWithF<state>, AStarOpenClosedDataWithF<state>> statesList)
 {
 	if(verbose){
 		printf("\t\tStarting to solve with IDAStar\n");
@@ -102,24 +106,35 @@ bool IDAStar<state, action, verbose>::GetPath(SearchEnvironment<state, action> *
 	nextBound = 0;
 	nodesExpanded = nodesTouched = dAstarLastIterExpansions = 0;
 	thePath.resize(0);
-	if(readyOpenList){
+	this->readyStatesList = readyStatesList;
+	if(readyStatesList){
+		this->statesList = statesList;
 		double minF = 0;
 		double maxF = 0;
-		for(AStarOpenClosedDataWithF<state> openState : openList){
-			if(minF == 0 || minF > openState.f){
-					minF = openState.f;
+		// iterate over open states
+		for (int x = 0; x < statesList.OpenSize(); x++){
+			double fValue = statesList.getElements()[statesList.GetOpenItem(x)].f;
+			if(minF == 0 || minF > fValue){
+					minF = fValue;
 			}
-			if(maxF == 0 || maxF < openState.f){
-					maxF = openState.f;
+			if(maxF == 0 || maxF < fValue){
+					maxF = fValue;
 			}
 		}
 		UpdateNextBound(0, minF);
-		
-		for(AStarOpenClosedDataWithF<state> openState : openList){
-			if(maxF > openState.f){
+		for (int x = 0; x < statesList.OpenSize(); x++){
+			if(maxF > statesList.getElements()[statesList.GetOpenItem(x)].f){
 				necessaryExpansions++;
 			}
 		}
+		for (int x = 0; x < statesList.OpenSize(); x++){
+			AStarOpenClosedDataWithF<state> openState = statesList.getElements()[statesList.GetOpenItem(x)];
+			openList.push_back(openState);
+		}
+		sort( openList.begin( ), openList.end( ), [ ]( const AStarOpenClosedDataWithF<state>& lhs, const AStarOpenClosedDataWithF<state>& rhs )
+		{
+		   return lhs.h < rhs.h;
+		});
 	}
 	else{
 		UpdateNextBound(0, heuristic->HCost(from, to));
@@ -143,10 +158,10 @@ bool IDAStar<state, action, verbose>::GetPath(SearchEnvironment<state, action> *
 		if (verbose)
 			printf("\t\tStarting iteration with bound %1.1f: ", nextBound, nodesExpanded);
 		double res;
-		if(readyOpenList){
+		if(readyStatesList){
 			double currentBound = nextBound;
-			for(AStarOpenClosedDataWithF<state> openState : openList){
-				res = DoIteration(env, openState.data, openState.data, thePath, currentBound, openState.g, openState.h);
+			for(AStarOpenClosedDataWithF<state> openState:openList){
+				res = DoIteration(env, openState.data, openState.data, thePath, currentBound, openState.g, openState.h, openState.h);
 				if(res == 0 && solved){
 					solLength = env->GetPathLength(thePath) + openState.g;
 					break;
@@ -240,8 +255,10 @@ double IDAStar<state, action, verbose>::DoIteration(SearchEnvironment<state, act
 
 	for (unsigned int x = 0; x < neighbors.size(); x++)
 	{
-		if (neighbors[x] == parent)
+		uint64_t childID;
+		if (neighbors[x] == parent || (readyStatesList && statesList.Lookup(env->GetStateHash(neighbors[x]), childID) != kNotFound)) {//check if exists in the closed list
 			continue;
+		}
 		thePath.push_back(neighbors[x]);
 		double edgeCost = env->GCost(currState, neighbors[x]);
 		double childH = DoIteration(env, currState, neighbors[x], thePath, bound,

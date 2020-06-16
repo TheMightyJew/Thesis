@@ -27,13 +27,13 @@
  ../../../../utils/MR1Permutation.h \
  ../../../../environments/GraphEnvironment.h \
  ../../../../generic/IDAStar.h ../../../../utils/vectorCache.h \
+ ../../../../generic/TemplateAStar.h ../../../../search/Constraint.h \
  ../../../../algorithms/AStarOpenClosed.h \
- ../../../../generic/ParallelIDAStar.h ../../../../envutil/STPInstances.h \
- ../../../../generic/EBSearch.h ../../../../generic/TemplateAStar.h \
- ../../../../search/Constraint.h \
  ../../../../algorithms/BucketOpenClosed.h \
  ../../../../algorithms/AStarOpenClosed.h \
  ../../../../generic/GenericSearchAlgorithm.h \
+ ../../../../generic/ParallelIDAStar.h ../../../../envutil/STPInstances.h \
+ ../../../../generic/EBSearch.h ../../../../generic/TemplateAStar.h \
  ../../../../environments/PancakePuzzle.h \
  ../../../../envutil/PancakeInstances.h ../../../../environments/TOH.h \
  ../../../../search/PDBHeuristic.h \

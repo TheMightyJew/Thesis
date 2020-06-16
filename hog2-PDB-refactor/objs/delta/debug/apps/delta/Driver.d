@@ -27,7 +27,11 @@
  ../../../../utils/MR1Permutation.h \
  ../../../../environments/GraphEnvironment.h \
  ../../../../environments/PancakePuzzle.h ../../../../generic/IDAStar.h \
- ../../../../utils/vectorCache.h ../../../../algorithms/AStarOpenClosed.h \
+ ../../../../utils/vectorCache.h ../../../../generic/TemplateAStar.h \
+ ../../../../search/Constraint.h ../../../../algorithms/AStarOpenClosed.h \
+ ../../../../algorithms/BucketOpenClosed.h \
+ ../../../../algorithms/AStarOpenClosed.h \
+ ../../../../generic/GenericSearchAlgorithm.h \
  ../../../../generic/ParallelIDAStar.h ../../../../environments/TopSpin.h \
  ../../../../environments/TOH.h ../../../../search/PDBHeuristic.h \
  ../../../../environments/RubiksCube.h \
@@ -41,7 +45,4 @@
  ../../../../utils/MapGenerators.h ../../../../utils/Map.h \
  ../../../../environments/Map2DEnvironment.h \
  ../../../../simulation/ReservationProvider.h \
- ../../../../generic/TemplateAStar.h ../../../../search/Constraint.h \
- ../../../../algorithms/BucketOpenClosed.h \
- ../../../../algorithms/AStarOpenClosed.h \
- ../../../../generic/GenericSearchAlgorithm.h ../../../../generic/MM.h
+ ../../../../generic/TemplateAStar.h ../../../../generic/MM.h

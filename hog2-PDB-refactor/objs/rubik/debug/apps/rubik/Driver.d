@@ -16,12 +16,13 @@
  ../../../../simulation/SimulationInfo.h \
  ../../../../simulation/EpisodicSimulation.h \
  ../../../../generic/IDAStar.h ../../../../utils/vectorCache.h \
- ../../../../algorithms/AStarOpenClosed.h \
- ../../../../generic/ParallelIDAStar.h ../../../../utils/SharedQueue.h \
  ../../../../generic/TemplateAStar.h ../../../../search/Constraint.h \
+ ../../../../algorithms/AStarOpenClosed.h \
  ../../../../algorithms/BucketOpenClosed.h \
  ../../../../algorithms/AStarOpenClosed.h \
  ../../../../generic/GenericSearchAlgorithm.h \
+ ../../../../generic/ParallelIDAStar.h ../../../../utils/SharedQueue.h \
+ ../../../../generic/TemplateAStar.h \
  ../../../../environments/RubiksCube.h \
  ../../../../environments/RubiksCubeCorners.h \
  ../../../../search/PDBHeuristic.h ../../../../utils/NBitArray.h \

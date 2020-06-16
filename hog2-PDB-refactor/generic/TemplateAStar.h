@@ -165,7 +165,7 @@ public:
 	double GetWeight() { return weight; }
 	unsigned long getIAstarExpansions() { return iAstarExpansions; }
 	unsigned long getMemoryStatesUse() { return memoryStatesUse; }
-	std::vector<AStarOpenClosedDataWithF<state>> getOpenList() { return openClosedList.getOpenList(); }
+	AStarOpenClosed<state, AStarCompareWithF<state>, AStarOpenClosedDataWithF<state>> &getStatesList() { return openClosedList; }
 private:
 	uint64_t nodesTouched, nodesExpanded;
 	

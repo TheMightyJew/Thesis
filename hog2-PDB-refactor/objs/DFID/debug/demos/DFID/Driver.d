@@ -17,7 +17,11 @@
  ../../../../simulation/EpisodicSimulation.h ../../../../utils/Plot2D.h \
  ../../../../utils/Graphics.h ../../../../generic/RandomUnit.h \
  ../../../../simulation/Unit.h ../../../../generic/IDAStar.h \
- ../../../../utils/vectorCache.h ../../../../algorithms/AStarOpenClosed.h \
+ ../../../../utils/vectorCache.h ../../../../generic/TemplateAStar.h \
+ ../../../../search/Constraint.h ../../../../algorithms/AStarOpenClosed.h \
+ ../../../../algorithms/BucketOpenClosed.h \
+ ../../../../algorithms/AStarOpenClosed.h \
+ ../../../../generic/GenericSearchAlgorithm.h \
  ../../../../generic/IncrementalDFID.h \
  ../../../../generic/IncrementalBFS.h ../../../../utils/SVGUtil.h \
  ../../../../environments/NaryTree.h

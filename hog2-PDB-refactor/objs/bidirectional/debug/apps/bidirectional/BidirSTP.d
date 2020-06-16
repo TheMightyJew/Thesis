@@ -25,13 +25,13 @@
  ../../../../algorithms/BDIndexOpenClosed.h \
  ../../../../algorithms/NBSQueue.h ../../../../algorithms/BDOpenClosed.h \
  ../../../../generic/IDAStar.h ../../../../utils/vectorCache.h \
- ../../../../algorithms/AStarOpenClosed.h ../../../../generic/MM.h \
- ../../../../apps/bidirectional/BSStar.h \
  ../../../../generic/TemplateAStar.h ../../../../search/Constraint.h \
+ ../../../../algorithms/AStarOpenClosed.h \
  ../../../../algorithms/BucketOpenClosed.h \
- ../../../../generic/GenericSearchAlgorithm.h \
- ../../../../generic/WeightedVertexGraph.h \
- ../../../../generic/TemplateAStar.h ../../../../utils/SVGUtil.h \
+ ../../../../generic/GenericSearchAlgorithm.h ../../../../generic/MM.h \
+ ../../../../apps/bidirectional/BSStar.h \
+ ../../../../generic/TemplateAStar.h \
+ ../../../../generic/WeightedVertexGraph.h ../../../../utils/SVGUtil.h \
  ../../../../utils/Graphics.h ../../../../utils/StringUtils.h \
  ../../../../envutil/STPInstances.h \
  ../../../../search/LexPermutationPDB.h \

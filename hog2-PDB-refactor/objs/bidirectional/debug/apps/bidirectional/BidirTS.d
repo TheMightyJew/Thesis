@@ -29,9 +29,9 @@
  ../../../../algorithms/BDIndexOpenClosed.h \
  ../../../../algorithms/NBSQueue.h ../../../../algorithms/BDOpenClosed.h \
  ../../../../generic/IDAStar.h ../../../../utils/vectorCache.h \
- ../../../../generic/MM.h ../../../../apps/bidirectional/BSStar.h \
- ../../../../generic/WeightedVertexGraph.h \
- ../../../../generic/TemplateAStar.h ../../../../utils/SVGUtil.h \
+ ../../../../generic/TemplateAStar.h ../../../../generic/MM.h \
+ ../../../../apps/bidirectional/BSStar.h \
+ ../../../../generic/WeightedVertexGraph.h ../../../../utils/SVGUtil.h \
  ../../../../utils/Graphics.h ../../../../utils/StringUtils.h \
  ../../../../generic/HeuristicError.h ../../../../search/Heuristic.h \
  ../../../../search/MR1PermutationPDB.h \

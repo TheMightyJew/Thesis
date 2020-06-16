@@ -19,6 +19,10 @@
  ../../../../utils/MMapUtil.h ../../../../utils/MinBloom.h \
  ../../../../utils/FourBitArray.h ../../../../generic/IDAStar.h \
  ../../../../utils/FPUtil.h ../../../../utils/vectorCache.h \
+ ../../../../generic/TemplateAStar.h ../../../../search/Constraint.h \
  ../../../../algorithms/AStarOpenClosed.h \
- ../../../../generic/ParallelIDAStar.h \
+ ../../../../algorithms/BucketOpenClosed.h \
+ ../../../../algorithms/AStarOpenClosed.h \
+ ../../../../generic/GenericSearchAlgorithm.h \
+ ../../../../utils/StatCollection.h ../../../../generic/ParallelIDAStar.h \
  ../../../../apps/bidirectional/MM0Rubik.h

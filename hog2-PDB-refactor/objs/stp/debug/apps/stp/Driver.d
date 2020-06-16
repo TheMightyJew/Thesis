@@ -27,7 +27,11 @@
  ../../../../utils/MR1Permutation.h \
  ../../../../environments/GraphEnvironment.h \
  ../../../../generic/IDAStar.h ../../../../utils/vectorCache.h \
+ ../../../../generic/TemplateAStar.h ../../../../search/Constraint.h \
  ../../../../algorithms/AStarOpenClosed.h \
+ ../../../../algorithms/BucketOpenClosed.h \
+ ../../../../algorithms/AStarOpenClosed.h \
+ ../../../../generic/GenericSearchAlgorithm.h \
  ../../../../generic/ParallelIDAStar.h ../../../../envutil/STPInstances.h \
  ../../../../environments/MNAgentPuzzle.h \
  ../../../../environments/SequenceAlignment.h ../../../../generic/BFS.h \

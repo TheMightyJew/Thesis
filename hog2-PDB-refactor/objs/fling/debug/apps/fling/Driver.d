@@ -16,6 +16,10 @@
  ../../../../simulation/SimulationInfo.h \
  ../../../../simulation/EpisodicSimulation.h \
  ../../../../generic/IDAStar.h ../../../../utils/vectorCache.h \
+ ../../../../generic/TemplateAStar.h ../../../../search/Constraint.h \
  ../../../../algorithms/AStarOpenClosed.h \
+ ../../../../algorithms/BucketOpenClosed.h \
+ ../../../../algorithms/AStarOpenClosed.h \
+ ../../../../generic/GenericSearchAlgorithm.h \
  ../../../../environments/Fling.h ../../../../generic/BFS.h \
  ../../../../utils/TextOverlay.h ../../../../utils/Graphics.h

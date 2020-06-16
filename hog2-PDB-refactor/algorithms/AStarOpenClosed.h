@@ -92,7 +92,6 @@ public:
 	uint64_t AddClosedNode(state &val, uint64_t hash, double g, double h, uint64_t parent=kTAStarNoNode);
 	void KeyChanged(uint64_t objKey);
 	dataLocation Lookup(uint64_t hashKey, uint64_t &objKey) const;
-	std::vector<dataStructure> getOpenList();
 	inline dataStructure &Lookup(uint64_t objKey) { return elements[objKey]; }
 	inline const dataStructure &Lookat(uint64_t objKey) const { return elements[objKey]; }
 	void Remove(uint64_t hash);
@@ -111,6 +110,7 @@ public:
 	size_t OpenSize() const { return theHeap.size(); }
 	size_t ClosedSize() const { return size()-OpenSize(); }
 	size_t size() const { return elements.size(); }
+	std::vector<dataStructure> &getElements() { return elements; }
 	//	void verifyData();
 private:
 	bool HeapifyUp(unsigned int index);
@@ -123,17 +123,9 @@ private:
 	// TODO: replace this with C++11 data structures
 	typedef __gnu_cxx::hash_map<uint64_t, uint64_t, AHash64> IndexTable;
 	IndexTable table;
-	std::vector<dataStructure > elements;
+	std::vector<dataStructure> elements;
 };
 
-template<typename state, typename CmpKey, class dataStructure>
-std::vector<dataStructure> AStarOpenClosed<state, CmpKey, dataStructure>::getOpenList(){
-	std::vector<dataStructure> open;
-	for (int x = 0; x < theHeap.size(); x++)
-			open.push_back(elements[theHeap[x]]);
-	std::sort(open.begin(), open.end());
-	return open;
-}
 template<typename state, typename CmpKey, class dataStructure>
 AStarOpenClosed<state, CmpKey, dataStructure>::AStarOpenClosed()
 {

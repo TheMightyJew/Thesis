@@ -16,11 +16,12 @@
  ../../../../simulation/SimulationInfo.h \
  ../../../../simulation/EpisodicSimulation.h \
  ../../../../generic/IDAStar.h ../../../../utils/vectorCache.h \
- ../../../../algorithms/AStarOpenClosed.h \
  ../../../../generic/TemplateAStar.h ../../../../search/Constraint.h \
+ ../../../../algorithms/AStarOpenClosed.h \
  ../../../../algorithms/BucketOpenClosed.h \
  ../../../../algorithms/AStarOpenClosed.h \
  ../../../../generic/GenericSearchAlgorithm.h \
+ ../../../../generic/TemplateAStar.h \
  ../../../../apps/arm/RoboticArmTest.h ../../../../generic/FrontierBFS.h \
  ../../../../environments/RoboticArm.h \
  ../../../../simulation/ReservationProvider.h \
