@@ -29,11 +29,12 @@ using namespace std;
 void StevenTest(int gap=0, int problems_num=1, bool randomPancake=true, vector<int> skipVector = vector<int>());
 
 int all_problems_num = 100;
-unsigned long MMstatesQuantityBound = 1000000;
-unsigned long ASTARstatesQuantityBound = 1000000;
+unsigned long MMstatesQuantityBound;
+unsigned long ASTARstatesQuantityBound;
+unsigned long statesQuantityBound = 1000000;
 int secondsLimit = 60*30;
-bool AstarRun=false;
-bool AstarPIDAstarRun=false;
+bool AstarRun=true;
+bool AstarPIDAstarRun=true;
 bool MMRun=true;
 bool MMpIDMM=true;
 bool IDAstarRun=false;
@@ -64,7 +65,10 @@ void TestPancake()
 	cout << "running..." << endl;
 	myfile.open (filename);
 	
-	StevenTest(0, 3, false);
+	//sub-optimal
+	StevenTest(3, 33, true, {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32});
+	//seg fault
+	StevenTest(0, 2, true);
 
 
 	
@@ -76,7 +80,7 @@ void TestPancake()
 
 void StevenTest(int gap, int problems_num, bool randomPancake, vector<int> skipVector)
 {
-	const int pancakes_num = 16;
+	const int pancakes_num = 10;
 	srandom(2017218);
 	PancakePuzzleState<pancakes_num> start;
 	PancakePuzzleState<pancakes_num> original;
@@ -96,9 +100,6 @@ void StevenTest(int gap, int problems_num, bool randomPancake, vector<int> skipV
 	myfile << boost::format("TestPancake:(Pancakes: %d, Gap: %d, Random: %d, Hard: %d)\n") % pancakes_num % gap % randomPancake % (!randomPancake);
 	for (int count = 0; count < problems_num; count++)
 	{
-		if(std::find(skipVector.begin(), skipVector.end(), count+1) != skipVector.end()) {
-			continue;
-		}
 		goal.Reset();
 		original.Reset();
 		if(randomPancake){
@@ -107,6 +108,9 @@ void StevenTest(int gap, int problems_num, bool randomPancake, vector<int> skipV
 		}
 		else{
 			GetPancakeInstance(original, count);
+		}
+		if(std::find(skipVector.begin(), skipVector.end(), count+1) != skipVector.end()) {
+			continue;
 		}
 		myfile << boost::format("\tProblem %d of %d\n") % (count+1) % problems_num;
 		myfile << "\tStart state: " << original << endl;
@@ -154,6 +158,15 @@ void StevenTest(int gap, int problems_num, bool randomPancake, vector<int> skipV
 				myfile << "\t\t\tI-MM failed because MM failed\n";
 			}
 		}
+		if(MMRun && AstarRun){
+			statesQuantityBound = min(ASTARstatesQuantityBound, MMstatesQuantityBound);
+		}
+		else if(MMRun && !AstarRun){
+			statesQuantityBound = MMstatesQuantityBound;
+		}
+		else if(!MMRun && AstarRun){
+			statesQuantityBound = ASTARstatesQuantityBound;
+		}
 		// IDA*
 		if (IDAstarRun)
 		{
@@ -184,7 +197,7 @@ void StevenTest(int gap, int problems_num, bool randomPancake, vector<int> skipV
 			unsigned long nodesExpanded;
 			for(double percentage : percentages){
 				timer.StartTimer();
-				unsigned long statesQuantityBoundforMBBDS = MMstatesQuantityBound*percentage;
+				unsigned long statesQuantityBoundforMBBDS = statesQuantityBound*percentage;
 				FullMBBDS<PancakePuzzleState<pancakes_num>, PancakePuzzleAction, PancakePuzzle<pancakes_num>, MbbdsBloomFilter<PancakePuzzleState<pancakes_num>, PancakeHasher<pancakes_num>>, pancakes_num, false> fullMbbds(statesQuantityBoundforMBBDS) ;
 				bool threePhase = true;
 				solved = fullMbbds.solve(&pancake, start, goal, midState, fullMbbdsPath, secondsLimit, threePhase);
@@ -204,7 +217,7 @@ void StevenTest(int gap, int problems_num, bool randomPancake, vector<int> skipV
 		if(MMpIDMM){
 			myfile << "\t\t_MM+IDMM_\n";
 			for(double percentage : percentages){
-				unsigned long statesQuantityBoundforMMpIDMM = min(MMstatesQuantityBound, ASTARstatesQuantityBound)*percentage;
+				unsigned long statesQuantityBoundforMMpIDMM = statesQuantityBound*percentage;
 				MM<PancakePuzzleState<pancakes_num>, PancakePuzzleAction, PancakePuzzle<pancakes_num>> mm;
 				goal.Reset();
 				start = original;
@@ -237,7 +250,7 @@ void StevenTest(int gap, int problems_num, bool randomPancake, vector<int> skipV
 		if (AstarPIDAstarRun){
 			myfile << "\t\t_Astar+IDAstar_\n";
 			for(double percentage : percentages){
-				unsigned long statesQuantityBoundforASPIDAS = min(MMstatesQuantityBound, ASTARstatesQuantityBound)*percentage;
+				unsigned long statesQuantityBoundforASPIDAS = statesQuantityBound*percentage;
 				TemplateAStar<PancakePuzzleState<pancakes_num>, PancakePuzzleAction, PancakePuzzle<pancakes_num>> astar;
 				goal.Reset();
 				start = original;
@@ -278,7 +291,7 @@ void StevenTest(int gap, int problems_num, bool randomPancake, vector<int> skipV
 					unsigned long nodesExpanded;
 					for(double percentage : percentages){
 						timer.StartTimer();
-						unsigned long statesQuantityBoundforMBBDS = min(MMstatesQuantityBound, ASTARstatesQuantityBound)*percentage;
+						unsigned long statesQuantityBoundforMBBDS = statesQuantityBound*percentage;
 						solved = false;
 						unsigned long nodesExpanded = 0;
 						double lastBound = 0;

@@ -46,6 +46,8 @@ private:
 	AStarOpenClosed<state, MMCompare<state>, AStarOpenClosedData<state>> backwardList;
 	std::vector<AStarOpenClosedData<state>> forwardOpenList;
 	std::vector<AStarOpenClosedData<state>> backwardOpenList;
+	std::vector<std::vector<AStarOpenClosedData<state>>> forwardMatrix;
+	std::vector<std::vector<AStarOpenClosedData<state>>> backwardMatrix;
 	bool readyOpenLists;
 	bool front2frontH;
 
@@ -56,6 +58,7 @@ template <class state, class action, bool verbose>
 bool IDMM<state, action, verbose>::GetMidState(SearchEnvironment<state, action>* env,
 	state fromState, state toState, state &midState, int secondsLimit, double startingFBound, bool readyOpenLists, AStarOpenClosed<state, MMCompare<state>, AStarOpenClosedData<state>> forwardList, AStarOpenClosed<state, MMCompare<state>, AStarOpenClosedData<state>> backwardList)
 {
+	auto startTime = std::chrono::steady_clock::now();
 	this->readyOpenLists = readyOpenLists;
 	this->forwardList = forwardList;
 	this->backwardList = backwardList;
@@ -64,6 +67,7 @@ bool IDMM<state, action, verbose>::GetMidState(SearchEnvironment<state, action>*
 	originGoal = toState;
 	if(readyOpenLists){
 		double minF = 0;
+
 		for (int x = 0; x < forwardList.OpenSize(); x++){
 			AStarOpenClosedData<state> openState = forwardList.getElements()[forwardList.GetOpenItem(x)];
 			double fValue = openState.h + openState.g;
@@ -89,7 +93,40 @@ bool IDMM<state, action, verbose>::GetMidState(SearchEnvironment<state, action>*
 		sort( backwardOpenList.begin( ), backwardOpenList.end( ), [ ]( const AStarOpenClosedData<state>& lhs, const AStarOpenClosedData<state>& rhs )
 		{
 		   return lhs.h+lhs.g < rhs.h+rhs.g;
-		});		
+		});
+		double f = -1;
+		for(AStarOpenClosedData<state> openState:forwardOpenList){
+			if(openState.h+openState.g > f){
+				f = openState.h+openState.g;
+				std::vector<AStarOpenClosedData<state>> newVector;
+				forwardMatrix.push_back(newVector);
+			}
+			forwardMatrix.back().push_back(openState);
+		}
+		for(std::vector<AStarOpenClosedData<state>> fVector:forwardMatrix){
+			sort( fVector.begin( ), fVector.end( ), [ ]( const AStarOpenClosedData<state>& lhs, const AStarOpenClosedData<state>& rhs )
+			{
+			   return lhs.g < rhs.g;
+			});
+		}
+		f = -1;
+		for(AStarOpenClosedData<state> openState:backwardOpenList){
+			if(openState.h+openState.g > f){
+				f = openState.h+openState.g;
+				std::vector<AStarOpenClosedData<state>> newVector;
+				backwardMatrix.push_back(newVector);
+			}
+			backwardMatrix.back().push_back(openState);
+		}
+		for(std::vector<AStarOpenClosedData<state>> fVector:backwardMatrix){
+			sort( fVector.begin( ), fVector.end( ), [ ]( const AStarOpenClosedData<state>& lhs, const AStarOpenClosedData<state>& rhs )
+			{
+			   return lhs.g < rhs.g;
+			});
+		}
+		/*auto currentTime = std::chrono::steady_clock::now();
+		std::chrono::duration<double> elapsed_seconds = currentTime-startTime;
+		std::cout << elapsed_seconds.count() << std::endl;*/
 		//necessaryExpansions = 
 	}
 	double initialHeuristic = env->HCost(fromState, toState);
@@ -98,7 +135,6 @@ bool IDMM<state, action, verbose>::GetMidState(SearchEnvironment<state, action>*
 	forwardBound = startingFBound - backwardBound;
 	unsigned long nodesExpandedSoFar = 0;
 	unsigned long previousIterationExpansions = 0;
-	auto startTime = std::chrono::steady_clock::now();
 	while (true){
 		dMMLastIterExpansions = 0;
 		auto currentTime = std::chrono::steady_clock::now();
@@ -111,21 +147,30 @@ bool IDMM<state, action, verbose>::GetMidState(SearchEnvironment<state, action>*
 		}
 		bool solved = false;
 		if(readyOpenLists){
-			/*for (int x = 0; x < forwardList.OpenSize(); x++){
-				AStarOpenClosedData<state> openState = forwardList.getElements()[forwardList.GetOpenItem(x)];
-				solved = DoIterationForward(env, openState.data, openState.data, openState.g, midState);
+			for(std::vector<AStarOpenClosedData<state>> fVector:forwardMatrix){
+				if(fVector.front().g+fVector.front().h > forwardBound+backwardBound){
+					break;
+				}
+				for (AStarOpenClosedData<state> openState: fVector){
+					if(openState.g > forwardBound)
+						break;
+					solved = DoIterationForward(env, openState.data, openState.data, openState.g, midState);
+					if(solved){
+						break;
+					}
+				}
 				if(solved){
 					break;
 				}
-			}*/
-			for (AStarOpenClosedData<state> openState: forwardOpenList){
+			}
+			/*for (AStarOpenClosedData<state> openState: forwardOpenList){
 				if(openState.g+openState.h > forwardBound+backwardBound)
 					break;
 				solved = DoIterationForward(env, openState.data, openState.data, openState.g, midState);
 				if(solved){
 					break;
 				}
-			}
+			}*/
 		}
 		else{
 			solved = DoIterationForward(env, originStart, originStart, 0, midState);
@@ -165,19 +210,27 @@ bool IDMM<state, action, verbose>::DoIterationForward(SearchEnvironment<state, a
 	}
 	else if (g == forwardBound) {
 		if(readyOpenLists){
-			/*for (int x = 0; x < backwardList.OpenSize(); x++){
-				AStarOpenClosedData<state> openState = backwardList.getElements()[backwardList.GetOpenItem(x)];
-				if (DoIterationBackward(env, openState.data, openState.data, openState.g, midState, currState)) {
-					midState = currState;
-					return true;
-				}
-			}*/
-			for (AStarOpenClosedData<state> openState: backwardOpenList){
+			/*for (AStarOpenClosedData<state> openState: backwardOpenList){
 				if(openState.g+openState.h > forwardBound+backwardBound)
 					break;
 				if (DoIterationBackward(env, openState.data, openState.data, openState.g, midState, currState)) {
 					midState = currState;
 					return true;
+				}
+			}
+			return false;*/
+			
+			for(std::vector<AStarOpenClosedData<state>> fVector:backwardMatrix){
+				if(fVector.front().g+fVector.front().h > forwardBound+backwardBound){
+					break;
+				}
+				for (AStarOpenClosedData<state> openState: fVector){
+					if(openState.g > backwardBound)
+						break;
+					if (DoIterationBackward(env, openState.data, openState.data, openState.g, midState, currState)) {
+						midState = currState;
+						return true;
+					}
 				}
 			}
 			return false;
