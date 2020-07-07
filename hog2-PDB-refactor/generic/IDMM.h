@@ -103,12 +103,13 @@ bool IDMM<state, action, verbose>::GetMidState(SearchEnvironment<state, action>*
 			}
 			forwardMatrix.back().push_back(openState);
 		}
-		for(std::vector<AStarOpenClosedData<state>> fVector:forwardMatrix){
-			sort( fVector.begin( ), fVector.end( ), [ ]( const AStarOpenClosedData<state>& lhs, const AStarOpenClosedData<state>& rhs )
+		for(std::vector<int>::size_type i = 0; i != forwardMatrix.size(); i++) {
+			sort( forwardMatrix[i].begin( ), forwardMatrix[i].end( ), [ ]( const AStarOpenClosedData<state>& lhs, const AStarOpenClosedData<state>& rhs )
 			{
 			   return lhs.g < rhs.g;
 			});
 		}
+	
 		f = -1;
 		for(AStarOpenClosedData<state> openState:backwardOpenList){
 			if(openState.h+openState.g > f){
@@ -118,12 +119,13 @@ bool IDMM<state, action, verbose>::GetMidState(SearchEnvironment<state, action>*
 			}
 			backwardMatrix.back().push_back(openState);
 		}
-		for(std::vector<AStarOpenClosedData<state>> fVector:backwardMatrix){
-			sort( fVector.begin( ), fVector.end( ), [ ]( const AStarOpenClosedData<state>& lhs, const AStarOpenClosedData<state>& rhs )
+		for(std::vector<int>::size_type i = 0; i != backwardMatrix.size(); i++) {
+			sort( backwardMatrix[i].begin( ), backwardMatrix[i].end( ), [ ]( const AStarOpenClosedData<state>& lhs, const AStarOpenClosedData<state>& rhs )
 			{
 			   return lhs.g < rhs.g;
 			});
 		}
+
 		/*auto currentTime = std::chrono::steady_clock::now();
 		std::chrono::duration<double> elapsed_seconds = currentTime-startTime;
 		std::cout << elapsed_seconds.count() << std::endl;*/
@@ -152,6 +154,11 @@ bool IDMM<state, action, verbose>::GetMidState(SearchEnvironment<state, action>*
 					break;
 				}
 				for (AStarOpenClosedData<state> openState: fVector){
+					auto currentTime = std::chrono::steady_clock::now();
+					std::chrono::duration<double> elapsed_seconds = currentTime-startTime;
+					if(elapsed_seconds.count() >= secondsLimit){
+						return false;
+					}
 					if(openState.g > forwardBound)
 						break;
 					solved = DoIterationForward(env, openState.data, openState.data, openState.g, midState);
@@ -253,7 +260,7 @@ bool IDMM<state, action, verbose>::DoIterationForward(SearchEnvironment<state, a
 	for (unsigned int x = 0; x < neighbors.size(); x++)
 	{
 		uint64_t childID;
-		if (neighbors[x] == parent || forwardList.Lookup(env->GetStateHash(neighbors[x]), childID) != kNotFound) {//check if exists in the closed list
+		if (neighbors[x] == parent || forwardList.Lookup(env->GetStateHash(neighbors[x]), childID) == kClosedList) {
 			continue;
 		}
 		double edgeCost = env->GCost(currState, neighbors[x]);
@@ -287,7 +294,7 @@ bool IDMM<state, action, verbose>::DoIterationBackward(SearchEnvironment<state, 
 	for (unsigned int x = 0; x < neighbors.size(); x++)
 	{
 		uint64_t childID;
-		if (neighbors[x] == parent || backwardList.Lookup(env->GetStateHash(neighbors[x]), childID) != kNotFound) {//check if exists in the closed list
+		if (neighbors[x] == parent || backwardList.Lookup(env->GetStateHash(neighbors[x]), childID) == kClosedList) {
 			continue;
 		}
 		double edgeCost = env->GCost(currState, neighbors[x]);

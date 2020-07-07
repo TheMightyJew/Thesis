@@ -35,13 +35,15 @@ unsigned long statesQuantityBound = 1000000;
 int secondsLimit = 60*30;
 bool AstarRun=true;
 bool AstarPIDAstarRun=true;
+bool AstarPIDAstarReverseRun=true;
 bool MMRun=true;
-bool MMpIDMM=true;
-bool IDAstarRun=false;
+bool MMpIDMM=false;
+bool IDAstarRun=true;
 bool MBBDSRun=false;
 bool threePhase=false;
 bool twoPhase=false;
 bool IDMMRun=false;
+bool idmmF2fFlag=true;
 
 string datetime()
 {
@@ -65,13 +67,11 @@ void TestPancake()
 	cout << "running..." << endl;
 	myfile.open (filename);
 	
-	//sub-optimal
-	StevenTest(3, 33, true, {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32});
-	//seg fault
-	StevenTest(0, 2, true);
+	StevenTest(0, 10, true);
+	StevenTest(1, 10, true);
+	StevenTest(2, 10, true);
+	StevenTest(3, 10, true);
 
-
-	
 	myfile << "completed!" << endl;
 	myfile.close();
 	cout << "completed!" << endl;
@@ -210,8 +210,8 @@ void StevenTest(int gap, int problems_num, bool randomPancake, vector<int> skipV
 				} 
 			}
 		}*/
-		double percentages[6] = {1, 0.9, 0.75, 0.5, 0.25, 0.1};
-		//double percentages[5] = {0.9, 0.75, 0.5, 0.25, 0.1};
+		//double percentages[6] = {1, 0.9, 0.75, 0.5, 0.25, 0.1};
+		double percentages[5] = {0.9, 0.75, 0.5, 0.25, 0.1};
 		long stateSize = sizeof(original);
 		// AstarPIDAstarRun
 		if(MMpIDMM){
@@ -231,7 +231,7 @@ void StevenTest(int gap, int problems_num, bool randomPancake, vector<int> skipV
 					   nodesExpanded % necessaryNodesExpanded  % t4.GetElapsedTime();
 				}
 				else{
-					IDMM<PancakePuzzleState<pancakes_num>, PancakePuzzleAction, false> idmm(true);
+					IDMM<PancakePuzzleState<pancakes_num>, PancakePuzzleAction, false> idmm(idmmF2fFlag);
 					PancakePuzzleState<pancakes_num> midState;
 					bool solved = idmm.GetMidState(&pancake, start, goal, midState, secondsLimit-t1.GetElapsedTime(), mm.getLastBound(), true, mm.GetForwardItems(), mm.GetBackwardItems());
 					nodesExpanded += idmm.GetNodesExpanded();
@@ -265,7 +265,7 @@ void StevenTest(int gap, int problems_num, bool randomPancake, vector<int> skipV
 				}
 				else{
 					IDAStar<PancakePuzzleState<pancakes_num>, PancakePuzzleAction, false> idastar;
-					solved = idastar.GetPath(&pancake, start, goal, idaPath, secondsLimit-t1.GetElapsedTime(), true, astar.getStatesList());
+					solved = idastar.ASpIDA(&pancake, start, goal, idaPath, astar.getStatesList(), secondsLimit-t1.GetElapsedTime());
 					nodesExpanded += idastar.GetNodesExpanded();
 					necessaryNodesExpanded += idastar.GetNecessaryExpansions();
 					t1.EndTimer();
@@ -280,6 +280,39 @@ void StevenTest(int gap, int problems_num, bool randomPancake, vector<int> skipV
 				}
 			}
 		}
+		/*if (AstarPIDAstarReverseRun){
+			myfile << "\t\t_Astar+IDAstar_\n";
+			for(double percentage : percentages){
+				unsigned long statesQuantityBoundforASPIDARS = statesQuantityBound*percentage;
+				TemplateAStar<PancakePuzzleState<pancakes_num>, PancakePuzzleAction, PancakePuzzle<pancakes_num>> astar;
+				goal.Reset();
+				start = original;
+				t1.StartTimer();
+				bool solved = astar.GetPathTime(&pancake, start, goal, astarPath, secondsLimit, true, statesQuantityBoundforASPIDARS);
+				unsigned long nodesExpanded = astar.GetNodesExpanded();
+				unsigned long necessaryNodesExpanded = astar.GetNecessaryExpansions();
+				if(solved){
+					t1.EndTimer();
+					myfile << boost::format("\t\t\tA*+IDA*_Reverse A* using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) found path length %1.0f; %llu expanded; %llu necessary; %1.4fs elapsed\n") % statesQuantityBoundforASPIDARS % stateSize % percentage % pancake.GetPathLength(astarPath) %
+					   nodesExpanded % necessaryNodesExpanded % t1.GetElapsedTime();
+				}
+				else{
+					IDAStar<PancakePuzzleState<pancakes_num>, PancakePuzzleAction, false> idastar;
+					solved = idastar.GetPath(&pancake, start, goal, idaPath, secondsLimit-t1.GetElapsedTime(), true, astar.getStatesList(), true);
+					nodesExpanded += idastar.GetNodesExpanded();
+					necessaryNodesExpanded += idastar.GetNecessaryExpansions();
+					t1.EndTimer();
+					if(solved){
+						myfile << boost::format("\t\t\tA*+IDA*_Reverse IDA* using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) found path length %1.0f; %llu expanded; %llu generated; %llu necessary; %1.4fs elapsed\n") % statesQuantityBoundforASPIDARS % stateSize % percentage % idastar.getSolLength() %
+						   nodesExpanded % idastar.GetNodesTouched() % necessaryNodesExpanded % t1.GetElapsedTime();
+					}
+					else{
+						myfile << boost::format("\t\t\tA*+IDA*_Reverse IDA* using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) failed after %1.4fs\n") % statesQuantityBoundforASPIDARS % stateSize % percentage % t1.GetElapsedTime();
+						break;
+					}	
+				}
+			}
+		}*/
 		// MBBDS
 		if (MBBDSRun && (threePhase || twoPhase)){
 			bool doThree = threePhase;
@@ -320,7 +353,7 @@ void StevenTest(int gap, int problems_num, bool randomPancake, vector<int> skipV
 								myfile << boost::format("\t\t\tMBBDS(k=1,ThreePhase=%d) MBBDS using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) found path length %1.0f; %llu expanded; %llu necessary; %d iterations; %1.4fs elapsed;\n") % int(doThree) % statesQuantityBoundforMBBDS % stateSize % percentage % mbbds.getPathLength() % nodesExpanded % mbbds.GetNecessaryExpansions() % mbbds.getIterationNum() % timer.GetElapsedTime();
 							}
 							else{
-								IDMM<PancakePuzzleState<pancakes_num>, PancakePuzzleAction, false> idmm;
+								IDMM<PancakePuzzleState<pancakes_num>, PancakePuzzleAction, false> idmm(false);
 								goal.Reset();
 								start = original;
 								solved = idmm.GetMidState(&pancake, start, goal, midState, secondsLimit-timer.GetElapsedTime(), int(lastBound));
@@ -344,7 +377,7 @@ void StevenTest(int gap, int problems_num, bool randomPancake, vector<int> skipV
 		if(IDMMRun)
 		{
 			myfile << "\t\t_IDMM_\n";
-			IDMM<PancakePuzzleState<pancakes_num>, PancakePuzzleAction, false> idmm(true);
+			IDMM<PancakePuzzleState<pancakes_num>, PancakePuzzleAction, false> idmm(idmmF2fFlag);
 			goal.Reset();
 			start = original;
 			PancakePuzzleState<pancakes_num> midState;

@@ -304,10 +304,14 @@ bool MM<state, action, environment, priorityQueue>::DoSingleSearchStep(std::vect
 			double forwardP;
 			double backwardP;
 			calculateBounds(minForwardG, minBackwardG, minForwardF, minBackwardF, forwardP, backwardP);
-			lastBound = std::max(lastBound, minForwardF);
-			lastBound = std::max(lastBound, minBackwardF);
-			lastBound = std::max(lastBound, minForwardG + minBackwardG);
-			lastBound = std::max(lastBound, std::min(forwardP, backwardP));
+			if(minForwardF!=DBL_MAX)
+				lastBound = std::max(lastBound, minForwardF);
+			if(minBackwardF!=DBL_MAX)
+				lastBound = std::max(lastBound, minBackwardF);
+			if(minForwardG + minBackwardG!=DBL_MAX)
+				lastBound = std::max(lastBound, minForwardG + minBackwardG);
+			if(std::min(forwardP, backwardP)!=DBL_MAX)
+				lastBound = std::max(lastBound, std::min(forwardP, backwardP));
 			return false;
 		}	
 	}	
