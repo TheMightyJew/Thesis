@@ -89,6 +89,8 @@ private:
 	unsigned long necessaryExpansions = 0;
 	AStarOpenClosed<state, AStarCompareWithF<state>, AStarOpenClosedDataWithF<state>> statesList;
 	std::vector<AStarOpenClosedDataWithF<state>> openList;
+	std::vector<AStarOpenClosedDataWithF<state>> perimeterList;
+	double perimeterG;
 	bool readyStatesList;
 	bool reverse;
 
@@ -100,7 +102,9 @@ public:
 
 template <class state, class action, bool verbose>
 bool IDAStar<state, action, verbose>::ASpIDA(SearchEnvironment<state, action> *env, state from, state to,
-							 std::vector<state> &thePath, AStarOpenClosed<state, AStarCompareWithF<state>, AStarOpenClosedDataWithF<state>> statesList, int secondsLimit){
+							 std::vector<state> &thePath, AStarOpenClosed<state, AStarCompareWithF<state>, AStarOpenClosedDataWithF<state>> statesList, int secondsLimit)
+{
+	reverse = false;
 	heuristic = env;
 	nextBound = 0;
 	nodesExpanded = nodesTouched = dAstarLastIterExpansions = 0;
@@ -116,8 +120,8 @@ bool IDAStar<state, action, verbose>::ASpIDA(SearchEnvironment<state, action> *e
 		maxF = std::max(maxF, openState.f);
 	}
 	UpdateNextBound(0, std::max(minF, heuristic->HCost(from, to)));
-	for (AStarOpenClosedDataWithF<state> openState : openList){
-		if(maxF > openState.f){
+	for (AStarOpenClosedDataWithF<state> astarState : statesList.getElements()){
+		if(maxF > astarState.f){
 			necessaryExpansions++;
 		}
 	}
@@ -174,31 +178,30 @@ bool IDAStar<state, action, verbose>::ASpIDA(SearchEnvironment<state, action> *e
 
 template <class state, class action, bool verbose>
 bool IDAStar<state, action, verbose>::ASpIDArev(SearchEnvironment<state, action> *env, state from, state to,
-							 std::vector<state> &thePath, AStarOpenClosed<state, AStarCompareWithF<state>, AStarOpenClosedDataWithF<state>> statesList, int secondsLimit){
+							 std::vector<state> &thePath, AStarOpenClosed<state, AStarCompareWithF<state>, AStarOpenClosedDataWithF<state>> statesList, int secondsLimit)
+{
+	reverse = true;
 	heuristic = env;
 	nextBound = 0;
 	nodesExpanded = nodesTouched = dAstarLastIterExpansions = 0;
 	thePath.resize(0);
-	this->readyStatesList = true;
-	this->statesList = statesList;
-	double minF = std::numeric_limits<double>::max();
+	this->readyStatesList = false;
 	double maxF = 0;
-	for (int x = 0; x < statesList.OpenSize(); x++){
-		AStarOpenClosedDataWithF<state> openState = statesList.getElements()[statesList.GetOpenItem(x)];
-		openList.push_back(openState);
-		minF = std::min(minF, openState.f);
-		maxF = std::max(maxF, openState.f);
+	double maxG = 0;
+	for (AStarOpenClosedDataWithF<state> astarState : statesList.getElements()){
+		maxF = std::max(maxF, astarState.f);
+		maxG = std::max(maxG, astarState.g);
 	}
-	UpdateNextBound(0, std::max(minF, heuristic->HCost(from, to)));
-	for (AStarOpenClosedDataWithF<state> openState : openList){
-		if(maxF > openState.f){
+	perimeterG = std::max(0.0, maxG-1);
+	for (AStarOpenClosedDataWithF<state> astarState : statesList.getElements()){
+		if(astarState.g < maxG){
+			perimeterList.push_back(astarState);
+		}
+		if(maxF > astarState.f){
 			necessaryExpansions++;
 		}
 	}
-	sort( openList.begin( ), openList.end( ), [ ]( const AStarOpenClosedDataWithF<state>& lhs, const AStarOpenClosedDataWithF<state>& rhs )
-	{
-	   return lhs.h < rhs.h;
-	});
+	UpdateNextBound(0, heuristic->HCost(from, to));
 	goal = to;
 	thePath.push_back(from);
 	unsigned long nodesExpandedSoFar = 0;
@@ -206,6 +209,8 @@ bool IDAStar<state, action, verbose>::ASpIDArev(SearchEnvironment<state, action>
 	auto startTime = std::chrono::steady_clock::now();
 	while (true) //thePath.size() == 0)
 	{
+		gCostHistogram.clear();
+		gCostHistogram.resize(nextBound+1);
 		dAstarLastIterExpansions = 0;
 		auto currentTime = std::chrono::steady_clock::now();
 		std::chrono::duration<double> elapsed_seconds = currentTime-startTime;
@@ -214,17 +219,7 @@ bool IDAStar<state, action, verbose>::ASpIDArev(SearchEnvironment<state, action>
 		}
 		if (verbose)
 			printf("\t\tStarting iteration with bound %1.1f: ", nextBound, nodesExpanded);
-		double res;
-		double currentBound = nextBound;
-		for(AStarOpenClosedDataWithF<state> openState:openList){
-			thePath.resize(0);
-			thePath.push_back(openState.data);
-			res = DoIteration(env, openState.data, openState.data, thePath, currentBound, openState.g, 0, openState.h, true, &openState);
-			if(res == 0 && solved){
-				solLength = env->GetPathLength(thePath) + openState.g;
-				break;
-			}
-		}
+		double res = DoIteration(env, from, from, thePath, nextBound, 0, 0);
 		if (verbose)
 			printf("Nodes expanded: %llu(%llu)\n", nodesExpanded-nodesExpandedSoFar, nodesExpanded);
 		if (res == 0 && solved){
@@ -249,6 +244,7 @@ bool IDAStar<state, action, verbose>::GetPath(SearchEnvironment<state, action> *
 									 state from, state to,
 									 std::vector<state> &thePath, int secondsLimit)
 {
+	reverse = false;
 	if(verbose){
 		printf("\t\tStarting to solve with IDAStar\n");
 	}
@@ -346,9 +342,23 @@ double IDAStar<state, action, verbose>::DoIteration(SearchEnvironment<state, act
 		//printf("Stopping at (%d, %d). g=%f h=%f\n", currState>>16, currState&0xFFFF, g, h);
 		return h;
 	}
+	/*else if(reverse && g > bound - perimeterG){
+		UpdateNextBound(bound, g+1);
+		return h;
+	}*/
 	if (env->GoalTest(currState, goal)){
 		solved = true;
 		return 0;
+	}
+	//else if(reverse && perimeterG+g >= bound){
+	else if(reverse){
+		for (AStarOpenClosedDataWithF<state> potenetionalMidState : perimeterList){
+			if (currState == potenetionalMidState.data){
+				solLength = g + potenetionalMidState.g;
+				solved = true;
+				return 0;
+			}
+		}
 	}
 		
 	std::vector<state> neighbors;
@@ -374,7 +384,10 @@ double IDAStar<state, action, verbose>::DoIteration(SearchEnvironment<state, act
 																g+edgeCost, maxH - edgeCost);
 		minNeighborF = std::min(minNeighborF, g+edgeCost+heuristic->HCost(neighbors[x], goal));	
 		minNeighborFchanged = true;
-		if (env->GoalTest(thePath.back(), goal) && g+edgeCost<=bound){
+		if(solved){
+			return 0;
+		}
+		else if (env->GoalTest(thePath.back(), goal) && g+edgeCost<=bound){
 			solved = true;
 			return 0;
 		}

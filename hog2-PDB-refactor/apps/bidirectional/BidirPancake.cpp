@@ -34,9 +34,9 @@ unsigned long ASTARstatesQuantityBound;
 unsigned long statesQuantityBound = 1000000;
 int secondsLimit = 60*30;
 bool AstarRun=true;
-bool AstarPIDAstarRun=true;
+bool AstarPIDAstarRun=false;
 bool AstarPIDAstarReverseRun=true;
-bool MMRun=true;
+bool MMRun=false;
 bool MMpIDMM=false;
 bool IDAstarRun=true;
 bool MBBDSRun=false;
@@ -67,10 +67,8 @@ void TestPancake()
 	cout << "running..." << endl;
 	myfile.open (filename);
 	
-	StevenTest(0, 10, true);
-	StevenTest(1, 10, true);
-	StevenTest(2, 10, true);
-	StevenTest(3, 10, true);
+	StevenTest(0, 5, true);
+	StevenTest(1, 5, true);
 
 	myfile << "completed!" << endl;
 	myfile.close();
@@ -280,15 +278,15 @@ void StevenTest(int gap, int problems_num, bool randomPancake, vector<int> skipV
 				}
 			}
 		}
-		/*if (AstarPIDAstarReverseRun){
-			myfile << "\t\t_Astar+IDAstar_\n";
+		if (AstarPIDAstarReverseRun){
+			myfile << "\t\t_Astar+IDAstar+Reverse_\n";
 			for(double percentage : percentages){
 				unsigned long statesQuantityBoundforASPIDARS = statesQuantityBound*percentage;
 				TemplateAStar<PancakePuzzleState<pancakes_num>, PancakePuzzleAction, PancakePuzzle<pancakes_num>> astar;
 				goal.Reset();
 				start = original;
 				t1.StartTimer();
-				bool solved = astar.GetPathTime(&pancake, start, goal, astarPath, secondsLimit, true, statesQuantityBoundforASPIDARS);
+				bool solved = astar.GetPathTime(&pancake, start, goal, astarPath, secondsLimit, true, statesQuantityBoundforASPIDARS, false);
 				unsigned long nodesExpanded = astar.GetNodesExpanded();
 				unsigned long necessaryNodesExpanded = astar.GetNecessaryExpansions();
 				if(solved){
@@ -298,7 +296,7 @@ void StevenTest(int gap, int problems_num, bool randomPancake, vector<int> skipV
 				}
 				else{
 					IDAStar<PancakePuzzleState<pancakes_num>, PancakePuzzleAction, false> idastar;
-					solved = idastar.GetPath(&pancake, start, goal, idaPath, secondsLimit-t1.GetElapsedTime(), true, astar.getStatesList(), true);
+					solved = idastar.ASpIDArev(&pancake, goal, start, idaPath, astar.getStatesList(), secondsLimit-t1.GetElapsedTime());
 					nodesExpanded += idastar.GetNodesExpanded();
 					necessaryNodesExpanded += idastar.GetNecessaryExpansions();
 					t1.EndTimer();
@@ -312,7 +310,7 @@ void StevenTest(int gap, int problems_num, bool randomPancake, vector<int> skipV
 					}	
 				}
 			}
-		}*/
+		}
 		// MBBDS
 		if (MBBDSRun && (threePhase || twoPhase)){
 			bool doThree = threePhase;

@@ -80,7 +80,7 @@ public:
 	}
 	virtual ~TemplateAStar() {}
 	void GetPath(environment *env, const state& from, const state& to, std::vector<state> &thePath);
-	bool GetPathTime(environment *env, const state& from, const state& to, std::vector<state> &thePath, int secondsLimit=600, bool boundExists=false, unsigned long statesBound=0);
+	bool GetPathTime(environment *env, const state& from, const state& to, std::vector<state> &thePath, int secondsLimit=600, bool boundExists=false, unsigned long statesBound=0, bool useH=true);
 	void GetPath(environment *, const state&, const state&, std::vector<action> & );
 	
 	openList openClosedList;
@@ -192,6 +192,7 @@ private:
 	bool boundExists=false;
 	
 	double lastF = 0;
+	bool useH = true;
 	uint64_t nodesExpandedInThisF = 0;
 };
 
@@ -223,8 +224,9 @@ const char *TemplateAStar<state,action,environment,openList>::GetName()
  * between from and to when the function returns, if one exists. 
  */
 template <class state, class action, class environment, class openList>
-bool TemplateAStar<state,action,environment,openList>::GetPathTime(environment *_env, const state& from, const state& to, std::vector<state> &thePath, int secondsLimit, bool boundExists, unsigned long statesBound)
+bool TemplateAStar<state,action,environment,openList>::GetPathTime(environment *_env, const state& from, const state& to, std::vector<state> &thePath, int secondsLimit, bool boundExists, unsigned long statesBound, bool useH)
 {
+	this->useH = useH;
 	this->boundExists = boundExists;
 	this->statesBound = statesBound;
 	if (!InitializeSearch(_env, from, to, thePath))
@@ -320,7 +322,10 @@ bool TemplateAStar<state,action,environment,openList>::InitializeSearch(environm
 		return false;
 	}
 	
-	double h = theHeuristic->HCost(start, goal);
+	double h = 0;
+	if(useH){
+		h = theHeuristic->HCost(start, goal);
+	}
 	openClosedList.AddOpenNode(start, env->GetStateHash(start), phi(h, 0), 0, h);
 	
 	return true;
@@ -425,7 +430,10 @@ bool TemplateAStar<state,action,environment,openList>::DoSingleSearchStep(std::v
 				lowHC = std::min(lowHC, openClosedList.Lookup(theID).h+edgeCosts.back());
 			}
 			else {
-				double tmpH = theHeuristic->HCost(neighbors[x], goal);
+				double tmpH = 0;
+				if(useH){
+					tmpH = theHeuristic->HCost(neighbors[x], goal);
+				}
 				if (!directed)
 					bestH = std::max(bestH, tmpH-edgeCosts.back());
 				lowHC = std::min(lowHC, tmpH+edgeCosts.back());
@@ -514,7 +522,10 @@ bool TemplateAStar<state,action,environment,openList>::DoSingleSearchStep(std::v
 //					std::cout << " adding to open ";
 //					std::cout << double(theHeuristic->HCost(neighbors[x], goal)+openClosedList.Lookup(nodeid).g+edgeCosts[x]);
 //					std::cout << " \n";
-					double h = theHeuristic->HCost(neighbors[x], goal);
+					double h = 0;
+					if(useH){
+						h = theHeuristic->HCost(neighbors[x], goal);
+					}
 					if (useBPMX)
 					{
 						openClosedList.AddOpenNode(neighbors[x],
