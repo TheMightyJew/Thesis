@@ -21,7 +21,9 @@ class IDMM {
 public:
 	IDMM(bool front2frontH=false) { this->front2frontH = front2frontH;}
 	virtual ~IDMM() {}
-	bool GetMidState(SearchEnvironment<state, action>* env, state fromState, state toState, state &midState, int secondsLimit=600, double startingFBound=0, bool readyOpenLists=false, AStarOpenClosed<state, MMCompare<state>> forwardList = AStarOpenClosed<state, MMCompare<state>>(), AStarOpenClosed<state, MMCompare<state>> backwardList = AStarOpenClosed<state, MMCompare<state>>());
+	bool GetMidState(SearchEnvironment<state, action>* env, state fromState, state toState, state &midState, int secondsLimit=600, double startingFBound=0);
+	bool GetMidStateFromLists(SearchEnvironment<state, action>* env, state fromState, state toState, state &midState, int secondsLimit=600, double startingFBound=0, AStarOpenClosed<state, MMCompare<state>> forwardList = AStarOpenClosed<state, MMCompare<state>>(), AStarOpenClosed<state, MMCompare<state>> backwardList = AStarOpenClosed<state, MMCompare<state>>());
+	bool GetMidStateFromForwardList(SearchEnvironment<state, action>* env, state fromState, state toState, state &midState, int secondsLimit=600, AStarOpenClosed<state, AStarCompareWithF<state>, AStarOpenClosedDataWithF<state>> forwardList = AStarOpenClosed<state, AStarCompareWithF<state>, AStarOpenClosedDataWithF<state>>());
 	double getPathLength()	{ return pathLength; }
 	uint64_t GetNodesExpanded() { return nodesExpanded; }
 	uint64_t GetNecessaryExpansions() { return necessaryExpansions; }
@@ -53,83 +55,121 @@ private:
 
 
 };
-
 template <class state, class action, bool verbose>
-bool IDMM<state, action, verbose>::GetMidState(SearchEnvironment<state, action>* env,
-	state fromState, state toState, state &midState, int secondsLimit, double startingFBound, bool readyOpenLists, AStarOpenClosed<state, MMCompare<state>, AStarOpenClosedData<state>> forwardList, AStarOpenClosed<state, MMCompare<state>, AStarOpenClosedData<state>> backwardList)
+bool IDMM<state, action, verbose>::GetMidStateFromForwardList(SearchEnvironment<state, action>* env,
+	state fromState, state toState, state &midState, int secondsLimit, AStarOpenClosed<state, AStarCompareWithF<state>, AStarOpenClosedDataWithF<state>> forwardList)
+{
+	AStarOpenClosed<state, MMCompare<state>, AStarOpenClosedData<state>> newForwardList;
+	double highestG = 0;
+	double secondHighestG = 0;
+	double highestF = 0;
+	double secondHighestF = 0;
+	for (int x = 0; x < forwardList.OpenSize(); x++){
+		AStarOpenClosedDataWithF<state> openState = forwardList.getElements()[forwardList.GetOpenItem(x)];
+		if(openState.g > highestG){
+			secondHighestG = highestG;
+			highestG = openState.g;
+		}
+		else if(openState.g > secondHighestG && openState.g < highestG){
+			secondHighestG = openState.g;
+		}
+		if(openState.f > highestF){
+			secondHighestF = highestF;
+			highestF = openState.f;
+		}
+		else if(openState.f > secondHighestF && openState.f < highestF){
+			secondHighestF = openState.f;
+		}
+	}
+	printf("bounds: %f|%f, %f|%f\n", highestG, secondHighestG, highestF, secondHighestF);
+	for (AStarOpenClosedDataWithF<state> forwardState : forwardList.getElements()){
+		if(forwardState.where == kOpenList){
+			if((secondHighestG==0 && forwardState.g == highestG) || (secondHighestG>0 && forwardState.g < highestG)){
+				newForwardList.AddOpenNode(forwardState.data, env->GetStateHash(forwardState.data), forwardState.g, forwardState.h);
+			}
+		}
+		else if(forwardState.where == kClosedList){
+			newForwardList.AddClosedNode(forwardState.data, env->GetStateHash(forwardState.data), forwardState.g, forwardState.h);
+		}
+	}
+	printf("sizes: %d|%d, %d|%d\n\n", forwardList.OpenSize(), forwardList.ClosedSize(), newForwardList.OpenSize(), newForwardList.ClosedSize());
+	
+	
+	
+	AStarOpenClosed<state, MMCompare<state>, AStarOpenClosedData<state>> newBackwardList;
+	double h = env->HCost(toState, fromState);
+	newBackwardList.AddOpenNode(toState, env->GetStateHash(toState), 0, h);
+	
+	return GetMidStateFromLists(env, fromState, toState, midState, secondsLimit, secondHighestF, newForwardList, newBackwardList);
+}
+template <class state, class action, bool verbose>
+bool IDMM<state, action, verbose>::GetMidStateFromLists(SearchEnvironment<state, action>* env,
+	state fromState, state toState, state &midState, int secondsLimit, double startingFBound, AStarOpenClosed<state, MMCompare<state>, AStarOpenClosedData<state>> forwardList, AStarOpenClosed<state, MMCompare<state>, AStarOpenClosedData<state>> backwardList)
 {
 	auto startTime = std::chrono::steady_clock::now();
-	this->readyOpenLists = readyOpenLists;
+	this->readyOpenLists = true;
 	this->forwardList = forwardList;
 	this->backwardList = backwardList;
 	nodesExpanded = nodesTouched = 0;
 	originStart = fromState;
 	originGoal = toState;
-	if(readyOpenLists){
-		double minF = 0;
-
-		for (int x = 0; x < forwardList.OpenSize(); x++){
-			AStarOpenClosedData<state> openState = forwardList.getElements()[forwardList.GetOpenItem(x)];
-			double fValue = openState.h + openState.g;
-			if(minF == 0 || minF > fValue){
-					minF = fValue;
-			}
+	double minF = 0;
+	for (int x = 0; x < forwardList.OpenSize(); x++){
+		AStarOpenClosedData<state> openState = forwardList.getElements()[forwardList.GetOpenItem(x)];
+		double fValue = openState.h + openState.g;
+		if(minF == 0 || minF > fValue){
+				minF = fValue;
 		}
-		startingFBound = std::max(minF, startingFBound);
+	}
+	startingFBound = std::max(minF, startingFBound);
 
-		for (int x = 0; x < forwardList.OpenSize(); x++){
-			AStarOpenClosedData<state> openState = forwardList.getElements()[forwardList.GetOpenItem(x)];
-			forwardOpenList.push_back(openState);
+	for (int x = 0; x < forwardList.OpenSize(); x++){
+		AStarOpenClosedData<state> openState = forwardList.getElements()[forwardList.GetOpenItem(x)];
+		forwardOpenList.push_back(openState);
+	}
+	sort( forwardOpenList.begin( ), forwardOpenList.end( ), [ ]( const AStarOpenClosedData<state>& lhs, const AStarOpenClosedData<state>& rhs )
+	{
+	   return lhs.h+lhs.g < rhs.h+rhs.g;
+	});
+
+	for (int x = 0; x < backwardList.OpenSize(); x++){
+		AStarOpenClosedData<state> openState = backwardList.getElements()[backwardList.GetOpenItem(x)];
+		backwardOpenList.push_back(openState);
+	}
+	sort( backwardOpenList.begin( ), backwardOpenList.end( ), [ ]( const AStarOpenClosedData<state>& lhs, const AStarOpenClosedData<state>& rhs )
+	{
+	   return lhs.h+lhs.g < rhs.h+rhs.g;
+	});
+	double f = -1;
+	for(AStarOpenClosedData<state> openState:forwardOpenList){
+		if(openState.h+openState.g > f){
+			f = openState.h+openState.g;
+			std::vector<AStarOpenClosedData<state>> newVector;
+			forwardMatrix.push_back(newVector);
 		}
-		sort( forwardOpenList.begin( ), forwardOpenList.end( ), [ ]( const AStarOpenClosedData<state>& lhs, const AStarOpenClosedData<state>& rhs )
+		forwardMatrix.back().push_back(openState);
+	}
+	for(std::vector<int>::size_type i = 0; i != forwardMatrix.size(); i++) {
+		sort( forwardMatrix[i].begin( ), forwardMatrix[i].end( ), [ ]( const AStarOpenClosedData<state>& lhs, const AStarOpenClosedData<state>& rhs )
 		{
-		   return lhs.h+lhs.g < rhs.h+rhs.g;
+		   return lhs.g < rhs.g;
 		});
+	}
 
-		for (int x = 0; x < backwardList.OpenSize(); x++){
-			AStarOpenClosedData<state> openState = backwardList.getElements()[backwardList.GetOpenItem(x)];
-			backwardOpenList.push_back(openState);
+	f = -1;
+	for(AStarOpenClosedData<state> openState:backwardOpenList){
+		if(openState.h+openState.g > f){
+			f = openState.h+openState.g;
+			std::vector<AStarOpenClosedData<state>> newVector;
+			backwardMatrix.push_back(newVector);
 		}
-		sort( backwardOpenList.begin( ), backwardOpenList.end( ), [ ]( const AStarOpenClosedData<state>& lhs, const AStarOpenClosedData<state>& rhs )
+		backwardMatrix.back().push_back(openState);
+	}
+	for(std::vector<int>::size_type i = 0; i != backwardMatrix.size(); i++) {
+		sort( backwardMatrix[i].begin( ), backwardMatrix[i].end( ), [ ]( const AStarOpenClosedData<state>& lhs, const AStarOpenClosedData<state>& rhs )
 		{
-		   return lhs.h+lhs.g < rhs.h+rhs.g;
+		   return lhs.g < rhs.g;
 		});
-		double f = -1;
-		for(AStarOpenClosedData<state> openState:forwardOpenList){
-			if(openState.h+openState.g > f){
-				f = openState.h+openState.g;
-				std::vector<AStarOpenClosedData<state>> newVector;
-				forwardMatrix.push_back(newVector);
-			}
-			forwardMatrix.back().push_back(openState);
-		}
-		for(std::vector<int>::size_type i = 0; i != forwardMatrix.size(); i++) {
-			sort( forwardMatrix[i].begin( ), forwardMatrix[i].end( ), [ ]( const AStarOpenClosedData<state>& lhs, const AStarOpenClosedData<state>& rhs )
-			{
-			   return lhs.g < rhs.g;
-			});
-		}
-	
-		f = -1;
-		for(AStarOpenClosedData<state> openState:backwardOpenList){
-			if(openState.h+openState.g > f){
-				f = openState.h+openState.g;
-				std::vector<AStarOpenClosedData<state>> newVector;
-				backwardMatrix.push_back(newVector);
-			}
-			backwardMatrix.back().push_back(openState);
-		}
-		for(std::vector<int>::size_type i = 0; i != backwardMatrix.size(); i++) {
-			sort( backwardMatrix[i].begin( ), backwardMatrix[i].end( ), [ ]( const AStarOpenClosedData<state>& lhs, const AStarOpenClosedData<state>& rhs )
-			{
-			   return lhs.g < rhs.g;
-			});
-		}
-
-		/*auto currentTime = std::chrono::steady_clock::now();
-		std::chrono::duration<double> elapsed_seconds = currentTime-startTime;
-		std::cout << elapsed_seconds.count() << std::endl;*/
-		//necessaryExpansions = 
 	}
 	double initialHeuristic = env->HCost(fromState, toState);
 	startingFBound = std::max(initialHeuristic, startingFBound); 
@@ -148,40 +188,86 @@ bool IDMM<state, action, verbose>::GetMidState(SearchEnvironment<state, action>*
 			printf("\t\tBounds: %1.1f and %1.1f: ", forwardBound, backwardBound);
 		}
 		bool solved = false;
-		if(readyOpenLists){
-			for(std::vector<AStarOpenClosedData<state>> fVector:forwardMatrix){
-				if(fVector.front().g+fVector.front().h > forwardBound+backwardBound){
-					break;
-				}
-				for (AStarOpenClosedData<state> openState: fVector){
-					auto currentTime = std::chrono::steady_clock::now();
-					std::chrono::duration<double> elapsed_seconds = currentTime-startTime;
-					if(elapsed_seconds.count() >= secondsLimit){
-						return false;
-					}
-					if(openState.g > forwardBound)
-						break;
-					solved = DoIterationForward(env, openState.data, openState.data, openState.g, midState);
-					if(solved){
-						break;
-					}
-				}
-				if(solved){
-					break;
-				}
+		for(std::vector<AStarOpenClosedData<state>> fVector:forwardMatrix){
+			if(fVector.front().g+fVector.front().h > forwardBound+backwardBound){
+				break;
 			}
-			/*for (AStarOpenClosedData<state> openState: forwardOpenList){
-				if(openState.g+openState.h > forwardBound+backwardBound)
+			for (AStarOpenClosedData<state> openState: fVector){
+				auto currentTime = std::chrono::steady_clock::now();
+				std::chrono::duration<double> elapsed_seconds = currentTime-startTime;
+				if(elapsed_seconds.count() >= secondsLimit){
+					return false;
+				}
+				if(openState.g > forwardBound)
 					break;
 				solved = DoIterationForward(env, openState.data, openState.data, openState.g, midState);
 				if(solved){
 					break;
 				}
-			}*/
+			}
+			if(solved){
+				break;
+			}
+		}
+		/*for (AStarOpenClosedData<state> openState: forwardOpenList){
+			if(openState.g+openState.h > forwardBound+backwardBound)
+				break;
+			solved = DoIterationForward(env, openState.data, openState.data, openState.g, midState);
+			if(solved){
+				break;
+			}
+		}*/
+		if(verbose){
+			printf("Nodes expanded: %d(%d)\n", nodesExpanded-nodesExpandedSoFar, nodesExpanded);
+		}
+		if (solved) {
+			dMMExpansions = previousIterationExpansions + dMMLastIterExpansions;
+			necessaryExpansions += nodesExpandedSoFar;
+			pathLength = backwardBound + forwardBound;
+			return true;
 		}
 		else{
-			solved = DoIterationForward(env, originStart, originStart, 0, midState);
+			if (forwardBound > backwardBound) {
+				backwardBound = forwardBound;
+			}
+			else{
+				forwardBound++;
+			}			
 		}
+		previousIterationExpansions = nodesExpanded-nodesExpandedSoFar;
+		nodesExpandedSoFar = nodesExpanded;
+	}
+	return false;
+}
+
+template <class state, class action, bool verbose>
+bool IDMM<state, action, verbose>::GetMidState(SearchEnvironment<state, action>* env,
+	state fromState, state toState, state &midState, int secondsLimit, double startingFBound)
+{
+	auto startTime = std::chrono::steady_clock::now();
+	this->readyOpenLists = false;
+	this->forwardList = forwardList;
+	this->backwardList = backwardList;
+	nodesExpanded = nodesTouched = 0;
+	originStart = fromState;
+	originGoal = toState;
+	double initialHeuristic = env->HCost(fromState, toState);
+	startingFBound = std::max(initialHeuristic, startingFBound); 
+	backwardBound = (int)(startingFBound / 2);
+	forwardBound = startingFBound - backwardBound;
+	unsigned long nodesExpandedSoFar = 0;
+	unsigned long previousIterationExpansions = 0;
+	while (true){
+		dMMLastIterExpansions = 0;
+		auto currentTime = std::chrono::steady_clock::now();
+		std::chrono::duration<double> elapsed_seconds = currentTime-startTime;
+		if(elapsed_seconds.count() >= secondsLimit){
+			return false;
+		}
+		if (verbose){
+			printf("\t\tBounds: %1.1f and %1.1f: ", forwardBound, backwardBound);
+		}
+		bool solved = DoIterationForward(env, originStart, originStart, 0, midState);
 		if(verbose){
 			printf("Nodes expanded: %d(%d)\n", nodesExpanded-nodesExpandedSoFar, nodesExpanded);
 		}

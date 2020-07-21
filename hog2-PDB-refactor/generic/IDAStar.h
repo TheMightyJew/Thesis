@@ -338,20 +338,22 @@ double IDAStar<state, action, verbose>::DoIteration(SearchEnvironment<state, act
 		h = maxH;
 	if (fgreater(g+h, bound))
 	{
-		UpdateNextBound(bound, g+h);
+		if(reverse)
+			UpdateNextBound(bound, bound+1);
+		else
+			UpdateNextBound(bound, g+h);
 		//printf("Stopping at (%d, %d). g=%f h=%f\n", currState>>16, currState&0xFFFF, g, h);
 		return h;
 	}
-	/*else if(reverse && g > bound - perimeterG){
-		UpdateNextBound(bound, g+1);
+	else if(reverse && g+perimeterG > bound){
+		UpdateNextBound(bound, bound+1);
 		return h;
-	}*/
+	}
 	if (env->GoalTest(currState, goal)){
 		solved = true;
 		return 0;
 	}
-	//else if(reverse && perimeterG+g >= bound){
-	else if(reverse){
+	else if(reverse && perimeterG+g == bound){
 		for (AStarOpenClosedDataWithF<state> potenetionalMidState : perimeterList){
 			if (currState == potenetionalMidState.data){
 				solLength = g + potenetionalMidState.g;
