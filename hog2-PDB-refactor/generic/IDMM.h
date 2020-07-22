@@ -13,6 +13,7 @@
 #include "SearchEnvironment.h"
 #include "AStarOpenClosed.h"
 #include "MM.h"
+#include <math.h>
 
 
 
@@ -81,26 +82,24 @@ bool IDMM<state, action, verbose>::GetMidStateFromForwardList(SearchEnvironment<
 			secondHighestF = openState.f;
 		}
 	}
-	printf("bounds: %f|%f, %f|%f\n", highestG, secondHighestG, highestF, secondHighestF);
 	for (AStarOpenClosedDataWithF<state> forwardState : forwardList.getElements()){
 		if(forwardState.where == kOpenList){
-			if((secondHighestG==0 && forwardState.g == highestG) || (secondHighestG>0 && forwardState.g < highestG)){
+			/*if((secondHighestF==0 && forwardState.f == highestF) || (secondHighestF>0 && forwardState.f < highestF)){
 				newForwardList.AddOpenNode(forwardState.data, env->GetStateHash(forwardState.data), forwardState.g, forwardState.h);
-			}
+			}*/
+			newForwardList.AddOpenNode(forwardState.data, env->GetStateHash(forwardState.data), forwardState.g, forwardState.h);
 		}
 		else if(forwardState.where == kClosedList){
 			newForwardList.AddClosedNode(forwardState.data, env->GetStateHash(forwardState.data), forwardState.g, forwardState.h);
 		}
 	}
-	printf("sizes: %d|%d, %d|%d\n\n", forwardList.OpenSize(), forwardList.ClosedSize(), newForwardList.OpenSize(), newForwardList.ClosedSize());
-	
-	
 	
 	AStarOpenClosed<state, MMCompare<state>, AStarOpenClosedData<state>> newBackwardList;
 	double h = env->HCost(toState, fromState);
 	newBackwardList.AddOpenNode(toState, env->GetStateHash(toState), 0, h);
 	
-	return GetMidStateFromLists(env, fromState, toState, midState, secondsLimit, secondHighestF, newForwardList, newBackwardList);
+	/*return GetMidStateFromLists(env, fromState, toState, midState, secondsLimit, secondHighestF, newForwardList, newBackwardList);*/
+	return GetMidStateFromLists(env, fromState, toState, midState, secondsLimit, highestF, newForwardList, newBackwardList);
 }
 template <class state, class action, bool verbose>
 bool IDMM<state, action, verbose>::GetMidStateFromLists(SearchEnvironment<state, action>* env,
@@ -113,13 +112,13 @@ bool IDMM<state, action, verbose>::GetMidStateFromLists(SearchEnvironment<state,
 	nodesExpanded = nodesTouched = 0;
 	originStart = fromState;
 	originGoal = toState;
-	double minF = 0;
+	double minF = std::numeric_limits<double>::max();;
+	double maxG = 0;
 	for (int x = 0; x < forwardList.OpenSize(); x++){
 		AStarOpenClosedData<state> openState = forwardList.getElements()[forwardList.GetOpenItem(x)];
 		double fValue = openState.h + openState.g;
-		if(minF == 0 || minF > fValue){
-				minF = fValue;
-		}
+		minF = std::min(minF, fValue);
+		maxG = std::max(maxG, openState.g);
 	}
 	startingFBound = std::max(minF, startingFBound);
 
@@ -173,8 +172,8 @@ bool IDMM<state, action, verbose>::GetMidStateFromLists(SearchEnvironment<state,
 	}
 	double initialHeuristic = env->HCost(fromState, toState);
 	startingFBound = std::max(initialHeuristic, startingFBound); 
-	backwardBound = (int)(startingFBound / 2);
-	forwardBound = startingFBound - backwardBound;
+	forwardBound = std::max(ceil(startingFBound / 2), round(maxG));
+	backwardBound = startingFBound - forwardBound;
 	unsigned long nodesExpandedSoFar = 0;
 	unsigned long previousIterationExpansions = 0;
 	while (true){
@@ -209,14 +208,6 @@ bool IDMM<state, action, verbose>::GetMidStateFromLists(SearchEnvironment<state,
 				break;
 			}
 		}
-		/*for (AStarOpenClosedData<state> openState: forwardOpenList){
-			if(openState.g+openState.h > forwardBound+backwardBound)
-				break;
-			solved = DoIterationForward(env, openState.data, openState.data, openState.g, midState);
-			if(solved){
-				break;
-			}
-		}*/
 		if(verbose){
 			printf("Nodes expanded: %d(%d)\n", nodesExpanded-nodesExpandedSoFar, nodesExpanded);
 		}
@@ -228,7 +219,7 @@ bool IDMM<state, action, verbose>::GetMidStateFromLists(SearchEnvironment<state,
 		}
 		else{
 			if (forwardBound > backwardBound) {
-				backwardBound = forwardBound;
+				backwardBound++;
 			}
 			else{
 				forwardBound++;
@@ -253,8 +244,8 @@ bool IDMM<state, action, verbose>::GetMidState(SearchEnvironment<state, action>*
 	originGoal = toState;
 	double initialHeuristic = env->HCost(fromState, toState);
 	startingFBound = std::max(initialHeuristic, startingFBound); 
-	backwardBound = (int)(startingFBound / 2);
-	forwardBound = startingFBound - backwardBound;
+	forwardBound = ceil(startingFBound / 2);
+	backwardBound = startingFBound - forwardBound;
 	unsigned long nodesExpandedSoFar = 0;
 	unsigned long previousIterationExpansions = 0;
 	while (true){
