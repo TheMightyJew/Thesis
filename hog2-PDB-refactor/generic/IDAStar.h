@@ -187,8 +187,10 @@ bool IDAStar<state, action, verbose>::ASpIDArev(SearchEnvironment<state, action>
 	thePath.resize(0);
 	this->readyStatesList = false;
 	double maxF = 0;
+	double minRealF = std::numeric_limits<double>::max();
 	double maxG = 0;
 	for (AStarOpenClosedDataWithF<state> astarState : statesList.getElements()){
+		minRealF = std::min(minRealF, astarState.g + heuristic->HCost(astarState.data, from));
 		maxF = std::max(maxF, astarState.f);
 		maxG = std::max(maxG, astarState.g);
 	}
@@ -201,7 +203,8 @@ bool IDAStar<state, action, verbose>::ASpIDArev(SearchEnvironment<state, action>
 			necessaryExpansions++;
 		}
 	}
-	UpdateNextBound(0, heuristic->HCost(from, to));
+	UpdateNextBound(0, std::max(minRealF, heuristic->HCost(from, to)));
+	//UpdateNextBound(0, heuristic->HCost(from, to));
 	goal = to;
 	thePath.push_back(from);
 	unsigned long nodesExpandedSoFar = 0;

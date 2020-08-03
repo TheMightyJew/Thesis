@@ -36,9 +36,11 @@ private:
 	unsigned long nodesExpanded, nodesTouched, dMMExpansions;
 	double backwardBound;
 	double forwardBound;
-	double pathLength;
+	double pathLength = std::numeric_limits<double>::max();
 	bool DoIterationForward(SearchEnvironment<state, action>* env, state parent, state currState, double g, state& midState);	
 	bool DoIterationBackward(SearchEnvironment<state, action>* env, state parent, state currState, double g, state& midState, state possibleMidState);
+	void updateBoundsG(double minOpenG, double maxOpenG);
+	void buildMatrix(std::vector<AStarOpenClosedData<state>> &openList, std::vector<std::vector<AStarOpenClosedData<state>>> &matrix);
 	
 	state originGoal;
 	state originStart;
@@ -53,6 +55,7 @@ private:
 	std::vector<std::vector<AStarOpenClosedData<state>>> backwardMatrix;
 	bool readyOpenLists;
 	bool front2frontH;
+	bool firstBounds;
 
 
 };
@@ -61,32 +64,10 @@ bool IDMM<state, action, verbose>::GetMidStateFromForwardList(SearchEnvironment<
 	state fromState, state toState, state &midState, int secondsLimit, AStarOpenClosed<state, AStarCompareWithF<state>, AStarOpenClosedDataWithF<state>> forwardList)
 {
 	AStarOpenClosed<state, MMCompare<state>, AStarOpenClosedData<state>> newForwardList;
-	double highestG = 0;
-	double secondHighestG = 0;
-	double highestF = 0;
-	double secondHighestF = 0;
-	for (int x = 0; x < forwardList.OpenSize(); x++){
-		AStarOpenClosedDataWithF<state> openState = forwardList.getElements()[forwardList.GetOpenItem(x)];
-		if(openState.g > highestG){
-			secondHighestG = highestG;
-			highestG = openState.g;
-		}
-		else if(openState.g > secondHighestG && openState.g < highestG){
-			secondHighestG = openState.g;
-		}
-		if(openState.f > highestF){
-			secondHighestF = highestF;
-			highestF = openState.f;
-		}
-		else if(openState.f > secondHighestF && openState.f < highestF){
-			secondHighestF = openState.f;
-		}
-	}
+	double minF = std::numeric_limits<double>::max();
 	for (AStarOpenClosedDataWithF<state> forwardState : forwardList.getElements()){
 		if(forwardState.where == kOpenList){
-			/*if((secondHighestF==0 && forwardState.f == highestF) || (secondHighestF>0 && forwardState.f < highestF)){
-				newForwardList.AddOpenNode(forwardState.data, env->GetStateHash(forwardState.data), forwardState.g, forwardState.h);
-			}*/
+			minF = std::min(minF, forwardState.h+forwardState.g);
 			newForwardList.AddOpenNode(forwardState.data, env->GetStateHash(forwardState.data), forwardState.g, forwardState.h);
 		}
 		else if(forwardState.where == kClosedList){
@@ -95,12 +76,35 @@ bool IDMM<state, action, verbose>::GetMidStateFromForwardList(SearchEnvironment<
 	}
 	
 	AStarOpenClosed<state, MMCompare<state>, AStarOpenClosedData<state>> newBackwardList;
-	double h = env->HCost(toState, fromState);
-	newBackwardList.AddOpenNode(toState, env->GetStateHash(toState), 0, h);
+	newBackwardList.AddOpenNode(toState, env->GetStateHash(toState), 0, env->HCost(toState, fromState));
 	
-	/*return GetMidStateFromLists(env, fromState, toState, midState, secondsLimit, secondHighestF, newForwardList, newBackwardList);*/
-	return GetMidStateFromLists(env, fromState, toState, midState, secondsLimit, highestF, newForwardList, newBackwardList);
+	return GetMidStateFromLists(env, fromState, toState, midState, secondsLimit, minF, newForwardList, newBackwardList);
 }
+
+template <class state, class action, bool verbose>
+void IDMM<state, action, verbose>::buildMatrix(std::vector<AStarOpenClosedData<state>> &openList, std::vector<std::vector<AStarOpenClosedData<state>>> &matrix){
+	sort( openList.begin( ), openList.end( ), [ ]( const AStarOpenClosedData<state>& lhs, const AStarOpenClosedData<state>& rhs )
+	{
+	   return lhs.h+lhs.g < rhs.h+rhs.g;
+	});
+	
+	double f = -1;
+	for(AStarOpenClosedData<state> openState:openList){
+		if(openState.h+openState.g > f){
+			f = openState.h+openState.g;
+			std::vector<AStarOpenClosedData<state>> newVector;
+			matrix.push_back(newVector);
+		}
+		matrix.back().push_back(openState);
+	}
+	for(std::vector<int>::size_type i = 0; i != matrix.size(); i++) {
+		sort( matrix[i].begin( ), matrix[i].end( ), [ ]( const AStarOpenClosedData<state>& lhs, const AStarOpenClosedData<state>& rhs )
+		{
+		   return lhs.g < rhs.g;
+		});
+	}
+}
+
 template <class state, class action, bool verbose>
 bool IDMM<state, action, verbose>::GetMidStateFromLists(SearchEnvironment<state, action>* env,
 	state fromState, state toState, state &midState, int secondsLimit, double startingFBound, AStarOpenClosed<state, MMCompare<state>, AStarOpenClosedData<state>> forwardList, AStarOpenClosed<state, MMCompare<state>, AStarOpenClosedData<state>> backwardList)
@@ -112,68 +116,33 @@ bool IDMM<state, action, verbose>::GetMidStateFromLists(SearchEnvironment<state,
 	nodesExpanded = nodesTouched = 0;
 	originStart = fromState;
 	originGoal = toState;
-	double minF = std::numeric_limits<double>::max();;
-	double maxG = 0;
-	for (int x = 0; x < forwardList.OpenSize(); x++){
-		AStarOpenClosedData<state> openState = forwardList.getElements()[forwardList.GetOpenItem(x)];
-		double fValue = openState.h + openState.g;
-		minF = std::min(minF, fValue);
-		maxG = std::max(maxG, openState.g);
-	}
-	startingFBound = std::max(minF, startingFBound);
+	double minF = std::numeric_limits<double>::max();
+	double maxOpenG = 0;
+	double minOpenG = std::numeric_limits<double>::max();
 
 	for (int x = 0; x < forwardList.OpenSize(); x++){
 		AStarOpenClosedData<state> openState = forwardList.getElements()[forwardList.GetOpenItem(x)];
+		
+		minOpenG = std::min(minOpenG, openState.g);
+		maxOpenG = std::max(maxOpenG , openState.g);
+			
 		forwardOpenList.push_back(openState);
 	}
-	sort( forwardOpenList.begin( ), forwardOpenList.end( ), [ ]( const AStarOpenClosedData<state>& lhs, const AStarOpenClosedData<state>& rhs )
-	{
-	   return lhs.h+lhs.g < rhs.h+rhs.g;
-	});
+	buildMatrix(forwardOpenList, forwardMatrix);
+	minF = forwardOpenList.front().g + forwardOpenList.front().h;
 
+	
 	for (int x = 0; x < backwardList.OpenSize(); x++){
 		AStarOpenClosedData<state> openState = backwardList.getElements()[backwardList.GetOpenItem(x)];
 		backwardOpenList.push_back(openState);
 	}
-	sort( backwardOpenList.begin( ), backwardOpenList.end( ), [ ]( const AStarOpenClosedData<state>& lhs, const AStarOpenClosedData<state>& rhs )
-	{
-	   return lhs.h+lhs.g < rhs.h+rhs.g;
-	});
-	double f = -1;
-	for(AStarOpenClosedData<state> openState:forwardOpenList){
-		if(openState.h+openState.g > f){
-			f = openState.h+openState.g;
-			std::vector<AStarOpenClosedData<state>> newVector;
-			forwardMatrix.push_back(newVector);
-		}
-		forwardMatrix.back().push_back(openState);
-	}
-	for(std::vector<int>::size_type i = 0; i != forwardMatrix.size(); i++) {
-		sort( forwardMatrix[i].begin( ), forwardMatrix[i].end( ), [ ]( const AStarOpenClosedData<state>& lhs, const AStarOpenClosedData<state>& rhs )
-		{
-		   return lhs.g < rhs.g;
-		});
-	}
+	buildMatrix(backwardOpenList, backwardMatrix);
 
-	f = -1;
-	for(AStarOpenClosedData<state> openState:backwardOpenList){
-		if(openState.h+openState.g > f){
-			f = openState.h+openState.g;
-			std::vector<AStarOpenClosedData<state>> newVector;
-			backwardMatrix.push_back(newVector);
-		}
-		backwardMatrix.back().push_back(openState);
-	}
-	for(std::vector<int>::size_type i = 0; i != backwardMatrix.size(); i++) {
-		sort( backwardMatrix[i].begin( ), backwardMatrix[i].end( ), [ ]( const AStarOpenClosedData<state>& lhs, const AStarOpenClosedData<state>& rhs )
-		{
-		   return lhs.g < rhs.g;
-		});
-	}
 	double initialHeuristic = env->HCost(fromState, toState);
-	startingFBound = std::max(initialHeuristic, startingFBound); 
-	forwardBound = std::max(ceil(startingFBound / 2), round(maxG));
+	startingFBound = std::max(startingFBound, std::max(initialHeuristic, minF));
+	forwardBound = std::max(ceil(startingFBound / 2), minOpenG);
 	backwardBound = startingFBound - forwardBound;
+	firstBounds = true;
 	unsigned long nodesExpandedSoFar = 0;
 	unsigned long previousIterationExpansions = 0;
 	while (true){
@@ -199,7 +168,9 @@ bool IDMM<state, action, verbose>::GetMidStateFromLists(SearchEnvironment<state,
 				}
 				if(openState.g > forwardBound)
 					break;
-				solved = DoIterationForward(env, openState.data, openState.data, openState.g, midState);
+				if(firstBounds || openState.g == forwardBound){
+					solved = DoIterationForward(env, openState.data, openState.data, openState.g, midState);
+				}
 				if(solved){
 					break;
 				}
@@ -214,16 +185,11 @@ bool IDMM<state, action, verbose>::GetMidStateFromLists(SearchEnvironment<state,
 		if (solved) {
 			dMMExpansions = previousIterationExpansions + dMMLastIterExpansions;
 			necessaryExpansions += nodesExpandedSoFar;
-			pathLength = backwardBound + forwardBound;
+			pathLength = std::min(pathLength, backwardBound + forwardBound);
 			return true;
 		}
 		else{
-			if (forwardBound > backwardBound) {
-				backwardBound++;
-			}
-			else{
-				forwardBound++;
-			}			
+			updateBoundsG(minOpenG, maxOpenG);			
 		}
 		previousIterationExpansions = nodesExpanded-nodesExpandedSoFar;
 		nodesExpandedSoFar = nodesExpanded;
@@ -231,6 +197,26 @@ bool IDMM<state, action, verbose>::GetMidStateFromLists(SearchEnvironment<state,
 	return false;
 }
 
+template <class state, class action, bool verbose>
+void IDMM<state, action, verbose>::updateBoundsG(double minOpenG, double maxOpenG){
+	/*if(forwardBound>backwardBound){
+		backwardBound++;
+	}
+	else{
+		forwardBound++;
+	}*/
+	if(maxOpenG > forwardBound && backwardBound-1 >= 0){
+		forwardBound++;
+		backwardBound--;
+		firstBounds = false;
+	}
+	else{
+		double fullBound = forwardBound + backwardBound + 1;
+		forwardBound = std::max(minOpenG, ceil(fullBound/2));
+		backwardBound = fullBound - forwardBound;
+		firstBounds = true;
+	}
+}
 template <class state, class action, bool verbose>
 bool IDMM<state, action, verbose>::GetMidState(SearchEnvironment<state, action>* env,
 	state fromState, state toState, state &midState, int secondsLimit, double startingFBound)
@@ -265,7 +251,7 @@ bool IDMM<state, action, verbose>::GetMidState(SearchEnvironment<state, action>*
 		if (solved) {
 			dMMExpansions = previousIterationExpansions + dMMLastIterExpansions;
 			necessaryExpansions += nodesExpandedSoFar;
-			pathLength = backwardBound + forwardBound;
+			pathLength = std::min(pathLength, backwardBound + forwardBound);
 			return true;
 		}
 		else{
@@ -293,17 +279,7 @@ bool IDMM<state, action, verbose>::DoIterationForward(SearchEnvironment<state, a
 		return false;
 	}
 	else if (g == forwardBound) {
-		if(readyOpenLists){
-			/*for (AStarOpenClosedData<state> openState: backwardOpenList){
-				if(openState.g+openState.h > forwardBound+backwardBound)
-					break;
-				if (DoIterationBackward(env, openState.data, openState.data, openState.g, midState, currState)) {
-					midState = currState;
-					return true;
-				}
-			}
-			return false;*/
-			
+		if(readyOpenLists){	
 			for(std::vector<AStarOpenClosedData<state>> fVector:backwardMatrix){
 				if(fVector.front().g+fVector.front().h > forwardBound+backwardBound){
 					break;
@@ -312,6 +288,7 @@ bool IDMM<state, action, verbose>::DoIterationForward(SearchEnvironment<state, a
 					if(openState.g > backwardBound)
 						break;
 					if (DoIterationBackward(env, openState.data, openState.data, openState.g, midState, currState)) {
+						pathLength += g;
 						midState = currState;
 						return true;
 					}
@@ -320,6 +297,7 @@ bool IDMM<state, action, verbose>::DoIterationForward(SearchEnvironment<state, a
 			return false;
 		}
 		else if (DoIterationBackward(env, originGoal, originGoal, 0, midState, currState)) {
+			pathLength += g;
 			midState = currState;
 			return true;
 		}
@@ -354,11 +332,11 @@ bool IDMM<state, action, verbose>::DoIterationBackward(SearchEnvironment<state, 
 {	
 	double h = env->HCost(currState, possibleMidState);
 	double originalH = env->HCost(currState, originStart);
-	if ((front2frontH && fgreater(g + h, backwardBound)) || g>backwardBound || fgreater(g + originalH, forwardBound+backwardBound))//not sure about that
-	{
+	if ((front2frontH && fgreater(g + h, backwardBound)) || g>backwardBound || fgreater(g + originalH, forwardBound+backwardBound)){
 		return false;
 	}
 	else if (currState == possibleMidState) {
+		pathLength = g;
 		return true;
 	}
 	std::vector<state> neighbors;

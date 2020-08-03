@@ -34,14 +34,14 @@ unsigned long ASTARstatesQuantityBound;
 unsigned long statesQuantityBound = 1000000;
 int secondsLimit = 60*30;
 bool AstarRun=true;
-bool AstarPIDAstarRun=false;
-bool AstarPIDAstarReverseRun=false;
+bool AstarPIDAstarRun=true;
+bool AstarPIDAstarReverseRun=true;
 bool ASTARpIDMM=true;
 bool MMRun=true;
 bool MMpIDMM=true;
-bool IDAstarRun=false;
-bool MBBDSRun=false;
-bool threePhase=false;
+bool IDAstarRun=true;
+bool MBBDSRun=true;
+bool threePhase=true;
 bool twoPhase=false;
 bool IDMMRun=true;
 bool idmmF2fFlag=true;
@@ -71,6 +71,7 @@ void TestPancake()
 	StevenTest(0, 10, true);
 	StevenTest(1, 10, true);
 	StevenTest(2, 10, true);
+	StevenTest(3, 10, true);
 
 	myfile << "completed!" << endl;
 	myfile.close();
@@ -80,7 +81,7 @@ void TestPancake()
 
 void StevenTest(int gap, int problems_num, bool randomPancake, vector<int> skipVector)
 {
-	const int pancakes_num = 10;
+	const int pancakes_num = 12;
 	srandom(2017218);
 	PancakePuzzleState<pancakes_num> start;
 	PancakePuzzleState<pancakes_num> original;
