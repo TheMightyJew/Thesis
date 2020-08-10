@@ -73,7 +73,8 @@ bool MBBDS<state, action, BloomFilter, verbose>::GetMidState(SearchEnvironment<s
 	forwardBound = startingFBound - backwardBound;
 	bool forwardSearch;
 	int saturationIncreased = 0;
-	int saturationMaxIncreasements = 100;
+	//changed
+	int saturationMaxIncreasements = 20;
 	iteration_num = 0;
 	double bound;
 	firstRun = true;

@@ -120,11 +120,6 @@ bool IDAStar<state, action, verbose>::ASpIDA(SearchEnvironment<state, action> *e
 		maxF = std::max(maxF, openState.f);
 	}
 	UpdateNextBound(0, std::max(minF, heuristic->HCost(from, to)));
-	for (AStarOpenClosedDataWithF<state> astarState : statesList.getElements()){
-		if(maxF > astarState.f){
-			necessaryExpansions++;
-		}
-	}
 	sort( openList.begin( ), openList.end( ), [ ]( const AStarOpenClosedDataWithF<state>& lhs, const AStarOpenClosedDataWithF<state>& rhs )
 	{
 	   return lhs.h < rhs.h;
@@ -165,6 +160,11 @@ bool IDAStar<state, action, verbose>::ASpIDA(SearchEnvironment<state, action> *e
 				printf("Nodes expanded: %llu(%llu)\n", nodesExpanded-nodesExpandedSoFar, nodesExpanded);
 			}
 			necessaryExpansions += nodesExpandedSoFar;
+			for (AStarOpenClosedDataWithF<state> astarState : statesList.getElements()){
+				if(astarState.where == kClosedList && astarState.f<solLength){
+					necessaryExpansions++;
+				}
+			}
 			break;
 		}
 		previousIterationExpansions = nodesExpanded-nodesExpandedSoFar;
@@ -196,21 +196,18 @@ bool IDAStar<state, action, verbose>::ASpIDArev(SearchEnvironment<state, action>
 	}
 	perimeterG = std::max(0.0, maxG-1);
 	for (AStarOpenClosedDataWithF<state> astarState : statesList.getElements()){
+		//changed
 		if(astarState.g < maxG){
 			perimeterList.push_back(astarState);
 		}
-		if(maxF > astarState.f){
-			necessaryExpansions++;
-		}
 	}
 	UpdateNextBound(0, std::max(minRealF, heuristic->HCost(from, to)));
-	//UpdateNextBound(0, heuristic->HCost(from, to));
 	goal = to;
 	thePath.push_back(from);
 	unsigned long nodesExpandedSoFar = 0;
 	unsigned long previousIterationExpansions = 0;
 	auto startTime = std::chrono::steady_clock::now();
-	while (true) //thePath.size() == 0)
+	while (true)
 	{
 		gCostHistogram.clear();
 		gCostHistogram.resize(nextBound+1);
@@ -231,6 +228,11 @@ bool IDAStar<state, action, verbose>::ASpIDArev(SearchEnvironment<state, action>
 				printf("Nodes expanded: %llu(%llu)\n", nodesExpanded-nodesExpandedSoFar, nodesExpanded);
 			}
 			necessaryExpansions += nodesExpandedSoFar;
+			for (AStarOpenClosedDataWithF<state> astarState : statesList.getElements()){
+				if(astarState.where == kClosedList && astarState.f<solLength){
+					necessaryExpansions++;
+				}
+			}
 			break;
 		}
 		previousIterationExpansions = nodesExpanded-nodesExpandedSoFar;
@@ -380,7 +382,7 @@ double IDAStar<state, action, verbose>::DoIteration(SearchEnvironment<state, act
 	for (unsigned int x = 0; x < neighbors.size(); x++)
 	{
 		uint64_t childID;
-		if (neighbors[x] == parent || (readyStatesList && statesList.Lookup(env->GetStateHash(neighbors[x]), childID) == kClosedList)) {//check if exists in the closed list
+		if (neighbors[x] == parent || (readyStatesList && statesList.Lookup(env->GetStateHash(neighbors[x]), childID) == kClosedList)) {
 			continue;
 		}
 		thePath.push_back(neighbors[x]);

@@ -339,7 +339,10 @@ bool TemplateAStar<state,action,environment,openList>::InitializeSearch(environm
 template <class state, class action, class environment, class openList>
 void TemplateAStar<state,action,environment,openList>::AddAdditionalStartState(state& newState)
 {
-	double h = theHeuristic->HCost(newState, goal);
+	double h = 0;
+	if(useH){
+		h = theHeuristic->HCost(newState, goal);
+	}
 	openClosedList.AddOpenNode(newState, env->GetStateHash(newState), phi(h, 0), 0, h);
 }
 
@@ -351,7 +354,10 @@ void TemplateAStar<state,action,environment,openList>::AddAdditionalStartState(s
 template <class state, class action, class environment, class openList>
 void TemplateAStar<state,action,environment,openList>::AddAdditionalStartState(state& newState, double cost)
 {
-	double h = theHeuristic->HCost(newState, goal);
+	double h = 0;
+	if(useH){
+		h = theHeuristic->HCost(newState, goal);
+	}
 	openClosedList.AddOpenNode(newState, env->GetStateHash(newState), phi(h, cost), cost, h);
 }
 

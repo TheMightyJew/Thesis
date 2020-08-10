@@ -133,7 +133,7 @@ private:
 		} while (forwardQueue.Lookup(node).parentID != node);
 		thePath.push_back(forwardQueue.Lookup(node).data);
 	}
-	void calculateBounds(double &minForwardG, double &minBackwardG, double &minForwardF, double &minBackwardF, double &forwardP, double &backwardP);
+	void calculateBounds(double &minForwardG, double &minBackwardG, double &minForwardF, double &minBackwardF, double &forwardP, double &backwardP, bool outOfMem = false);
 
 	void OpenGLDraw(const priorityQueue &queue) const;
 	std::string SVGDraw(const priorityQueue &queue) const;
@@ -293,28 +293,10 @@ bool MM<state, action, environment, priorityQueue>::DoSingleSearchStep(std::vect
 			Expand(forwardQueue, backwardQueue, forwardHeuristic, goal, f);
 			//Expand(forwardQueue, backwardQueue, forwardHeuristic, goal, g_f, f_f);
 		}
-	}
+	}	
 	if(GetNumBackwardItems() + GetNumForwardItems() > memoryStatesUse){
 		memoryStatesUse = GetNumBackwardItems()+GetNumForwardItems();
-		if(statesBound < memoryStatesUse){
-			double minForwardG = DBL_MAX;
-			double minBackwardG = DBL_MAX;
-			double minForwardF = DBL_MAX;
-			double minBackwardF =  DBL_MAX;
-			double forwardP;
-			double backwardP;
-			calculateBounds(minForwardG, minBackwardG, minForwardF, minBackwardF, forwardP, backwardP);
-			if(minForwardF!=DBL_MAX)
-				lastBound = std::max(lastBound, minForwardF);
-			if(minBackwardF!=DBL_MAX)
-				lastBound = std::max(lastBound, minBackwardF);
-			if(minForwardG + minBackwardG!=DBL_MAX)
-				lastBound = std::max(lastBound, minForwardG + minBackwardG);
-			if(std::min(forwardP, backwardP)!=DBL_MAX)
-				lastBound = std::max(lastBound, std::min(forwardP, backwardP));
-			return false;
-		}	
-	}	
+	}
 	// check if we can terminate
 	if (recheckPath)
 	{
@@ -378,13 +360,56 @@ bool MM<state, action, environment, priorityQueue>::DoSingleSearchStep(std::vect
 			thePath.insert( thePath.end(), pBack.begin()+1, pBack.end() );
 			
 			return true;
-		}
+		}	
 	}
+	if(statesBound < memoryStatesUse){
+		//printf("memoryStatesUse=%1.1llu, statesBound=%1.1llu\n", memoryStatesUse, statesBound);
+		double minForwardG = DBL_MAX;
+		double minBackwardG = DBL_MAX;
+		double minForwardF = DBL_MAX;
+		double minBackwardF =  DBL_MAX;
+		double forwardP;
+		double backwardP;
+		//printf("lastBound: %f\n", lastBound);
+		//printf("currentCost: %f\n", currentCost);
+		calculateBounds(minForwardG, minBackwardG, minForwardF, minBackwardF, forwardP, backwardP,true);
+		if(minForwardF!=DBL_MAX){
+			//printf("lastBound: %f, minForwardF: %f\n", lastBound, minForwardF);
+			lastBound = std::max(lastBound, minForwardF);
+		}
+		if(minBackwardF!=DBL_MAX){
+			//printf("lastBound: %f, minBackwardF: %f\n", lastBound, minBackwardF);
+			lastBound = std::max(lastBound, minBackwardF);
+		}
+		if(minForwardG != DBL_MAX && minBackwardG!=DBL_MAX){
+			//printf("lastBound: %f, minForwardG: %f, minBackwardG: %f\n", lastBound, minForwardG,minBackwardG);
+			lastBound = std::max(lastBound, minForwardG + minBackwardG);
+		}
+		if(std::min(forwardP, backwardP)!=DBL_MAX){
+			//printf("lastBound: %f, forwardP: %f, backwardP: %f\n", lastBound, forwardP,backwardP);
+			lastBound = std::max(lastBound, std::min(forwardP, backwardP));
+		}
+		return false;
+	}	
+	
 	return false;
 }
 template <class state, class action, class environment, class priorityQueue>
-void MM<state, action, environment, priorityQueue>::calculateBounds(double &minForwardG, double &minBackwardG, double &minForwardF, double &minBackwardF, double &forwardP, double &backwardP)
+void MM<state, action, environment, priorityQueue>::calculateBounds(double &minForwardG, double &minBackwardG, double &minForwardF, double &minBackwardF, double &forwardP, double &backwardP, bool outOfMem)
 {
+  /*
+  printf("minForwardF: %f\n",minForwardF);
+  printf("forward f:\n[");
+  for (auto i = f.begin(); i != f.end(); i++){
+      printf("%f,%f,%f;", i->first.first, i->first.second,i->second);
+  }
+  
+  printf("]\nbackward b:\n[");
+  for (auto i = b.begin(); i != b.end(); i++){
+      printf("%f,%f,%f;", i->first.first, i->first.second,i->second);
+  }
+  printf("]\n");
+  */
 	for (auto i = f.begin(); i != f.end(); i++)
 		{
 			if (i->second > 0) // some elements
@@ -392,6 +417,7 @@ void MM<state, action, environment, priorityQueue>::calculateBounds(double &minF
 				if ((i->first.first + i->first.second < currentCost) && // termination only stopped by lower f-cost
 					(i->first.first + lastMinBackwardG + 1.0 < currentCost))
 				{
+          //printf("element: %f,%f,%f;", i->first.first, i->first.second,i->second);
 					minForwardG = std::min(minForwardG, i->first.first);
 					minForwardF = std::min(minForwardF, i->first.first+i->first.second);
 				}
@@ -417,11 +443,11 @@ void MM<state, action, environment, priorityQueue>::calculateBounds(double &minF
 			forwardP = std::max(iF.g+iF.h, iF.g*2);
 		}
 		bool done = false;
-		if (minForwardF == DBL_MAX)
+		if (!outOfMem && minForwardF == DBL_MAX)
 		{
 			minForwardF = minForwardG = currentCost+1;
 		}
-		if (minBackwardF == DBL_MAX)
+		if (!outOfMem && minBackwardF == DBL_MAX)
 		{
 			minBackwardF = minBackwardG = currentCost+1;
 		}
