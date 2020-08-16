@@ -32,7 +32,6 @@ using namespace std;
 
 static void StevenTest(int problems_num=1, bool randomSTP=true, vector<int> skipVector = vector<int>());
 
-static int all_problems_num = 100;
 static unsigned long MMstatesQuantityBound;
 static unsigned long ASTARstatesQuantityBound;
 static unsigned long statesQuantityBound = 1000000;
@@ -65,7 +64,7 @@ static string datetime()
 }
 
 static ofstream myfile;
-static string filename = "test_results/stp/results_" + datetime() + ".txt";
+static string filename = "Test_Results/STP/results_" + datetime() + ".txt";
 
 
 void TestSTP(int algorithm)

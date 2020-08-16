@@ -18,7 +18,7 @@
  ../../../../utils/StatCollection.h ../../../../generic/IDAStar.h \
  ../../../../utils/vectorCache.h ../../../../generic/TemplateAStar.h \
  ../../../../generic/MM.h ../../../../envutil/PancakeInstances.h \
- ../../../../generic/MBBDS.h ../../../../generic/PancakeHasher.h \
- ../../../../generic/MurmurHash3.h ../../../../generic/FullMBBDS.h \
+ ../../../../generic/MBBDS.h ../../../../generic/FullMBBDS.h \
  ../../../../generic/MM.h ../../../../generic/IDMM.h \
- ../../../../generic/IDMM.h ../../../../generic/MbbdsBloomFilter.h
+ ../../../../generic/IDMM.h ../../../../generic/MbbdsBloomFilter.h \
+ ../../../../generic/PancakeHasher.h ../../../../generic/MurmurHash3.h

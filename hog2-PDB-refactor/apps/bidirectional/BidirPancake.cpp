@@ -28,22 +28,21 @@ using namespace std;
 
 static void StevenTest(int gap=0, int problems_num=1, bool randomPancake=true, vector<int> skipVector = vector<int>());
 
-static int all_problems_num = 100;
 static unsigned long MMstatesQuantityBound;
 static unsigned long ASTARstatesQuantityBound;
 static unsigned long statesQuantityBound = 1000000;
 static int secondsLimit = 60*30;
 static bool AstarRun=true;
-static bool AstarPIDAstarRun=false;
-static bool AstarPIDAstarReverseRun=false;
+static bool AstarPIDAstarRun=true;
+static bool AstarPIDAstarReverseRun=true;
 static bool ASTARpIDMM=true;
 static bool MMRun=true;
-static bool MMpIDMM=false;
-static bool IDAstarRun=false;
-static bool MBBDSRun=false;
-static bool threePhase=false;
+static bool MMpIDMM=true;
+static bool IDAstarRun=true;
+static bool MBBDSRun=true;
+static bool threePhase=true;
 static bool twoPhase=false;
-static bool IDMMRun=false;
+static bool IDMMRun=true;
 static bool idmmF2fFlag=true;
 static bool isConsistent=true;
 
@@ -62,7 +61,7 @@ string datetime()
 }
 
 ofstream myfile;
-string filename = "test_results/results_" + datetime() + ".txt";
+string filename = "Test_Results/PancakeSorting/results_" + datetime() + ".txt";
 
 
 void TestPancake()
@@ -70,10 +69,10 @@ void TestPancake()
 	cout << "running..." << endl;
 	myfile.open (filename);
 	
-	StevenTest(0, 100, true);
-	StevenTest(1, 100, true);
-	StevenTest(2, 100, true);
-  StevenTest(3, 100, true);
+	StevenTest(0, 5, true);
+	StevenTest(1, 5, true);
+	StevenTest(2, 5, true);
+	StevenTest(3, 5, true);
 
 	myfile << "completed!" << endl;
 	myfile.close();
@@ -83,7 +82,7 @@ void TestPancake()
 
 void StevenTest(int gap, int problems_num, bool randomPancake, vector<int> skipVector)
 {
-	const int pancakes_num = 10;
+	const int pancakes_num = 8;
 	srandom(2017218);
 	PancakePuzzleState<pancakes_num> start;
 	PancakePuzzleState<pancakes_num> original;

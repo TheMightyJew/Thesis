@@ -18,22 +18,21 @@
  ../../../../utils/StatCollection.h \
  ../../../../simulation/OccupancyInterface.h ../../../../utils/FPUtil.h \
  ../../../../simulation/SimulationInfo.h \
- ../../../../environments/GraphEnvironment.h ../../../../generic/NBS.h \
- ../../../../algorithms/BDOpenClosed.h \
- ../../../../algorithms/AStarOpenClosed.h \
- ../../../../algorithms/BDIndexOpenClosed.h \
- ../../../../algorithms/BDIndexOpenClosed.h \
- ../../../../algorithms/NBSQueue.h ../../../../algorithms/BDOpenClosed.h \
- ../../../../generic/IDAStar.h ../../../../utils/vectorCache.h \
+ ../../../../environments/GraphEnvironment.h \
+ ../../../../generic/WeightedVertexGraph.h \
  ../../../../generic/TemplateAStar.h ../../../../search/Constraint.h \
  ../../../../algorithms/AStarOpenClosed.h \
  ../../../../algorithms/BucketOpenClosed.h \
- ../../../../generic/GenericSearchAlgorithm.h ../../../../generic/MM.h \
- ../../../../apps/bidirectional/BSStar.h \
- ../../../../generic/TemplateAStar.h \
- ../../../../generic/WeightedVertexGraph.h ../../../../utils/SVGUtil.h \
+ ../../../../algorithms/AStarOpenClosed.h \
+ ../../../../generic/GenericSearchAlgorithm.h ../../../../utils/SVGUtil.h \
  ../../../../utils/Graphics.h ../../../../utils/StringUtils.h \
  ../../../../envutil/STPInstances.h \
  ../../../../search/LexPermutationPDB.h \
  ../../../../search/PermutationPDB.h ../../../../search/PDBHeuristic.h \
- ../../../../utils/NBitArray.h ../../../../search/MR1PermutationPDB.h
+ ../../../../utils/NBitArray.h ../../../../search/MR1PermutationPDB.h \
+ ../../../../generic/STPHasher.h ../../../../generic/MurmurHash3.h \
+ ../../../../generic/TemplateAStar.h ../../../../generic/IDAStar.h \
+ ../../../../utils/vectorCache.h ../../../../generic/MM.h \
+ ../../../../generic/MBBDS.h ../../../../generic/FullMBBDS.h \
+ ../../../../generic/MM.h ../../../../generic/IDMM.h \
+ ../../../../generic/IDMM.h ../../../../generic/MbbdsBloomFilter.h

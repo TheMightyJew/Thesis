@@ -384,9 +384,10 @@ int MyCLHandler(char *argument[], int maxNumArgs)
 		AnalyzeMap(argument[1], argument[2], weight);
 		return 3;
 	}
-	else if (strcmp(argument[0], "-stp") == 0 && maxNumArgs > 1)
+	//else if (strcmp(argument[0], "-stp") == 0 && maxNumArgs > 1)
+	else if (strcmp(argument[0], "-stp") == 0)
 	{
-		TestSTP(atoi(argument[1]));
+		TestSTP();
 	}
 	else if (strcmp(argument[0], "-rubik") == 0 && maxNumArgs > 1)
 	{
