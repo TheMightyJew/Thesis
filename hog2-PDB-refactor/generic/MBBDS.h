@@ -12,7 +12,7 @@
 #include<algorithm> 
 #include <unordered_set>
 #include "SearchEnvironment.h"
-#include "PancakeHasher.h"
+//#include "PancakeHasher.h"
 #include <math.h>
 
 template <class state, class action, class BloomFilter, bool verbose = true>

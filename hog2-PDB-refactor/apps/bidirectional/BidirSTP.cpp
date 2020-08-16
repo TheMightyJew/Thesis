@@ -2,245 +2,410 @@
 //  BidirSTP.cpp
 //  hog2 glut
 //
-//  Created by Nathan Sturtevant on 1/30/17.
+//  Created by Nathan Sturtevant on 2/7/17.
 //  Copyright © 2017 University of Denver. All rights reserved.
 //
-
 #include "BidirSTP.h"
 #include "MNPuzzle.h"
-#include "NBS.h"
-#include "IDAStar.h"
-#include "MM.h"
-#include "BSStar.h"
-#include "TemplateAStar.h"
 #include "WeightedVertexGraph.h"
 #include "STPInstances.h"
 #include "LexPermutationPDB.h"
 #include "MR1PermutationPDB.h"
 
-typedef MR1PermutationPDB<MNPuzzleState<4, 4>, slideDir, MNPuzzle<4, 4>> STPPDB;
-void MakePDBs(MNPuzzleState<4, 4> g, Heuristic<MNPuzzleState<4, 4>> &h, MNPuzzle<4,4> &mnp)
+#include <algorithm>
+#include "STPHasher.h"
+#include "TemplateAStar.h"
+#include "AStarOpenClosed.h"
+#include "IDAStar.h"
+#include "MM.h"
+#include "MBBDS.h"
+#include "FullMBBDS.h"
+#include "IDMM.h"
+#include "MbbdsBloomFilter.h"
+#include <fstream>
+#include <iostream>
+#include <boost/format.hpp>
+#include <math.h> 
+#include <ctime>
+using namespace std;
+
+
+static void StevenTest(int problems_num=1, bool randomSTP=true, vector<int> skipVector = vector<int>());
+
+static int all_problems_num = 100;
+static unsigned long MMstatesQuantityBound;
+static unsigned long ASTARstatesQuantityBound;
+static unsigned long statesQuantityBound = 1000000;
+static int secondsLimit = 60*30;
+static bool AstarRun=true;
+static bool AstarPIDAstarRun=true;
+static bool AstarPIDAstarReverseRun=true;
+static bool ASTARpIDMM=true;
+static bool MMRun=true;
+static bool MMpIDMM=true;
+static bool IDAstarRun=true;
+static bool MBBDSRun=true;
+static bool threePhase=true;
+static bool twoPhase=false;
+static bool IDMMRun=true;
+static bool idmmF2fFlag=true;
+
+
+static string datetime()
 {
-	std::vector<int> p1 = {0,1,2,3,4,5};
-	std::vector<int> p2 = {0,10,11,12,13,14,15};
-	std::vector<int> p3 = {0,6,7,8,9};
-//	std::vector<int> p4 = {0,12,13,14,15};
-//	mnp.StoreGoal(g);
-	STPPDB *pdb1 = new STPPDB(&mnp, g, p1);
-	STPPDB *pdb2 = new STPPDB(&mnp, g, p2);
-	STPPDB *pdb3 = new STPPDB(&mnp, g, p3);
-//	STPPDB *pdb4 = new STPPDB(&mnp, g, p4);
-	pdb1->BuildPDB(g, std::thread::hardware_concurrency());
-	pdb2->BuildPDB(g, std::thread::hardware_concurrency());
-	pdb3->BuildPDB(g, std::thread::hardware_concurrency());
-//	pdb4->BuildPDB(g, std::thread::hardware_concurrency());
-	h.lookups.resize(0);
-	h.lookups.push_back({kMaxNode, 1, 4});
-	h.lookups.push_back({kLeafNode, 0, 0});
-	h.lookups.push_back({kLeafNode, 1, 1});
-	h.lookups.push_back({kLeafNode, 2, 2});
-	h.lookups.push_back({kLeafNode, 3, 3});
-//	h.lookups.push_back({kLeafNode, 4, 4});
-	h.heuristics.resize(0);
-	h.heuristics.push_back(&mnp);
-	h.heuristics.push_back(pdb1);
-	h.heuristics.push_back(pdb2);
-	h.heuristics.push_back(pdb3);
-//	h.heuristics.push_back(pdb4);
+    time_t rawtime;
+    struct tm * timeinfo;
+    char buffer[80];
+
+    time (&rawtime);
+    timeinfo = localtime(&rawtime);
+
+    strftime(buffer,80,"%d-%m-%Y_%H-%M-%S",timeinfo);
+    return string(buffer);
 }
+
+static ofstream myfile;
+static string filename = "test_results/stp/results_" + datetime() + ".txt";
+
 
 void TestSTP(int algorithm)
 {
-	NBS<MNPuzzleState<4, 4>, slideDir, MNPuzzle<4,4>> nbs;
-	MM<MNPuzzleState<4, 4>, slideDir, MNPuzzle<4,4>> mm;
-	BSStar<MNPuzzleState<4, 4>, slideDir, MNPuzzle<4,4>> bs;
-	TemplateAStar<MNPuzzleState<4, 4>, slideDir, MNPuzzle<4,4>> astar;
-	MNPuzzle<4,4> mnp;
+	cout << "running..." << endl;
+	myfile.open (filename);
 	
-	Heuristic<MNPuzzleState<4, 4>> h_f;
-	MNPuzzleState<4, 4> start, goal;
-	MakePDBs(goal, h_f, mnp);
+	StevenTest(10, true);
 
-	
-	for (int x = 0; x < 100; x++) // 547 to 540
-	{
-		Heuristic<MNPuzzleState<4, 4>> h_b;
-		printf("Problem %d of %d\n", x+1, 100);
-		
-		std::vector<MNPuzzleState<4,4>> nbsPath;
-		std::vector<MNPuzzleState<4,4>> astarPath;
-		Timer t1, t2;
-
-		start = STP::GetKorfInstance(x);
-		goal.Reset();
-		MakePDBs(start, h_b, mnp);
-
-		if (algorithm == -1 || algorithm == 10) // Optimal Analysis
-		{
-			start = STP::GetKorfInstance(x);
-			goal.Reset();
-
-			std::string t = "/Users/nathanst/bidir/stp/stp_";
-			t += std::to_string(x+1);
-			
-			BidirectionalProblemAnalyzer<MNPuzzleState<4, 4>, slideDir, MNPuzzle<4, 4>> p(start, goal, &mnp, &h_f, &h_b);
-//			p.drawFullGraph = true;
-//			p.drawProblemInstance = false;
-//			p.drawMinimumVC = true;
-//			p.drawAllG = false;
-//			p.drawStatistics = false;
-//			p.SaveSVG((t+"-full.svg").c_str());
-//			p.drawFullGraph = false;
-//			p.drawProblemInstance = false;
-//			p.drawAllG = true;
-//			p.drawStatistics = false;
-//			p.SaveSVG((t+"-min.svg").c_str());
-//			printf("Forward: %d\n", p.GetForwardWork());
-//			printf("Backward: %d\n", p.GetBackwardWork());
-//			printf("Minimum: %d\n", p.GetMinWork());
-//			int maxg = p.GetNumGCosts();
-//			p.SaveSVG((t+"-shrunk.svg").c_str(), (maxg+11)/12);
-
-		}
-
-		if (algorithm == 0 || algorithm == 10) // A*
-		{
-			goal.Reset();
-			start = STP::GetKorfInstance(x);
-			t1.StartTimer();
-			astar.SetHeuristic(&h_f);
-			astar.GetPath(&mnp, start, goal, astarPath);
-			t1.EndTimer();
-			printf("A* found path length %1.0f; %llu expanded; %llu necessary; %llu generated; %1.2fs elapsed\n", mnp.GetPathLength(astarPath),
-				   astar.GetNodesExpanded(), astar.GetNecessaryExpansions(), astar.GetNodesTouched(), t1.GetElapsedTime());
-		}
-		if (algorithm == 1) // BS*
-		{
-			goal.Reset();
-			start = STP::GetKorfInstance(x);
-			t2.StartTimer();
-			bs.GetPath(&mnp, start, goal, &mnp, &mnp, nbsPath);
-			t2.EndTimer();
-			printf("BS* found path length %1.0f; %llu expanded; %llu necessary; %llu generated; %1.2fs elapsed\n", mnp.GetPathLength(nbsPath),
-				   bs.GetNodesExpanded(), bs.GetNecessaryExpansions(), bs.GetNodesTouched(), t2.GetElapsedTime());
-		}
-		if (algorithm == 2) // MM
-		{
-			goal.Reset();
-			start = STP::GetKorfInstance(x);
-			t2.StartTimer();
-			mm.GetPath(&mnp, start, goal, &mnp, &mnp, nbsPath);
-			t2.EndTimer();
-			printf("MM found path length %1.0f; %llu expanded; %llu necessary; %llu generated; %1.2fs elapsed\n", mnp.GetPathLength(nbsPath),
-				   mm.GetNodesExpanded(), mm.GetNecessaryExpansions(), mm.GetNodesTouched(), t2.GetElapsedTime());
-		}
-		if (algorithm == 3||algorithm == 10) // NBS
-		{
-			goal.Reset();
-			start = STP::GetKorfInstance(x);
-			t2.StartTimer();
-			nbs.GetPath(&mnp, start, goal, &h_f, &h_b, nbsPath);
-			t2.EndTimer();
-			printf("NBS found path length %1.0f; %llu expanded; %llu necessary; %llu generated; %1.2fs elapsed\n", mnp.GetPathLength(nbsPath),
-				   nbs.GetNodesExpanded(), nbs.GetNecessaryExpansions(), nbs.GetNodesTouched(), t2.GetElapsedTime());
-		}
-		if (algorithm == 4) // MM0
-		{
-			ZeroHeuristic<MNPuzzleState<4,4>> z;
-			goal.Reset();
-			start = STP::GetKorfInstance(x);
-			t2.StartTimer();
-			mm.GetPath(&mnp, start, goal, &z, &z, nbsPath);
-			t2.EndTimer();
-			printf("MM found path length %1.0f; %llu expanded; %llu necessary; %llu generated; %1.2fs elapsed\n", mnp.GetPathLength(nbsPath),
-				   mm.GetNodesExpanded(), mm.GetNecessaryExpansions(), mm.GetNodesTouched(), t2.GetElapsedTime());
-		}
-		
-
-		delete h_b.heuristics[1];
-		delete h_b.heuristics[2];
-		delete h_b.heuristics[3];
-//		delete h_b.heuristics[4];
-//
-//		std::cout << astar.GetNodesExpanded() << "\t" << nbs.GetNodesExpanded() << "\t";
-//		std::cout << t1.GetElapsedTime() << "\t" <<  t2.GetElapsedTime() << "\n";
-	}
+	myfile << "completed!" << endl;
+	myfile.close();
+	cout << "completed!" << endl;
 	exit(0);
 }
 
-void TestSTPFull()
+void StevenTest(int problems_num, bool randomSTP, vector<int> skipVector)
 {
-	NBS<MNPuzzleState<4, 4>, slideDir, MNPuzzle<4,4>> nbs;
-	MM<MNPuzzleState<4, 4>, slideDir, MNPuzzle<4,4>> mm;
-	MNPuzzle<4,4> mnp;
-	IDAStar<MNPuzzleState<4,4>, slideDir> ida;
-	TemplateAStar<MNPuzzleState<4, 4>, slideDir, MNPuzzle<4,4>> astar;
-
-	for (int x = 0; x < 100; x++) // 547 to 540
+	srandom(2017218);
+	MNPuzzleState<4, 4> original = STP::GetRandomInstance(64);
+	MNPuzzleState<4, 4> start, goal;
+	MNPuzzle<4, 4> mnp;
+	MNPuzzle<4, 4> mnp2;
+	
+	vector<MNPuzzleState<4, 4>> astarPath;
+	vector<MNPuzzleState<4, 4>> mmPath;
+	vector<MNPuzzleState<4, 4>> fullMbbdsPath;
+	vector<MNPuzzleState<4, 4>> idaPath;
+	MNPuzzleState<4, 4> midState;
+	
+	Timer timer;
+	myfile << boost::format("TestSTP:(Random: %d, Hard: %d)\n") % randomSTP % (!randomSTP);
+	for (int count = 0; count < problems_num; count++)
 	{
-		MNPuzzleState<4, 4> start, goal;
-		printf("Problem %d of %d\n", x+1, 100);
-		
-		std::vector<slideDir> idaPath;
-		std::vector<MNPuzzleState<4,4>> nbsPath;
-		std::vector<MNPuzzleState<4,4>> astarPath;
-		std::vector<MNPuzzleState<4,4>> mmPath;
-		Timer t1, t2, t3, t4;
-		
 		goal.Reset();
-		start = STP::GetKorfInstance(x);
-		t1.StartTimer();
-		ida.GetPath(&mnp, start, goal, idaPath);
-		t1.EndTimer();
-		printf("IDA* found path length %ld; %llu expanded; %1.2fs elapsed\n", idaPath.size(),  ida.GetNodesExpanded(), t1.GetElapsedTime());
-
-		goal.Reset();
-		start = STP::GetKorfInstance(x);
-		t2.StartTimer();
-		astar.GetPath(&mnp, start, goal, astarPath);
-		t2.EndTimer();
-		printf("A* found path length %ld; %llu expanded; %1.2fs elapsed\n", astarPath.size()-1,  astar.GetNodesExpanded(), t2.GetElapsedTime());
-
-		goal.Reset();
-		start = STP::GetKorfInstance(x);
-		t3.StartTimer();
-		nbs.GetPath(&mnp, start, goal, &mnp, &mnp, nbsPath);
-		t3.EndTimer();
-		printf("NBS found path length %ld; %llu expanded; %1.2fs elapsed\n", nbsPath.size()-1,  nbs.GetNodesExpanded(), t3.GetElapsedTime());
-
-		goal.Reset();
-		start = STP::GetKorfInstance(x);
-		t4.StartTimer();
-		mm.GetPath(&mnp, start, goal, &mnp, &mnp, mmPath);
-		t4.EndTimer();
-		printf("MM found path length %ld; %llu expanded; %1.2fs elapsed\n", mmPath.size()-1,  mm.GetNodesExpanded(), t3.GetElapsedTime());
-
-
-		std::cout << ida.GetNodesExpanded() << "\t" <<  astar.GetNodesExpanded() << "\t" << nbs.GetNodesExpanded() << "\t";
-		std::cout << t1.GetElapsedTime() << "\t" <<  t2.GetElapsedTime() << "\t" << t3.GetElapsedTime() << "\n";
-		
-		//if (!fequal)
-		if (nbsPath.size() != idaPath.size()+1)
-		{
-			std::cout << "error solution cost:\t expected cost\n";
-			std::cout << nbsPath.size() << "\t" << idaPath.size() << "\n";
-//			double d;
-//			for (auto x : correctPath)
-//			{
-//				astar.GetClosedListGCost(x, d);
-//				auto t = nbs.GetNodeForwardLocation(x);
-//				auto u = nbs.GetNodeBackwardLocation(x);
-//				std::cout << x << " is on " << t << " and " << u << "\n";
-//				std::cout << "True g: " << d;
-//				if (t != kUnseen)
-//					std::cout << " forward g: " << nbs.GetNodeForwardG(x);
-//				if (u != kUnseen)
-//					std::cout << " backward g: " << nbs.GetNodeBackwardG(x);
-//				std::cout << "\n";
-//			}
-			exit(0);
+		original.Reset();
+		if(randomSTP){
+			original = STP::GetRandomInstance(64);
 		}
+		else{
+			original = STP::GetKorfInstance(count);
+		}
+		if(std::find(skipVector.begin(), skipVector.end(), count+1) != skipVector.end()) {
+			continue;
+		}
+		myfile << boost::format("\tProblem %d of %d\n") % (count+1) % problems_num;
+		myfile << "\tStart state: " << original << endl;
+		myfile << "\tGoal state: " << goal << endl;
+		myfile <<"\tInitial heuristic " << mnp.HCost(original, goal) << endl;
+		// A*
+		vector<AStarOpenClosedDataWithF<MNPuzzleState<4, 4>>> astarOpenList;
+		if (AstarRun)
+		{
+			myfile <<"\t\t_A*_\n";
+			TemplateAStar<MNPuzzleState<4, 4>, slideDir, MNPuzzle<4, 4>> astar;
+			start = original;
+			timer.StartTimer();
+			bool solved = astar.GetPathTime(&mnp, start, goal, astarPath, secondsLimit);
+			ASTARstatesQuantityBound = astar.getMemoryStatesUse();
+			timer.EndTimer();
+			if(solved){
+				myfile << boost::format("\t\t\tA* found path length %1.0f; %llu expanded; %llu necessary; using %1.0llu states in memory; %1.4fs elapsed\n") % mnp.GetPathLength(astarPath) %
+				   astar.GetNodesExpanded() % astar.GetNecessaryExpansions() % ASTARstatesQuantityBound % timer.GetElapsedTime();
+				myfile << boost::format("\t\t\tI-A* ; %llu expanded;\n") % astar.getIAstarExpansions();	
+			}
+			else{
+				myfile << boost::format("\t\t\tA* failed after %1.4fs\n") % timer.GetElapsedTime();
+				myfile << "\t\t\tI-A* failed after because A* failed\n";	
+			}
+		}
+		// MM
+		if (MMRun)
+		{
+			myfile << "\t\t_MM_\n";				
+			MM<MNPuzzleState<4, 4>, slideDir, MNPuzzle<4, 4>> mm;
+			goal.Reset();
+			start = original;
+			timer.StartTimer();
+			bool solved = mm.GetPath(&mnp, start, goal, &mnp, &mnp2, mmPath, secondsLimit);
+			MMstatesQuantityBound = mm.getMemoryStatesUse();
+			timer.EndTimer();
+			if(solved){
+				myfile << boost::format("\t\t\tMM found path length %1.0f; %llu expanded; %llu necessary; using %1.0llu states in memory; %1.4fs elapsed\n") % mnp.GetPathLength(mmPath) %
+					   mm.GetNodesExpanded() % mm.GetNecessaryExpansions() % MMstatesQuantityBound % timer.GetElapsedTime();
+				myfile << boost::format("\t\t\tI-MM ; %llu expanded;\n") % mm.getIMMExpansions();				
+			}
+			else{
+				myfile << boost::format("\t\t\tMM failed after %1.4fs\n") % timer.GetElapsedTime();
+				myfile << "\t\t\tI-MM failed because MM failed\n";
+			}
+		}
+		if(MMRun && AstarRun){
+			statesQuantityBound = min(ASTARstatesQuantityBound, MMstatesQuantityBound);
+		}
+		else if(MMRun && !AstarRun){
+			statesQuantityBound = MMstatesQuantityBound;
+		}
+		else if(!MMRun && AstarRun){
+			statesQuantityBound = ASTARstatesQuantityBound;
+		}
+		// IDA*
+		if (IDAstarRun)
+		{
+			myfile << "\t\t_IDA*_\n";
+			IDAStar<MNPuzzleState<4, 4>, slideDir, false> idastar;
+			goal.Reset();
+			start = original;
+			timer.StartTimer();
+			bool solved = idastar.GetPath(&mnp, start, goal, idaPath, secondsLimit);
+			timer.EndTimer();
+			if(solved){
+				myfile << boost::format("\t\t\tIDA* found path length %1.0f; %llu expanded; %llu generated; %llu necessary; %1.4fs elapsed\n") % mnp.GetPathLength(idaPath) %
+				   idastar.GetNodesExpanded() % idastar.GetNodesTouched() % idastar.GetNecessaryExpansions() % timer.GetElapsedTime();
+				myfile << boost::format("\t\t\tD-A* ; %llu expanded;\n") % idastar.getDAstarExpansions();
+			}
+			else{
+				myfile << boost::format("\t\t\tIDA* failed after %1.4fs\n") % timer.GetElapsedTime();
+				myfile << "\t\t\tD-A* failed because IDA* failed\n";
+			}					   
+		}
+		//double percentages[6] = {1, 0.9, 0.75, 0.5, 0.25, 0.1};
+		double percentages[5] = {0.9, 0.75, 0.5, 0.25, 0.1};
+		long stateSize = sizeof(original);
 		
+		if(MMpIDMM){
+			myfile << "\t\t_MM+IDMM_\n";
+			for(double percentage : percentages){
+				unsigned long statesQuantityBoundforMMpIDMM = statesQuantityBound*percentage;
+				MM<MNPuzzleState<4, 4>, slideDir, MNPuzzle<4, 4>> mm;
+				goal.Reset();
+				start = original;
+				timer.StartTimer();
+				bool solved = mm.GetPath(&mnp, start, goal, &mnp, &mnp2, mmPath, secondsLimit, statesQuantityBoundforMMpIDMM);
+				unsigned long nodesExpanded = mm.GetNodesExpanded();
+				unsigned long necessaryNodesExpanded = 0;
+				if(solved){
+					timer.EndTimer();
+					necessaryNodesExpanded = mm.GetNecessaryExpansions();
+					myfile << boost::format("\t\t\tMM+IDMM MM using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) found path length %1.0f; %llu expanded; %llu necessary; %1.4fs elapsed\n") % statesQuantityBoundforMMpIDMM % stateSize % percentage % mnp.GetPathLength(mmPath) %
+					   nodesExpanded % necessaryNodesExpanded  % timer.GetElapsedTime();
+				}
+				else{
+					IDMM<MNPuzzleState<4, 4>, slideDir, false> idmm(idmmF2fFlag);
+					MNPuzzleState<4, 4> midState;
+					bool solved = idmm.GetMidStateFromLists(&mnp, start, goal, midState, secondsLimit-timer.GetElapsedTime(), mm.getLastBound(), mm.GetForwardItems(), mm.GetBackwardItems());
+					nodesExpanded += idmm.GetNodesExpanded();
+					necessaryNodesExpanded += idmm.GetNecessaryExpansions();
+					timer.EndTimer();
+					if(solved){
+						myfile << boost::format("\t\t\tMM+IDMM IDMM using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) found path length %1.0f; %llu expanded; %llu necessary; %1.4fs elapsed\n") % statesQuantityBoundforMMpIDMM % stateSize % percentage % idmm.getPathLength() % nodesExpanded % necessaryNodesExpanded % timer.GetElapsedTime();
+					}
+					else{
+						myfile << boost::format("\t\t\tMM+IDMM IDMM using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) failed after %1.4fs\n") % statesQuantityBoundforMMpIDMM % stateSize % percentage % timer.GetElapsedTime();
+						break;
+					}	
+				}
+			}
+		}
+		if(ASTARpIDMM){
+			myfile << "\t\t_A*+IDMM_\n";
+			for(double percentage : percentages){
+				unsigned long statesQuantityBoundforASPIDMM = statesQuantityBound*percentage;
+				TemplateAStar<MNPuzzleState<4, 4>, slideDir, MNPuzzle<4, 4>> astar;
+				goal.Reset();
+				start = original;
+				timer.StartTimer();
+				bool solved = astar.GetPathTime(&mnp, start, goal, astarPath, secondsLimit, true, statesQuantityBoundforASPIDMM);
+				unsigned long nodesExpanded = astar.GetNodesExpanded();
+				unsigned long necessaryNodesExpanded = 0;
+				if(solved){
+					timer.EndTimer();
+					necessaryNodesExpanded = astar.GetNecessaryExpansions();
+					myfile << boost::format("\t\t\tA*+IDMM A* using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) found path length %1.0f; %llu expanded; %llu necessary; %1.4fs elapsed\n") % statesQuantityBoundforASPIDMM % stateSize % percentage % mnp.GetPathLength(mmPath) %
+					   nodesExpanded % necessaryNodesExpanded  % timer.GetElapsedTime();
+				}
+				else{
+					IDMM<MNPuzzleState<4, 4>, slideDir, false> idmm(idmmF2fFlag);
+					MNPuzzleState<4, 4> midState;
+					bool solved = idmm.GetMidStateFromForwardList(&mnp, start, goal, midState, secondsLimit-timer.GetElapsedTime(), astar.getStatesList());
+					nodesExpanded += idmm.GetNodesExpanded();
+					necessaryNodesExpanded += idmm.GetNecessaryExpansions();
+					timer.EndTimer();
+					if(solved){
+						myfile << boost::format("\t\t\tA*+IDMM IDMM using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) found path length %1.0f; %llu expanded; %llu necessary; %1.4fs elapsed\n") % statesQuantityBoundforASPIDMM % stateSize % percentage % idmm.getPathLength() % nodesExpanded % necessaryNodesExpanded % timer.GetElapsedTime();
+					}
+					else{
+						myfile << boost::format("\t\t\tA*+IDMM IDMM using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) failed after %1.4fs\n") % statesQuantityBoundforASPIDMM % stateSize % percentage % timer.GetElapsedTime();
+						break;
+					}	
+				}
+			}
+		}
+		if (AstarPIDAstarRun){
+			myfile << "\t\t_Astar+IDAstar_\n";
+			for(double percentage : percentages){
+				unsigned long statesQuantityBoundforASPIDAS = statesQuantityBound*percentage;
+				TemplateAStar<MNPuzzleState<4, 4>, slideDir, MNPuzzle<4, 4>> astar;
+				goal.Reset();
+				start = original;
+				timer.StartTimer();
+				bool solved = astar.GetPathTime(&mnp, start, goal, astarPath, secondsLimit, true, statesQuantityBoundforASPIDAS);
+				unsigned long nodesExpanded = astar.GetNodesExpanded();
+				unsigned long necessaryNodesExpanded = 0;
+				if(solved){
+					timer.EndTimer();
+					necessaryNodesExpanded = astar.GetNecessaryExpansions();
+					myfile << boost::format("\t\t\tA*+IDA* A* using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) found path length %1.0f; %llu expanded; %llu necessary; %1.4fs elapsed\n") % statesQuantityBoundforASPIDAS % stateSize % percentage % mnp.GetPathLength(astarPath) %
+					   nodesExpanded % necessaryNodesExpanded % timer.GetElapsedTime();
+				}
+				else{
+					IDAStar<MNPuzzleState<4, 4>, slideDir, false> idastar;
+					solved = idastar.ASpIDA(&mnp, start, goal, idaPath, astar.getStatesList(), secondsLimit-timer.GetElapsedTime());
+					nodesExpanded += idastar.GetNodesExpanded();
+					necessaryNodesExpanded += idastar.GetNecessaryExpansions();
+					timer.EndTimer();
+					if(solved){
+						myfile << boost::format("\t\t\tA*+IDA* IDA* using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) found path length %1.0f; %llu expanded; %llu generated; %llu necessary; %1.4fs elapsed\n") % statesQuantityBoundforASPIDAS % stateSize % percentage % idastar.getSolLength() %
+						   nodesExpanded % idastar.GetNodesTouched() % necessaryNodesExpanded % timer.GetElapsedTime();
+					}
+					else{
+						myfile << boost::format("\t\t\tA*+IDA* IDA* using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) failed after %1.4fs\n") % statesQuantityBoundforASPIDAS % stateSize % percentage % timer.GetElapsedTime();
+						break;
+					}	
+				}
+			}
+		}
+		if (AstarPIDAstarReverseRun){
+			myfile << "\t\t_Astar+IDAstar+Reverse_\n";
+			for(double percentage : percentages){
+				unsigned long statesQuantityBoundforASPIDARS = statesQuantityBound*percentage;
+				TemplateAStar<MNPuzzleState<4, 4>, slideDir, MNPuzzle<4, 4>> astar;
+				goal.Reset();
+				start = original;
+				timer.StartTimer();
+				bool solved = astar.GetPathTime(&mnp, start, goal, astarPath, secondsLimit, true, statesQuantityBoundforASPIDARS, false);
+				unsigned long nodesExpanded = astar.GetNodesExpanded();
+				unsigned long necessaryNodesExpanded = 0;
+				if(solved){
+					timer.EndTimer();
+					necessaryNodesExpanded = astar.GetNecessaryExpansions();
+					myfile << boost::format("\t\t\tA*+IDA*_Reverse A* using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) found path length %1.0f; %llu expanded; %llu necessary; %1.4fs elapsed\n") % statesQuantityBoundforASPIDARS % stateSize % percentage % mnp.GetPathLength(astarPath) %
+					   nodesExpanded % necessaryNodesExpanded % timer.GetElapsedTime();
+				}
+				else{
+					IDAStar<MNPuzzleState<4, 4>, slideDir, false> idastar;
+					solved = idastar.ASpIDArev(&mnp, goal, start, idaPath, astar.getStatesList(), secondsLimit-timer.GetElapsedTime());
+					nodesExpanded += idastar.GetNodesExpanded();
+					necessaryNodesExpanded += idastar.GetNecessaryExpansions();
+					timer.EndTimer();
+					if(solved){
+						myfile << boost::format("\t\t\tA*+IDA*_Reverse IDA* using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) found path length %1.0f; %llu expanded; %llu generated; %llu necessary; %1.4fs elapsed\n") % statesQuantityBoundforASPIDARS % stateSize % percentage % idastar.getSolLength() %
+						   nodesExpanded % idastar.GetNodesTouched() % necessaryNodesExpanded % timer.GetElapsedTime();
+					}
+					else{
+						myfile << boost::format("\t\t\tA*+IDA*_Reverse IDA* using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) failed after %1.4fs\n") % statesQuantityBoundforASPIDARS % stateSize % percentage % timer.GetElapsedTime();
+						break;
+					}	
+				}
+			}
+		}
+		// MBBDS
+		if (MBBDSRun && (threePhase || twoPhase)){
+			bool doThree = threePhase;
+			bool doTwo = twoPhase;
+			for(int i=0;i<2;i++){
+				if((i==0 && doThree) || (i==1 && twoPhase)){
+					myfile << boost::format("\t\t_MBBDS(ThreePhase=%d)_\n")% int(doThree);
+					bool solved;
+					unsigned long nodesExpanded;
+					for(double percentage : percentages){
+						timer.StartTimer();
+						unsigned long statesQuantityBoundforMBBDS = statesQuantityBound*percentage;
+						solved = false;
+						unsigned long nodesExpanded = 0;
+						double lastBound = 0;
+						MM<MNPuzzleState<4, 4>, slideDir, MNPuzzle<4, 4>> mm;
+						if(doThree){
+							goal.Reset();
+							start = original;
+							solved = mm.GetPath(&mnp, start, goal, &mnp, &mnp2, mmPath, secondsLimit, statesQuantityBoundforMBBDS);
+							nodesExpanded += mm.GetNodesExpanded();
+							lastBound = mm.getLastBound();
+						}
+						if(solved){
+							timer.EndTimer();
+							myfile << boost::format("\t\t\tMBBDS(k=1,ThreePhase=%d) MM using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) found path length %1.0f; %llu expanded; %llu necessary; %d iterations; %1.4fs elapsed;\n") % int(doThree) % statesQuantityBoundforMBBDS % stateSize % percentage % mnp.GetPathLength(mmPath) %
+							   nodesExpanded % mm.GetNecessaryExpansions() % 0 % timer.GetElapsedTime();
+						}
+						else{
+							MBBDS<MNPuzzleState<4, 4>, slideDir, MbbdsBloomFilter<MNPuzzleState<4, 4>, STPHasher>, false> mbbds(statesQuantityBoundforMBBDS) ;
+							goal.Reset();
+							start = original;
+							solved = mbbds.GetMidState(&mnp, start, goal, midState, secondsLimit - timer.GetElapsedTime(), int(lastBound));
+							nodesExpanded += mbbds.GetNodesExpanded();
+							lastBound = mbbds.getLastBound();
+							if(solved){
+								timer.EndTimer();
+								myfile << boost::format("\t\t\tMBBDS(k=1,ThreePhase=%d) MBBDS using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) found path length %1.0f; %llu expanded; %llu necessary; %d iterations; %1.4fs elapsed;\n") % int(doThree) % statesQuantityBoundforMBBDS % stateSize % percentage % mbbds.getPathLength() % nodesExpanded % mbbds.GetNecessaryExpansions() % mbbds.getIterationNum() % timer.GetElapsedTime();
+							}
+							else{
+								IDMM<MNPuzzleState<4, 4>, slideDir, false> idmm(idmmF2fFlag);
+								goal.Reset();
+								start = original;
+								solved = idmm.GetMidState(&mnp, start, goal, midState, secondsLimit-timer.GetElapsedTime(), int(lastBound));
+								nodesExpanded += idmm.GetNodesExpanded();
+								timer.EndTimer();
+								if(solved){
+									myfile << boost::format("\t\t\tMBBDS(k=1,ThreePhase=%d) IDMM using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) found path length %1.0f; %llu expanded; %llu necessary; %d iterations; %1.4fs elapsed;\n") % int(doThree) % statesQuantityBoundforMBBDS % stateSize % percentage % idmm.getPathLength() % nodesExpanded % mbbds.GetNecessaryExpansions() % mbbds.getIterationNum() % timer.GetElapsedTime();
+								}
+								else{
+									myfile << boost::format("\t\t\tMBBDS(k=1,ThreePhase=%d) IDMM using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) failed after %1.4fs and %d iterations\n") % int(doThree) % statesQuantityBoundforMBBDS % stateSize % percentage % timer.GetElapsedTime() % mbbds.getIterationNum();
+									break;
+								} 
+							}
+						}
+					}
+				}
+				doThree = false;
+			}
+		}
+		//IDMM
+		if(IDMMRun)
+		{
+			myfile << "\t\t_IDMM_\n";
+			IDMM<MNPuzzleState<4, 4>, slideDir, false> idmm(idmmF2fFlag);
+			goal.Reset();
+			start = original;
+			MNPuzzleState<4, 4> midState;
+			timer.StartTimer();
+			bool solved = idmm.GetMidState(&mnp, start, goal, midState, secondsLimit);
+			timer.EndTimer();
+			if(solved){
+				myfile << boost::format("\t\t\tIDMM found path length %1.0f; %llu expanded; %llu generated; %llu necessary; %1.4fs elapsed; ") % idmm.getPathLength() %
+				   idmm.GetNodesExpanded() % idmm.GetNodesTouched() % idmm.GetNecessaryExpansions() % timer.GetElapsedTime();
+				myfile << "Mid state: " << midState << endl;
+				myfile << boost::format("\t\t\tD-MM ; %llu expanded;\n") % idmm.getDMMExpansions();
+			}
+			else{
+				myfile << boost::format("\t\t\tIDMM failed after %1.4fs\n") % timer.GetElapsedTime();
+				myfile << "\t\t\tD-MM failed because IDMM failed\n";
+			}   				
+		}
 	}
-	exit(0);
 }

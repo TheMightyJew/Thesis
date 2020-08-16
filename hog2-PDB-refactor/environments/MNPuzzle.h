@@ -48,8 +48,8 @@ public:
 	}
 
 	unsigned int blank;
-	std::array<int, width*height> puzzle;
-//	int puzzle[width*height];
+	//std::array<int, width*height> puzzle;
+	int puzzle[width*height];
 };
 
 /**
@@ -108,6 +108,7 @@ enum puzzleWeight {
 	kSquarePlusOneRoot,
 	kUnitPlusFrac
 };
+
 
 template <int width, int height>
 class MNPuzzle : public PermutationPuzzle::PermutationPuzzleEnvironment<MNPuzzleState<width, height>, slideDir> {
@@ -1495,6 +1496,17 @@ std::vector<slideDir> MNPuzzle<width, height>::Get_Op_Order_From_Hash(int order_
 	return ops;
 }
 
-
+namespace std {
+	
+	template <int width, int height>
+	struct hash<MNPuzzleState<width,height>>
+	{
+		std::size_t operator()(const MNPuzzleState<width,height>& p) const
+		{
+			return MNPuzzle<width,height>::Hash(p);
+		}
+	};
+	
+}
 
 #endif

@@ -11,6 +11,6 @@
 
 #include <stdio.h>
 
-void TestSTP(int algorithm);
+void TestSTP(int algorithm=0);
 
 #endif /* BidirSTP_hpp */

@@ -26,25 +26,26 @@
 using namespace std;
 
 
-void StevenTest(int gap=0, int problems_num=1, bool randomPancake=true, vector<int> skipVector = vector<int>());
+static void StevenTest(int gap=0, int problems_num=1, bool randomPancake=true, vector<int> skipVector = vector<int>());
 
-int all_problems_num = 100;
-unsigned long MMstatesQuantityBound;
-unsigned long ASTARstatesQuantityBound;
-unsigned long statesQuantityBound = 1000000;
-int secondsLimit = 60*30;
-bool AstarRun=true;
-bool AstarPIDAstarRun=true;
-bool AstarPIDAstarReverseRun=true;
-bool ASTARpIDMM=true;
-bool MMRun=true;
-bool MMpIDMM=false;
-bool IDAstarRun=true;
-bool MBBDSRun=true;
-bool threePhase=true;
-bool twoPhase=false;
-bool IDMMRun=true;
-bool idmmF2fFlag=true;
+static int all_problems_num = 100;
+static unsigned long MMstatesQuantityBound;
+static unsigned long ASTARstatesQuantityBound;
+static unsigned long statesQuantityBound = 1000000;
+static int secondsLimit = 60*30;
+static bool AstarRun=true;
+static bool AstarPIDAstarRun=false;
+static bool AstarPIDAstarReverseRun=false;
+static bool ASTARpIDMM=true;
+static bool MMRun=true;
+static bool MMpIDMM=false;
+static bool IDAstarRun=false;
+static bool MBBDSRun=false;
+static bool threePhase=false;
+static bool twoPhase=false;
+static bool IDMMRun=false;
+static bool idmmF2fFlag=true;
+static bool isConsistent=true;
 
 
 string datetime()
@@ -72,7 +73,7 @@ void TestPancake()
 	StevenTest(0, 100, true);
 	StevenTest(1, 100, true);
 	StevenTest(2, 100, true);
-	StevenTest(3, 100, true);
+  StevenTest(3, 100, true);
 
 	myfile << "completed!" << endl;
 	myfile.close();
@@ -114,6 +115,11 @@ void StevenTest(int gap, int problems_num, bool randomPancake, vector<int> skipV
 		if(std::find(skipVector.begin(), skipVector.end(), count+1) != skipVector.end()) {
 			continue;
 		}
+    /*
+    if (count +1 < 49){
+      continue;
+    }
+    */
 		myfile << boost::format("\tProblem %d of %d\n") % (count+1) % problems_num;
 		myfile << "\tStart state: " << original << endl;
 		myfile << "\tGoal state: " << goal << endl;
@@ -234,7 +240,7 @@ void StevenTest(int gap, int problems_num, bool randomPancake, vector<int> skipV
 					   nodesExpanded % necessaryNodesExpanded  % t4.GetElapsedTime();
 				}
 				else{
-					IDMM<PancakePuzzleState<pancakes_num>, PancakePuzzleAction, false> idmm(idmmF2fFlag);
+					IDMM<PancakePuzzleState<pancakes_num>, PancakePuzzleAction, false> idmm(idmmF2fFlag,isConsistent);
 					PancakePuzzleState<pancakes_num> midState;
 					bool solved = idmm.GetMidStateFromLists(&pancake, start, goal, midState, secondsLimit-t1.GetElapsedTime(), mm.getLastBound(), mm.GetForwardItems(), mm.GetBackwardItems());
 					nodesExpanded += idmm.GetNodesExpanded();
@@ -268,7 +274,7 @@ void StevenTest(int gap, int problems_num, bool randomPancake, vector<int> skipV
 					   nodesExpanded % necessaryNodesExpanded  % t1.GetElapsedTime();
 				}
 				else{
-					IDMM<PancakePuzzleState<pancakes_num>, PancakePuzzleAction, false> idmm(idmmF2fFlag);
+					IDMM<PancakePuzzleState<pancakes_num>, PancakePuzzleAction, false> idmm(idmmF2fFlag,isConsistent);
 					PancakePuzzleState<pancakes_num> midState;
 					bool solved = idmm.GetMidStateFromForwardList(&pancake, start, goal, midState, secondsLimit-t1.GetElapsedTime(), astar.getStatesList());
 					nodesExpanded += idmm.GetNodesExpanded();
@@ -392,7 +398,7 @@ void StevenTest(int gap, int problems_num, bool randomPancake, vector<int> skipV
 								myfile << boost::format("\t\t\tMBBDS(k=1,ThreePhase=%d) MBBDS using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) found path length %1.0f; %llu expanded; %llu necessary; %d iterations; %1.4fs elapsed;\n") % int(doThree) % statesQuantityBoundforMBBDS % stateSize % percentage % mbbds.getPathLength() % nodesExpanded % mbbds.GetNecessaryExpansions() % mbbds.getIterationNum() % timer.GetElapsedTime();
 							}
 							else{
-								IDMM<PancakePuzzleState<pancakes_num>, PancakePuzzleAction, false> idmm(idmmF2fFlag);
+								IDMM<PancakePuzzleState<pancakes_num>, PancakePuzzleAction, false> idmm(idmmF2fFlag,isConsistent);
 								goal.Reset();
 								start = original;
 								solved = idmm.GetMidState(&pancake, start, goal, midState, secondsLimit-timer.GetElapsedTime(), int(lastBound));
@@ -416,7 +422,7 @@ void StevenTest(int gap, int problems_num, bool randomPancake, vector<int> skipV
 		if(IDMMRun)
 		{
 			myfile << "\t\t_IDMM_\n";
-			IDMM<PancakePuzzleState<pancakes_num>, PancakePuzzleAction, false> idmm(idmmF2fFlag);
+			IDMM<PancakePuzzleState<pancakes_num>, PancakePuzzleAction, false> idmm(idmmF2fFlag,isConsistent);
 			goal.Reset();
 			start = original;
 			PancakePuzzleState<pancakes_num> midState;

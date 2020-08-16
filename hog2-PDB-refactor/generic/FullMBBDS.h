@@ -12,7 +12,7 @@
 #include<algorithm> 
 #include <unordered_set>
 #include "SearchEnvironment.h"
-#include "PancakeHasher.h"
+//#include "PancakeHasher.h"
 #include <math.h>
 #include "MM.h"
 #include "IDMM.h"
@@ -56,7 +56,7 @@ bool FullMBBDS<state, action, environment, BloomFilter, pancakes_num, verbose>::
 	}
 	else{
 		MBBDS<state, action, BloomFilter, false> mbbds(statesQuantityBound) ;
-		PancakePuzzleState<pancakes_num> midState;
+		state midState;
 		solved = mbbds.GetMidState(env, fromState, toState, midState, secondsLimit, lastBound);
 		currentNodesExapanded += mbbds.GetNodesExpanded();
 		lastBound = mbbds.getLastBound();

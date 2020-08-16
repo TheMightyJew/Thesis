@@ -1,4 +1,5 @@
-#pragma once
+#ifndef PANCAKE_HASHER_H
+#define PANCAKE_HASHER_H
 
 #include "MurmurHash3.h"
 
@@ -15,3 +16,4 @@ struct PancakeHasher {
 		return get(pancakePuzzleState, 0);
 	}
 };
+#endif
