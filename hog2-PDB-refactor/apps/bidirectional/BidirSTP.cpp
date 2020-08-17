@@ -37,18 +37,19 @@ static unsigned long MMstatesQuantityBound;
 static unsigned long ASTARstatesQuantityBound;
 static unsigned long statesQuantityBound = 1000000;
 static int secondsLimit = 60*30;
-static bool AstarRun=true;
-static bool AstarPIDAstarRun=true;
+static bool AstarRun=false;
+static bool AstarPIDAstarRun=false;
 static bool AstarPIDAstarReverseRun=false;
-static bool ASTARpIDMM=true;
-static bool MMRun=true;
+static bool ASTARpIDMM=false;
+static bool MMRun=false;
 static bool MMpIDMM=false;
 static bool IDAstarRun=true;
-static bool MBBDSRun=true;
-static bool threePhase=true;
+static bool MBBDSRun=false;
+static bool threePhase=false;
 static bool twoPhase=false;
 static bool IDMMRun=true;
 static bool idmmF2fFlag=true;
+static bool isConsistent=false;
 
 
 static string datetime()
@@ -73,7 +74,7 @@ void TestSTP(int algorithm)
 	cout << "running..." << endl;
 	myfile.open (filename);
 	
-	StevenTest(100, false);
+	StevenTest(1, false);
 
 	myfile << "completed!" << endl;
 	myfile.close();
@@ -206,7 +207,7 @@ void StevenTest(int problems_num, bool randomSTP, vector<int> skipVector)
 					   nodesExpanded % necessaryNodesExpanded  % timer.GetElapsedTime();
 				}
 				else{
-					IDMM<MNPuzzleState<4, 4>, slideDir, false> idmm(idmmF2fFlag);
+					IDMM<MNPuzzleState<4, 4>, slideDir, false> idmm(idmmF2fFlag,isConsistent);
 					MNPuzzleState<4, 4> midState;
 					bool solved = idmm.GetMidStateFromLists(&mnp, start, goal, midState, secondsLimit-timer.GetElapsedTime(), mm.getLastBound(), mm.GetForwardItems(), mm.GetBackwardItems());
 					nodesExpanded += idmm.GetNodesExpanded();
@@ -240,7 +241,7 @@ void StevenTest(int problems_num, bool randomSTP, vector<int> skipVector)
 					   nodesExpanded % necessaryNodesExpanded  % timer.GetElapsedTime();
 				}
 				else{
-					IDMM<MNPuzzleState<4, 4>, slideDir, false> idmm(idmmF2fFlag);
+					IDMM<MNPuzzleState<4, 4>, slideDir, false> idmm(idmmF2fFlag,isConsistent);
 					MNPuzzleState<4, 4> midState;
 					bool solved = idmm.GetMidStateFromForwardList(&mnp, start, goal, midState, secondsLimit-timer.GetElapsedTime(), astar.getStatesList());
 					nodesExpanded += idmm.GetNodesExpanded();
@@ -364,7 +365,7 @@ void StevenTest(int problems_num, bool randomSTP, vector<int> skipVector)
 								myfile << boost::format("\t\t\tMBBDS(k=1,ThreePhase=%d) MBBDS using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) found path length %1.0f; %llu expanded; %llu necessary; %d iterations; %1.4fs elapsed;\n") % int(doThree) % statesQuantityBoundforMBBDS % stateSize % percentage % mbbds.getPathLength() % nodesExpanded % mbbds.GetNecessaryExpansions() % mbbds.getIterationNum() % timer.GetElapsedTime();
 							}
 							else{
-								IDMM<MNPuzzleState<4, 4>, slideDir, false> idmm(idmmF2fFlag);
+								IDMM<MNPuzzleState<4, 4>, slideDir, false> idmm(idmmF2fFlag,isConsistent);
 								goal.Reset();
 								start = original;
 								solved = idmm.GetMidState(&mnp, start, goal, midState, secondsLimit-timer.GetElapsedTime(), int(lastBound));
@@ -388,7 +389,7 @@ void StevenTest(int problems_num, bool randomSTP, vector<int> skipVector)
 		if(IDMMRun)
 		{
 			myfile << "\t\t_IDMM_\n";
-			IDMM<MNPuzzleState<4, 4>, slideDir, false> idmm(idmmF2fFlag);
+			IDMM<MNPuzzleState<4, 4>, slideDir, false> idmm(idmmF2fFlag,isConsistent);
 			goal.Reset();
 			start = original;
 			MNPuzzleState<4, 4> midState;

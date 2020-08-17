@@ -403,23 +403,22 @@ bool IDMM<state, action, verbose>::DoIterationBackward(SearchEnvironment<state, 
     UpdateNextBound(forwardBound+backwardBound, fbound);
 		return false;
 	}
-
-  if (isConsistent){
-    error = g - env->HCost(currState,originGoal);
-    fbound = std::max(forwardBound + otherH + error,fbound); 
-  }
-  if (fgreater(fbound, forwardBound+backwardBound) || g>=backwardBound){
-    UpdateNextBound(forwardBound+backwardBound, fbound);
-		return false;
-	}
   if (front2frontH){
     double h = env->HCost(currState, possibleMidState);
     fbound = std::max(fbound, g + h + forwardBound);
+    if (fgreater(fbound, forwardBound+backwardBound)){
+      UpdateNextBound(forwardBound+backwardBound, fbound);
+      return false;
+    }
   }
-	if (fgreater(fbound, forwardBound+backwardBound) || g>=backwardBound){
-    UpdateNextBound(forwardBound+backwardBound, fbound);
-		return false;
-	}
+  if (isConsistent){
+    error = g - env->HCost(currState,originGoal);
+    fbound = std::max(forwardBound + otherH + error,fbound); 
+    if (fgreater(fbound, forwardBound+backwardBound)){
+      UpdateNextBound(forwardBound+backwardBound, fbound);
+      return false;
+    }
+  }
 
 	std::vector<state> neighbors;
 	env->GetSuccessors(currState, neighbors);
@@ -432,7 +431,7 @@ bool IDMM<state, action, verbose>::DoIterationBackward(SearchEnvironment<state, 
 	{
 		uint64_t childID;
 		double edgeCost = env->GCost(currState, neighbors[x]);
-		if (neighbors[x] == parent || backwardList.Lookup(env->GetStateHash(neighbors[x]), childID) == kClosedList || (backwardList.Lookup(env->GetStateHash(neighbors[x]), childID) == kOpenList && backwardList.Lookup(childID).g <= g + edgeCost)) {
+		if (neighbors[x] == parent || (readyOpenLists && (backwardList.Lookup(env->GetStateHash(neighbors[x]), childID) == kClosedList || (backwardList.Lookup(env->GetStateHash(neighbors[x]), childID) == kOpenList && backwardList.Lookup(childID).g <= g + edgeCost)))) {
 			continue;
 		}
 		/*if (neighbors[x] == parent || backwardList.Lookup(env->GetStateHash(neighbors[x]), childID) == kClosedList) {
