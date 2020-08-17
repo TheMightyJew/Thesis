@@ -392,32 +392,35 @@ template <class state, class action, bool verbose>
 bool IDMM<state, action, verbose>::DoIterationBackward(SearchEnvironment<state, action>* env,
 	state parent, state currState, double g, state& midState, state possibleMidState, double otherH,double otherError)
 {	
-	double h = env->HCost(currState, possibleMidState);
-	double originalH = env->HCost(currState, originStart);
-  double error = 0;
-  if (isConsistent){
-    error = g - env->HCost(currState,originGoal);
-  }
-  //double maxError = std::max(otherError,error);
-  //printf("error: %f, otherError %f\n",error,otherError);
-  double fbound = std::max(forwardBound + otherH + error, g + originalH + otherError);
-  if (front2frontH){
-    fbound = std::max(fbound, g + h + forwardBound);
-  }
-	if (fgreater(fbound, forwardBound+backwardBound) || g>backwardBound){
-    UpdateNextBound(forwardBound+backwardBound, fbound);
-  //if ((front2frontH && fgreater(g + h, backwardBound)) || g>backwardBound || fgreater(g + originalH + otherError, forwardBound+backwardBound)){
-    
-  
-  //if ((front2frontH && fgreater(g + h, backwardBound)) || g>backwardBound || fgreater(g + originalH, forwardBound+backwardBound) || fgreater(forwardBound + env->HCost(originGoal, possibleMidState), forwardBound+backwardBound)){
-    
-  //if ((front2frontH && fgreater(g + h, backwardBound)) || g>backwardBound || fgreater(g + originalH, forwardBound+backwardBound)){
-		return false;
-	}
-	else if (currState == possibleMidState) {
+	if (currState == possibleMidState) {
 		pathLength = g;
 		return true;
 	}
+  double originalH = env->HCost(currState, originStart);
+  double error = 0;
+	double fbound = g + originalH + otherError;
+	if (fgreater(fbound, forwardBound+backwardBound) || g>=backwardBound){
+    UpdateNextBound(forwardBound+backwardBound, fbound);
+		return false;
+	}
+
+  if (isConsistent){
+    error = g - env->HCost(currState,originGoal);
+    fbound = std::max(forwardBound + otherH + error,fbound); 
+  }
+  if (fgreater(fbound, forwardBound+backwardBound) || g>=backwardBound){
+    UpdateNextBound(forwardBound+backwardBound, fbound);
+		return false;
+	}
+  if (front2frontH){
+    double h = env->HCost(currState, possibleMidState);
+    fbound = std::max(fbound, g + h + forwardBound);
+  }
+	if (fgreater(fbound, forwardBound+backwardBound) || g>=backwardBound){
+    UpdateNextBound(forwardBound+backwardBound, fbound);
+		return false;
+	}
+
 	std::vector<state> neighbors;
 	env->GetSuccessors(currState, neighbors);
 	nodesTouched += neighbors.size();
