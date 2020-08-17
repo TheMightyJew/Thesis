@@ -32,16 +32,17 @@ using namespace std;
 
 static void StevenTest(int problems_num=1, bool randomSTP=true, vector<int> skipVector = vector<int>());
 
+static int walkLength = 120;
 static unsigned long MMstatesQuantityBound;
 static unsigned long ASTARstatesQuantityBound;
 static unsigned long statesQuantityBound = 1000000;
 static int secondsLimit = 60*30;
 static bool AstarRun=true;
 static bool AstarPIDAstarRun=true;
-static bool AstarPIDAstarReverseRun=true;
+static bool AstarPIDAstarReverseRun=false;
 static bool ASTARpIDMM=true;
 static bool MMRun=true;
-static bool MMpIDMM=true;
+static bool MMpIDMM=false;
 static bool IDAstarRun=true;
 static bool MBBDSRun=true;
 static bool threePhase=true;
@@ -72,7 +73,7 @@ void TestSTP(int algorithm)
 	cout << "running..." << endl;
 	myfile.open (filename);
 	
-	StevenTest(10, true);
+	StevenTest(100, false);
 
 	myfile << "completed!" << endl;
 	myfile.close();
@@ -83,8 +84,7 @@ void TestSTP(int algorithm)
 void StevenTest(int problems_num, bool randomSTP, vector<int> skipVector)
 {
 	srandom(2017218);
-	MNPuzzleState<4, 4> original = STP::GetRandomInstance(64);
-	MNPuzzleState<4, 4> start, goal;
+	MNPuzzleState<4, 4> original, start, goal;
 	MNPuzzle<4, 4> mnp;
 	MNPuzzle<4, 4> mnp2;
 	
@@ -101,7 +101,7 @@ void StevenTest(int problems_num, bool randomSTP, vector<int> skipVector)
 		goal.Reset();
 		original.Reset();
 		if(randomSTP){
-			original = STP::GetRandomInstance(64);
+			original = STP::GetRandomInstance(walkLength);
 		}
 		else{
 			original = STP::GetKorfInstance(count);
