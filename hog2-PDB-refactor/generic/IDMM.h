@@ -62,7 +62,8 @@ private:
   bool isConsistent;
   double minForwardError = 0;
   double minBackwardError = 0;
-
+  //double prevMinForwardError = 0;
+  //double prevMinBackwardError = 0;
 
 };
 template <class state, class action, bool verbose>
@@ -375,7 +376,7 @@ bool IDMM<state, action, verbose>::DoIterationForward(SearchEnvironment<state, a
 	{
 		uint64_t childID;
 		double edgeCost = env->GCost(currState, neighbors[x]);
-		if (neighbors[x] == parent || forwardList.Lookup(env->GetStateHash(neighbors[x]), childID) == kClosedList || (forwardList.Lookup(env->GetStateHash(neighbors[x]), childID) == kOpenList && forwardList.Lookup(childID).g <= g + edgeCost)) {
+		if (neighbors[x] == parent || (readyOpenLists && forwardList.Lookup(env->GetStateHash(neighbors[x]), childID) != kNotFound && (forwardList.Lookup(childID).where == kClosedList || (forwardList.Lookup(childID).where == kOpenList && forwardList.Lookup(childID).g <= g + edgeCost)))) {
 			continue;
 		}
 		/*if (neighbors[x] == parent || forwardList.Lookup(env->GetStateHash(neighbors[x]), childID) == kClosedList) {
@@ -396,14 +397,12 @@ bool IDMM<state, action, verbose>::DoIterationBackward(SearchEnvironment<state, 
 		pathLength = g;
 		return true;
 	}
-  double originalH = env->HCost(currState, originStart);
-  double error = 0;
-	double fbound = g + originalH + otherError;
-	if (fgreater(fbound, forwardBound+backwardBound) || g>=backwardBound){
+    double fbound = 0;
+  	if (g>=backwardBound){
     UpdateNextBound(forwardBound+backwardBound, fbound);
 		return false;
-	}
-  if (front2frontH){
+	} 
+    if (front2frontH){
     double h = env->HCost(currState, possibleMidState);
     fbound = std::max(fbound, g + h + forwardBound);
     if (fgreater(fbound, forwardBound+backwardBound)){
@@ -412,7 +411,7 @@ bool IDMM<state, action, verbose>::DoIterationBackward(SearchEnvironment<state, 
     }
   }
   if (isConsistent){
-    error = g - env->HCost(currState,originGoal);
+    double error = g - env->HCost(currState,originGoal);
     fbound = std::max(forwardBound + otherH + error,fbound); 
     if (fgreater(fbound, forwardBound+backwardBound)){
       UpdateNextBound(forwardBound+backwardBound, fbound);
@@ -420,11 +419,18 @@ bool IDMM<state, action, verbose>::DoIterationBackward(SearchEnvironment<state, 
     }
   }
 
+  double originalH = env->HCost(currState, originStart);
+  fbound = std::max(g + originalH + otherError,fbound);
+  if (fgreater(fbound, forwardBound+backwardBound) || g>=backwardBound){
+    UpdateNextBound(forwardBound+backwardBound, fbound);
+    return false;
+  }
+  
 	std::vector<state> neighbors;
 	env->GetSuccessors(currState, neighbors);
 	nodesTouched += neighbors.size();
 	nodesExpanded++;
-	if(g + originalH == forwardBound+backwardBound){
+	if(fbound == forwardBound+backwardBound){
 		dMMLastIterExpansions++;
 	}
 	for (unsigned int x = 0; x < neighbors.size(); x++)
