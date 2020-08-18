@@ -37,15 +37,15 @@ static unsigned long MMstatesQuantityBound;
 static unsigned long ASTARstatesQuantityBound;
 static unsigned long statesQuantityBound = 1000000;
 static int secondsLimit = 60*30;
-static bool AstarRun=false;
-static bool AstarPIDAstarRun=false;
+static bool AstarRun=true;
+static bool AstarPIDAstarRun=true;
 static bool AstarPIDAstarReverseRun=false;
-static bool ASTARpIDMM=false;
-static bool MMRun=false;
+static bool ASTARpIDMM=true;
+static bool MMRun=true;
 static bool MMpIDMM=false;
 static bool IDAstarRun=true;
-static bool MBBDSRun=false;
-static bool threePhase=false;
+static bool MBBDSRun=true;
+static bool threePhase=true;
 static bool twoPhase=false;
 static bool IDMMRun=true;
 static bool idmmF2fFlag=true;
@@ -74,7 +74,7 @@ void TestSTP(int algorithm)
 	cout << "running..." << endl;
 	myfile.open (filename);
 	
-	StevenTest(1, false);
+	StevenTest(100, false);
 
 	myfile << "completed!" << endl;
 	myfile.close();

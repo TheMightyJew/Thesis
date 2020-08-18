@@ -69,10 +69,10 @@ void TestPancake()
 	cout << "running..." << endl;
 	myfile.open (filename);
 	
-	StevenTest(0, 5, true);
-	StevenTest(1, 5, true);
-	StevenTest(2, 5, true);
-	StevenTest(3, 5, true);
+	StevenTest(0, 10, true);
+	StevenTest(1, 10, true);
+	StevenTest(2, 10, true);
+	StevenTest(3, 10, true);
 
 	myfile << "completed!" << endl;
 	myfile.close();

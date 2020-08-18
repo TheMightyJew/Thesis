@@ -12,7 +12,6 @@
 #include<algorithm> 
 #include <unordered_set>
 #include "SearchEnvironment.h"
-//#include "PancakeHasher.h"
 #include <math.h>
 
 template <class state, class action, class BloomFilter, bool verbose = true>
@@ -31,6 +30,8 @@ public:
 	int getIterationNum() { return iteration_num; }
 	void ResetNodeCount() { nodesExpanded = nodesTouched = 0; }
 private:
+	void UpdateNextBound(double fCost);
+
 	unsigned long nodesExpanded, nodesTouched, statesQuantityBound, necessaryExpansions, lastIterBoundExpansions;
 ;
 	int iteration_num;
@@ -48,7 +49,7 @@ private:
 	bool DoIteration(SearchEnvironment<state, action>* env,
 		state parent, state currState, double bound, double g, state& midState);
 	bool checkState(state midState);
-	
+	double nextBound;
 	state goal;
 	state start;
 
@@ -69,12 +70,13 @@ bool MBBDS<state, action, BloomFilter, verbose>::GetMidState(SearchEnvironment<s
 	state from;
 	double initialHeuristic = env->HCost(fromState, toState);
 	startingFBound = round(std::max(initialHeuristic, startingFBound));
-	backwardBound = (int)(startingFBound / 2);
-	forwardBound = startingFBound - backwardBound;
+	nextBound = startingFBound;
+	forwardBound = ceil(startingFBound / 2);
+	backwardBound = startingFBound - forwardBound;
 	bool forwardSearch;
 	int saturationIncreased = 0;
 	//changed
-	int saturationMaxIncreasements = 20;
+	int saturationMaxIncreasements = 10;
 	iteration_num = 0;
 	double bound;
 	firstRun = true;
@@ -173,12 +175,11 @@ bool MBBDS<state, action, BloomFilter, verbose>::GetMidState(SearchEnvironment<s
 		forwardSearch = true;
 		listReady = false;
 		middleStates.clear();
-		if (forwardBound == backwardBound) {
-			forwardBound++;
+		if(nextBound <= forwardBound+backwardBound){
+			nextBound = forwardBound+backwardBound+1;
 		}
-		else{
-			forwardBound = backwardBound = std::max(forwardBound, backwardBound);
-		}
+		forwardBound = ceil(nextBound/2);
+		backwardBound = nextBound - forwardBound;
 	}
 	return false;
 }
@@ -190,8 +191,7 @@ bool MBBDS<state, action, BloomFilter, verbose>::DoIteration(SearchEnvironment<s
 {
 	double h = env->HCost(currState, goal);
 	if (g == bound) {
-		bool solution = checkState(currState);
-		if (solution) {
+		if (checkState(currState)){
 			midState = currState;
 			return true;
 		}
@@ -199,8 +199,9 @@ bool MBBDS<state, action, BloomFilter, verbose>::DoIteration(SearchEnvironment<s
 			return false;
 		}
 	}
-	else if (g > bound  || fgreater(g + h, backwardBound + forwardBound))//not sure about that
+	else if (g > bound  || fgreater(g + h, backwardBound + forwardBound))
 	{
+		UpdateNextBound(g + h);
 		return false;
 	}
 	std::vector<state> neighbors;
@@ -236,7 +237,7 @@ bool MBBDS<state, action, BloomFilter, verbose>::checkState(state midState)
 			currentBloomfilter.insert(midState);
 		}
 		else {
-			if (middleStates.size() == (int)(statesQuantityBound/2)) {
+			if (middleStates.size() >= (int)(statesQuantityBound/2)) {
 				outOfSpace = true;
 				currentBloomfilter = BloomFilter(memoryBound/2, 1, previousBloomfilter.hashOffset + previousBloomfilter.getK());
 				for (state possibleMidState : middleStates) {
@@ -253,4 +254,17 @@ bool MBBDS<state, action, BloomFilter, verbose>::checkState(state midState)
 	return false;
 }
 
+template<class state, class action, class BloomFilter, bool verbose>
+void MBBDS<state, action, BloomFilter, verbose>::UpdateNextBound(double fCost)
+{
+	double currBound = backwardBound + forwardBound;
+	if (!fgreater(nextBound, currBound))
+	{
+		nextBound = fCost;
+	}
+	else if (fgreater(fCost, currBound) && fless(fCost, nextBound))
+	{
+		nextBound = fCost;
+	}
+}
 #endif
