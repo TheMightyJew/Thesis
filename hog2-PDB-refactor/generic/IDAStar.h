@@ -378,7 +378,6 @@ double IDAStar<state, action, verbose>::DoIteration(SearchEnvironment<state, act
 	gCostHistogram[g]++;
 
 	double minNeighborF = std::numeric_limits<double>::max();
-	bool minNeighborFchanged = false;
 	for (unsigned int x = 0; x < neighbors.size(); x++)
 	{
 		uint64_t childID;
@@ -389,8 +388,9 @@ double IDAStar<state, action, verbose>::DoIteration(SearchEnvironment<state, act
 		double edgeCost = env->GCost(currState, neighbors[x]);
 		double childH = DoIteration(env, currState, neighbors[x], thePath, bound,
 																g+edgeCost, maxH - edgeCost);
-		minNeighborF = std::min(minNeighborF, g+edgeCost+heuristic->HCost(neighbors[x], goal));	
-		minNeighborFchanged = true;
+    if (updateH){
+      minNeighborF = std::min(minNeighborF, g+edgeCost+heuristic->HCost(neighbors[x], goal));	
+    }
 		if(solved){
 			return 0;
 		}
@@ -411,7 +411,7 @@ double IDAStar<state, action, verbose>::DoIteration(SearchEnvironment<state, act
 			}
 		}
 	}
-	if(updateH && minNeighborFchanged){
+	if(updateH){
 		stateObject->h = stateObject->h + (minNeighborF-g);
 	}
 	return h;

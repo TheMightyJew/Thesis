@@ -32,19 +32,19 @@ static unsigned long MMstatesQuantityBound;
 static unsigned long ASTARstatesQuantityBound;
 static unsigned long statesQuantityBound = 1000000;
 static int secondsLimit = 60*30;
-static bool AstarRun=true;
-static bool AstarPIDAstarRun=true;
-static bool AstarPIDAstarReverseRun=true;
-static bool ASTARpIDMM=true;
-static bool MMRun=true;
-static bool MMpIDMM=true;
+static bool AstarRun=false;
+static bool AstarPIDAstarRun=false;
+static bool AstarPIDAstarReverseRun=false;
+static bool ASTARpIDMM=false;
+static bool MMRun=false;
+static bool MMpIDMM=false;
 static bool IDAstarRun=true;
-static bool MBBDSRun=true;
-static bool threePhase=true;
+static bool MBBDSRun=false;
+static bool threePhase=false;
 static bool twoPhase=false;
 static bool IDMMRun=true;
 static bool idmmF2fFlag=true;
-static bool isConsistent=true;
+static bool isConsistent=false;
 
 
 string datetime()
@@ -69,10 +69,11 @@ void TestPancake()
 	cout << "running..." << endl;
 	myfile.open (filename);
 	
-	StevenTest(0, 10, true);
-	StevenTest(1, 10, true);
-	StevenTest(2, 10, true);
-	StevenTest(3, 10, true);
+
+	StevenTest(0, 100, true);
+	//StevenTest(1, 100, true);
+	//StevenTest(2, 100, true);
+	//StevenTest(3, 100, true);
 
 	myfile << "completed!" << endl;
 	myfile.close();
@@ -82,7 +83,7 @@ void TestPancake()
 
 void StevenTest(int gap, int problems_num, bool randomPancake, vector<int> skipVector)
 {
-	const int pancakes_num = 8;
+	const int pancakes_num = 50;
 	srandom(2017218);
 	PancakePuzzleState<pancakes_num> start;
 	PancakePuzzleState<pancakes_num> original;
