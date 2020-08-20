@@ -23,8 +23,8 @@ public:
 	IDMM(bool front2frontH=false, bool isConsistent = false, double smallestEdge=1) { this->front2frontH = front2frontH; this->isConsistent = isConsistent; this->smallestEdge = smallestEdge;}
 	virtual ~IDMM() {}
 	bool GetMidState(SearchEnvironment<state, action>* env, state fromState, state toState, state &midState, int secondsLimit=600, double startingFBound=0);
-	bool GetMidStateFromLists(SearchEnvironment<state, action>* env, state fromState, state toState, state &midState, int secondsLimit=600, double startingFBound=0, AStarOpenClosed<state, MMCompare<state>> forwardList = AStarOpenClosed<state, MMCompare<state>>(), AStarOpenClosed<state, MMCompare<state>> backwardList = AStarOpenClosed<state, MMCompare<state>>());
-	bool GetMidStateFromForwardList(SearchEnvironment<state, action>* env, state fromState, state toState, state &midState, int secondsLimit=600, AStarOpenClosed<state, AStarCompareWithF<state>, AStarOpenClosedDataWithF<state>> forwardList = AStarOpenClosed<state, AStarCompareWithF<state>, AStarOpenClosedDataWithF<state>>());
+	bool GetMidStateFromLists(SearchEnvironment<state, action>* env, state fromState, state toState, state &midState, int secondsLimit=600, double startingFBound=0, AStarOpenClosed<state, MMCompare<state>> forwardList = AStarOpenClosed<state, MMCompare<state>>(), AStarOpenClosed<state, MMCompare<state>> backwardList = AStarOpenClosed<state, MMCompare<state>>(), bool detectDuplicates = true);
+	bool GetMidStateFromForwardList(SearchEnvironment<state, action>* env, state fromState, state toState, state &midState, int secondsLimit=600, AStarOpenClosed<state, AStarCompareWithF<state>, AStarOpenClosedDataWithF<state>> forwardList = AStarOpenClosed<state, AStarCompareWithF<state>, AStarOpenClosedDataWithF<state>>(),bool detectDuplicates = true);
 	double getPathLength()	{ return pathLength; }
 	uint64_t GetNodesExpanded() { return nodesExpanded; }
 	uint64_t GetNecessaryExpansions() { return necessaryExpansions; }
@@ -38,6 +38,7 @@ private:
 	double forwardBound;
 	double fBound;
 	double pathLength = std::numeric_limits<double>::max();
+  bool detectDuplicates;
 	bool DoIterationForward(SearchEnvironment<state, action>* env, state parent, state currState, double g, state& midState);	
 	bool DoIterationBackward(SearchEnvironment<state, action>* env, state parent, state currState, double g, state& midState, state possibleMidState, double possibleMidStateG, double otherH = 0,double otherError = 0);
 	//void updateBoundsG(double minOpenG, double maxOpenG);
@@ -73,7 +74,7 @@ private:
 };
 template <class state, class action, bool verbose>
 bool IDMM<state, action, verbose>::GetMidStateFromForwardList(SearchEnvironment<state, action>* env,
-	state fromState, state toState, state &midState, int secondsLimit, AStarOpenClosed<state, AStarCompareWithF<state>, AStarOpenClosedDataWithF<state>> forwardList)
+	state fromState, state toState, state &midState, int secondsLimit, AStarOpenClosed<state, AStarCompareWithF<state>, AStarOpenClosedDataWithF<state>> forwardList, bool detectDuplicates)
 {
 	startTimeTest = std::chrono::steady_clock::now();
 	AStarOpenClosed<state, MMCompare<state>, AStarOpenClosedData<state>> newForwardList;
@@ -91,7 +92,7 @@ bool IDMM<state, action, verbose>::GetMidStateFromForwardList(SearchEnvironment<
 	AStarOpenClosed<state, MMCompare<state>, AStarOpenClosedData<state>> newBackwardList;
 	newBackwardList.AddOpenNode(toState, env->GetStateHash(toState), 0, env->HCost(toState, fromState));
 	
-	return GetMidStateFromLists(env, fromState, toState, midState, secondsLimit, minF, newForwardList, newBackwardList);
+	return GetMidStateFromLists(env, fromState, toState, midState, secondsLimit, minF, newForwardList, newBackwardList, detectDuplicates);
 }
 
 template <class state, class action, bool verbose>
@@ -120,12 +121,13 @@ void IDMM<state, action, verbose>::buildMatrix(std::vector<AStarOpenClosedData<s
 
 template <class state, class action, bool verbose>
 bool IDMM<state, action, verbose>::GetMidStateFromLists(SearchEnvironment<state, action>* env,
-	state fromState, state toState, state &midState, int secondsLimit, double startingFBound, AStarOpenClosed<state, MMCompare<state>, AStarOpenClosedData<state>> forwardList, AStarOpenClosed<state, MMCompare<state>, AStarOpenClosedData<state>> backwardList)
+	state fromState, state toState, state &midState, int secondsLimit, double startingFBound, AStarOpenClosed<state, MMCompare<state>, AStarOpenClosedData<state>> forwardList, AStarOpenClosed<state, MMCompare<state>, AStarOpenClosedData<state>> backwardList, bool detectDuplicates)
 {
 	auto startTime = std::chrono::steady_clock::now();
 	this->readyOpenLists = true;
 	this->forwardList = forwardList;
 	this->backwardList = backwardList;
+  this->detectDuplicates = detectDuplicates;
 	nodesExpanded = nodesTouched = 0;
 	originStart = fromState;
 	originGoal = toState;
@@ -375,7 +377,7 @@ bool IDMM<state, action, verbose>::DoIterationForward(SearchEnvironment<state, a
 	for (unsigned int x = 0; x < neighbors.size(); x++){
 		uint64_t childID;
 		double edgeCost = env->GCost(currState, neighbors[x]);
-		if (neighbors[x] == parent || (forwardList.getElements().size()>1 && forwardList.Lookup(env->GetStateHash(neighbors[x]), childID) != kNotFound && (forwardList.Lookup(childID).where == kClosedList || (forwardList.Lookup(childID).where == kOpenList && forwardList.Lookup(childID).g <= g + edgeCost)))) {
+		if (neighbors[x] == parent || (detectDuplicates && forwardList.getElements().size()>1 && forwardList.Lookup(env->GetStateHash(neighbors[x]), childID) != kNotFound && (forwardList.Lookup(childID).where == kClosedList || (forwardList.Lookup(childID).where == kOpenList && forwardList.Lookup(childID).g <= g + edgeCost)))) {
 			continue;
 		}
 		if (DoIterationForward(env, currState, neighbors[x], g + edgeCost, midState)) {
@@ -436,7 +438,8 @@ bool IDMM<state, action, verbose>::DoIterationBackward(SearchEnvironment<state, 
 	for (unsigned int x = 0; x < neighbors.size(); x++){
 		uint64_t childID;
 		double edgeCost = env->GCost(currState, neighbors[x]);
-		if (neighbors[x] == parent || (backwardList.getElements().size()>1 && (backwardList.Lookup(env->GetStateHash(neighbors[x]), childID) == kClosedList || (backwardList.Lookup(env->GetStateHash(neighbors[x]), childID) == kOpenList && backwardList.Lookup(childID).g <= g + edgeCost)))) {
+		if (neighbors[x] == parent || (detectDuplicates && backwardList.getElements().size()>1 && 
+     backwardList.Lookup(env->GetStateHash(neighbors[x]), childID) != kNotFound && (backwardList.Lookup(childID).where == kClosedList || (backwardList.Lookup(childID).where == kOpenList && backwardList.Lookup(childID).g <= g + edgeCost)))) {
 			continue;
 		}
 		if (DoIterationBackward(env, currState, neighbors[x], g + edgeCost, midState, possibleMidState, possibleMidStateG, otherH, otherError)) {
