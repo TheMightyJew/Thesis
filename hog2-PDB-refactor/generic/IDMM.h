@@ -20,7 +20,7 @@
 template <class state, class action, bool verbose = true>
 class IDMM {
 public:
-	IDMM(bool front2frontH=false, bool isConsistent = false) { this->front2frontH = front2frontH; this->isConsistent = isConsistent;}
+	IDMM(bool front2frontH=false, bool isConsistent = false, double smallestEdge=1) { this->front2frontH = front2frontH; this->isConsistent = isConsistent; this->smallestEdge = smallestEdge;}
 	virtual ~IDMM() {}
 	bool GetMidState(SearchEnvironment<state, action>* env, state fromState, state toState, state &midState, int secondsLimit=600, double startingFBound=0);
 	bool GetMidStateFromLists(SearchEnvironment<state, action>* env, state fromState, state toState, state &midState, int secondsLimit=600, double startingFBound=0, AStarOpenClosed<state, MMCompare<state>> forwardList = AStarOpenClosed<state, MMCompare<state>>(), AStarOpenClosed<state, MMCompare<state>> backwardList = AStarOpenClosed<state, MMCompare<state>>());
@@ -36,13 +36,16 @@ private:
 	unsigned long nodesExpanded, nodesTouched, dMMExpansions;
 	double backwardBound;
 	double forwardBound;
+	double fBound;
 	double pathLength = std::numeric_limits<double>::max();
 	bool DoIterationForward(SearchEnvironment<state, action>* env, state parent, state currState, double g, state& midState);	
-	bool DoIterationBackward(SearchEnvironment<state, action>* env, state parent, state currState, double g, state& midState, state possibleMidState, double otherH = 0,double otherError = 0);
-	void updateBoundsG(double minOpenG, double maxOpenG);
+	bool DoIterationBackward(SearchEnvironment<state, action>* env, state parent, state currState, double g, state& midState, state possibleMidState, double possibleMidStateG, double otherH = 0,double otherError = 0);
+	//void updateBoundsG(double minOpenG, double maxOpenG);
 	void buildMatrix(std::vector<AStarOpenClosedData<state>> &openList, std::vector<std::vector<AStarOpenClosedData<state>>> &matrix);
-	double nextBound;
-	void UpdateNextBound(double currBound, double fCost);
+	double nextBound[2];
+  int const forwardLoc = 0;
+  int const backwardLoc = 0;
+	void UpdateNextBound(double currBound, double fCost, int loc);
 	state originGoal;
 	state originStart;
 	unsigned long dMMLastIterExpansions = 0;
@@ -62,6 +65,8 @@ private:
 	bool isConsistent;
 	double minForwardError = 0;
 	double minBackwardError = 0;
+	double smallestEdge;
+	std::chrono::steady_clock::time_point startTimeTest;
 	//double prevMinForwardError = 0;
 	//double prevMinBackwardError = 0;
 
@@ -70,6 +75,7 @@ template <class state, class action, bool verbose>
 bool IDMM<state, action, verbose>::GetMidStateFromForwardList(SearchEnvironment<state, action>* env,
 	state fromState, state toState, state &midState, int secondsLimit, AStarOpenClosed<state, AStarCompareWithF<state>, AStarOpenClosedDataWithF<state>> forwardList)
 {
+	startTimeTest = std::chrono::steady_clock::now();
 	AStarOpenClosed<state, MMCompare<state>, AStarOpenClosedData<state>> newForwardList;
 	double minF = std::numeric_limits<double>::max();
 	for (AStarOpenClosedDataWithF<state> forwardState : forwardList.getElements()){
@@ -123,7 +129,6 @@ bool IDMM<state, action, verbose>::GetMidStateFromLists(SearchEnvironment<state,
 	nodesExpanded = nodesTouched = 0;
 	originStart = fromState;
 	originGoal = toState;
-	nextBound = 0;
 	double minF = std::numeric_limits<double>::max();
 	double minFforward = std::numeric_limits<double>::max();
 	double minFbackward = std::numeric_limits<double>::max();
@@ -137,8 +142,8 @@ bool IDMM<state, action, verbose>::GetMidStateFromLists(SearchEnvironment<state,
 		
 		minOpenG = std::min(minOpenG, openState.g);
 		maxOpenG = std::max(maxOpenG , openState.g);
-    minFforward = std::min(minFforward,openState.g+openState.h);
-    minForwardError = std::min(minForwardError, openState.g - env->HCost(originStart, openState.data));
+		minFforward = std::min(minFforward,openState.g+openState.h);
+		minForwardError = std::min(minForwardError, openState.g - env->HCost(originStart, openState.data));
 		forwardOpenList.push_back(openState);
 	}
 	//buildMatrix(forwardOpenList, forwardMatrix);
@@ -148,8 +153,8 @@ bool IDMM<state, action, verbose>::GetMidStateFromLists(SearchEnvironment<state,
   //}
 	for (int x = 0; x < backwardList.OpenSize(); x++){
 		AStarOpenClosedData<state> openState = backwardList.getElements()[backwardList.GetOpenItem(x)];
-    minFbackward = std::min(minFbackward,openState.g+openState.h);
-    minBackwardError = std::min(minBackwardError, openState.g - env->HCost(openState.data,originGoal));
+		minFbackward = std::min(minFbackward,openState.g+openState.h);
+		minBackwardError = std::min(minBackwardError, openState.g - env->HCost(openState.data,originGoal));
 		backwardOpenList.push_back(openState);
 	}
 	if (!isConsistent){
@@ -170,11 +175,15 @@ bool IDMM<state, action, verbose>::GetMidStateFromLists(SearchEnvironment<state,
 	{
 	   return lhs.h < rhs.h;
 	});
+	
 	double initialHeuristic = env->HCost(fromState, toState);
-	startingFBound = std::max(startingFBound, std::max(initialHeuristic, minF));
-	forwardBound = minOpenG;
-	backwardBound = startingFBound - forwardBound;
+	fBound = 	nextBound[forwardLoc] = nextBound[backwardLoc] = std::max(smallestEdge,std::max(startingFBound, std::max(initialHeuristic, minF)));
+	//forwardBound = minOpenG;
+	forwardBound = std::max(minOpenG, ceil(fBound/2) - smallestEdge);
 	firstBounds = true;
+	auto curtime = std::chrono::steady_clock::now();
+	std::chrono::duration<double> process_time = curtime-startTimeTest;
+	//printf("%f\n", process_time);
 	while (true){
 		dMMLastIterExpansions = 0;
 		auto currentTime = std::chrono::steady_clock::now();
@@ -187,13 +196,15 @@ bool IDMM<state, action, verbose>::GetMidStateFromLists(SearchEnvironment<state,
 		}
 		bool solved = false;
 		for (AStarOpenClosedData<state> openState: forwardOpenList){
-		auto currentTime = std::chrono::steady_clock::now();
-				std::chrono::duration<double> elapsed_seconds = currentTime-startTime;
-				if(elapsed_seconds.count() >= secondsLimit){
-					return false;
-				}
-				if(openState.g + openState.h > forwardBound+backwardBound || openState.g > forwardBound)
-					continue;
+			auto currentTime = std::chrono::steady_clock::now();
+			std::chrono::duration<double> elapsed_seconds = currentTime-startTime;
+			if(elapsed_seconds.count() >= secondsLimit){
+				return false;
+			}
+			/*if(openState.g + openState.h > fBound){
+				UpdateNextBound(fBound, openState.g + openState.h);
+				continue;
+			}*/
 		//for(std::vector<AStarOpenClosedData<state>> fVector:forwardMatrix){
 		//	if(fVector.front().g+fVector.front().h > forwardBound+backwardBound){
 		//		break;
@@ -206,13 +217,14 @@ bool IDMM<state, action, verbose>::GetMidStateFromLists(SearchEnvironment<state,
 		//		}
 		//		if(openState.g > forwardBound)
 		//			break;
-				if(firstBounds || openState.g == forwardBound){
-					solved = DoIterationForward(env, openState.data, openState.data, openState.g, midState);
-				}
-				if(solved){
-					break;
-				}
+				/*if(firstBounds || openState.g == forwardBound){
+					solved = DoIterationForward(env, openState.data, openState.data, openState.g, midState);*/
+			solved = DoIterationForward(env, openState.data, openState.data, openState.g, midState);
+				//}
+			if(solved){
+				break;
 			}
+		}
 			//if(solved){
 			//	break;
 			//}
@@ -222,11 +234,11 @@ bool IDMM<state, action, verbose>::GetMidStateFromLists(SearchEnvironment<state,
 		}
 		if (solved) {
 			dMMExpansions = previousIterationExpansions + dMMLastIterExpansions;
-			pathLength = std::min(pathLength, backwardBound + forwardBound);
+			//pathLength = std::min(pathLength, fBound);
 
 			necessaryExpansions += nodesExpandedSoFar;
 			for (AStarOpenClosedData<state> forwardState : forwardList.getElements()){
-				if(forwardState.where == kClosedList && forwardState.g+forwardState.h<pathLength){
+				if(forwardState.where == kClosedList && forwardState.g + forwardState.h < pathLength){
 					necessaryExpansions++;
 				}
 			}
@@ -238,12 +250,14 @@ bool IDMM<state, action, verbose>::GetMidStateFromLists(SearchEnvironment<state,
 			return true;
 		}
 		else{
-			updateBoundsG(minOpenG, maxOpenG);			
+			//updateBoundsG(minOpenG, maxOpenG);			
+			fBound = std::max(nextBound[forwardLoc],nextBound[backwardLoc]);
+			forwardBound = std::max(minOpenG, ceil(fBound/2) - smallestEdge);
 		}
 	}
 	return false;
 }
-
+/*
 template <class state, class action, bool verbose>
 void IDMM<state, action, verbose>::updateBoundsG(double minOpenG, double maxOpenG){
 	if(maxOpenG > forwardBound && backwardBound > 0){
@@ -252,14 +266,16 @@ void IDMM<state, action, verbose>::updateBoundsG(double minOpenG, double maxOpen
 		firstBounds = false;
 	}
 	else{
-		double fullBound = forwardBound + backwardBound + 1;
+		double fullBound = std::max(forwardBound + backwardBound + 1,nextBound);
 		forwardBound = std::max(minOpenG, ceil(fullBound/2));
 		backwardBound = fullBound - forwardBound;
 		firstBounds = true;
 		previousIterationExpansions = nodesExpanded-nodesExpandedSoFar;
 		nodesExpandedSoFar = nodesExpanded;
 	}
+	fBound = forwardBound+backwardBound;
 }
+*/
 template <class state, class action, bool verbose>
 bool IDMM<state, action, verbose>::GetMidState(SearchEnvironment<state, action>* env,
 	state fromState, state toState, state &midState, int secondsLimit, double startingFBound)
@@ -268,15 +284,13 @@ bool IDMM<state, action, verbose>::GetMidState(SearchEnvironment<state, action>*
 	this->readyOpenLists = false;
 	this->forwardList = forwardList;
 	this->backwardList = backwardList;
-  nextBound = 0;
 	nodesExpanded = nodesTouched = 0;
 	originStart = fromState;
 	originGoal = toState;
 	double initialHeuristic = env->HCost(fromState, toState);
-  UpdateNextBound(0,env->HCost(fromState, toState));
-	startingFBound = std::max(initialHeuristic, startingFBound); 
-	forwardBound = ceil(startingFBound / 2);
-	backwardBound = startingFBound - forwardBound;
+	fBound = 	nextBound[forwardLoc] = nextBound[backwardLoc] = std::max(smallestEdge,std::max(startingFBound, initialHeuristic));
+	forwardBound = ceil(fBound / 2) - smallestEdge;
+	//printf("%f|%f|%f\n", fBound, smallestEdge, forwardBound);
 	unsigned long nodesExpandedSoFar = 0;
 	unsigned long previousIterationExpansions = 0;
 	while (true){
@@ -296,20 +310,12 @@ bool IDMM<state, action, verbose>::GetMidState(SearchEnvironment<state, action>*
 		if (solved) {
 			dMMExpansions = previousIterationExpansions + dMMLastIterExpansions;
 			necessaryExpansions += nodesExpandedSoFar;
-			pathLength = std::min(pathLength, backwardBound + forwardBound);
+			//pathLength = std::min(pathLength, fBound);
 			return true;
 		}
 		else{
-      forwardBound = ceil(nextBound / 2);
-      backwardBound = nextBound - forwardBound;
-      /*
-			if (forwardBound > backwardBound) {
-				backwardBound = forwardBound;
-			}
-			else{
-				forwardBound++;
-			}
-      */
+			fBound = std::max(nextBound[forwardLoc],nextBound[backwardLoc]);
+			forwardBound = ceil(fBound / 2) - smallestEdge;
 		}
 		previousIterationExpansions = nodesExpanded-nodesExpandedSoFar;
 		nodesExpandedSoFar = nodesExpanded;
@@ -323,65 +329,55 @@ bool IDMM<state, action, verbose>::DoIterationForward(SearchEnvironment<state, a
 	state parent, state currState, double g, state& midState)
 {
 	double h = env->HCost(currState, originGoal);
-	if (g > forwardBound  || fgreater(g + h + minBackwardError, backwardBound + forwardBound))//not sure about that
-	{
-    UpdateNextBound(backwardBound + forwardBound,g + h + minBackwardError);
+	if (fgreater(g + h + minBackwardError, fBound)){
+		UpdateNextBound(fBound, g + h + minBackwardError,forwardLoc);
 		return false;
 	}
-	else if (g == forwardBound) {
+	else if (g > forwardBound) {
+		backwardBound = fBound - g - smallestEdge;
 		double error = 0;
 		if (isConsistent){
 		  error = g - env->HCost(currState,originStart);
 		}
 		if(readyOpenLists){	
-			//for(std::vector<AStarOpenClosedData<state>> fVector:backwardMatrix){
-			//	if(fVector.front().g+fVector.front().h > forwardBound+backwardBound){
-			//		break;
-			//	}
-			//	for (AStarOpenClosedData<state> openState: fVector){
-			//		if(openState.g > backwardBound)
-			//			break;
-          for (AStarOpenClosedData<state> openState: backwardOpenList){
-            if(openState.g+openState.h > forwardBound+backwardBound || openState.g > backwardBound){
-              UpdateNextBound(backwardBound + forwardBound,openState.g+openState.h);
-              continue;
-            }
-            if (DoIterationBackward(env, openState.data, openState.data, openState.g, midState, currState,h,error)) {
-              pathLength += g;
-              midState = currState;
-              return true;
-            }
-          }
-				//}
-			//}
+			for (AStarOpenClosedData<state> openState: backwardOpenList){
+				//if(openState.g + openState.h > fBound || openState.g > backwardBound){
+				if(openState.g + openState.h > fBound){
+				  UpdateNextBound(fBound, openState.g + openState.h,forwardLoc);
+				  continue;
+				}
+				if (DoIterationBackward(env, openState.data, openState.data, openState.g, midState, currState, g, h, error)) {
+				  pathLength += g;
+				  midState = currState;
+				  return true;
+				}
+			}
 			return false;
-		}
-		else if (DoIterationBackward(env, originGoal, originGoal, 0, midState, currState,h,error)) {
-			pathLength += g;
-			midState = currState;
-			return true;
 		}
 		else{
-			return false;
+			if (DoIterationBackward(env, originGoal, originGoal, 0, midState, currState, g, h, error)) {
+				pathLength += g;
+				midState = currState;
+				return true;
+			}
+			else{
+				return false;
+			}
 		}
 	}
 	std::vector<state> neighbors;
 	env->GetSuccessors(currState, neighbors);
 	nodesTouched += neighbors.size();
 	nodesExpanded++;
-	if(g + h == forwardBound+backwardBound){
+	if(g + h == fBound){
 		dMMLastIterExpansions++;
 	}
-	for (unsigned int x = 0; x < neighbors.size(); x++)
-	{
+	for (unsigned int x = 0; x < neighbors.size(); x++){
 		uint64_t childID;
 		double edgeCost = env->GCost(currState, neighbors[x]);
 		if (neighbors[x] == parent || (forwardList.getElements().size()>1 && forwardList.Lookup(env->GetStateHash(neighbors[x]), childID) != kNotFound && (forwardList.Lookup(childID).where == kClosedList || (forwardList.Lookup(childID).where == kOpenList && forwardList.Lookup(childID).g <= g + edgeCost)))) {
 			continue;
 		}
-		/*if (neighbors[x] == parent || forwardList.Lookup(env->GetStateHash(neighbors[x]), childID) == kClosedList) {
-			continue;
-		}*/
 		if (DoIterationForward(env, currState, neighbors[x], g + edgeCost, midState)) {
 			return true;
 		}
@@ -391,59 +387,59 @@ bool IDMM<state, action, verbose>::DoIterationForward(SearchEnvironment<state, a
 
 template <class state, class action, bool verbose>
 bool IDMM<state, action, verbose>::DoIterationBackward(SearchEnvironment<state, action>* env,
-	state parent, state currState, double g, state& midState, state possibleMidState, double otherH,double otherError)
+	state parent, state currState, double g, state& midState, state possibleMidState, double possibleMidStateG, double otherH, double otherError)
 {	
-	if (currState == possibleMidState) {
+	if (currState == possibleMidState && g + possibleMidStateG <= fBound) {
 		pathLength = g;
 		return true;
 	}
-    double fbound = 0;
-  	if (g>=backwardBound){
-		UpdateNextBound(forwardBound+backwardBound, fbound);
+	
+	double fPossibleBound = 0;
+    if (front2frontH){
+		double h = env->HCost(currState, possibleMidState);
+		fPossibleBound = std::max(fPossibleBound, g + h + possibleMidStateG);
+		if (fgreater(fPossibleBound, fBound) || g > backwardBound){
+			UpdateNextBound(fBound, fPossibleBound,backwardLoc);
+			return false;
+		}
+	}
+	if (isConsistent){
+		double error = g - env->HCost(currState,originGoal);
+		fPossibleBound = std::max(possibleMidStateG + otherH + error, fPossibleBound); 
+		if (fgreater(fPossibleBound, fBound) || g > backwardBound){
+			UpdateNextBound(fBound, fPossibleBound,backwardLoc);
+			return false;
+		}
+	}
+  
+  double originalH = env->HCost(currState, originStart);
+  fPossibleBound = std::max(g + originalH + otherError, fPossibleBound);
+	if (fgreater(fPossibleBound, fBound) || g > backwardBound){
+		UpdateNextBound(fBound, fPossibleBound,backwardLoc);
+		return false;
+	}
+  
+  /*
+  if (originalH + g > fBound || g > backwardBound){
+		UpdateNextBound(fBound, originalH + g);
 		return false;
 	} 
-    if (front2frontH){
-    double h = env->HCost(currState, possibleMidState);
-    fbound = std::max(fbound, g + h + forwardBound);
-    if (fgreater(fbound, forwardBound+backwardBound)){
-      UpdateNextBound(forwardBound+backwardBound, fbound);
-      return false;
-    }
-  }
-  if (isConsistent){
-    double error = g - env->HCost(currState,originGoal);
-    fbound = std::max(forwardBound + otherH + error,fbound); 
-    if (fgreater(fbound, forwardBound+backwardBound)){
-      UpdateNextBound(forwardBound+backwardBound, fbound);
-      return false;
-    }
-  }
-
-  double originalH = env->HCost(currState, originStart);
-  fbound = std::max(g + originalH + otherError,fbound);
-  if (fgreater(fbound, forwardBound+backwardBound) || g>=backwardBound){
-    UpdateNextBound(forwardBound+backwardBound, fbound);
-    return false;
-  }
+  */
   
 	std::vector<state> neighbors;
 	env->GetSuccessors(currState, neighbors);
 	nodesTouched += neighbors.size();
 	nodesExpanded++;
-	if(fbound == forwardBound+backwardBound){
+	if(fPossibleBound == fBound){
 		dMMLastIterExpansions++;
 	}
-	for (unsigned int x = 0; x < neighbors.size(); x++)
-	{
+	for (unsigned int x = 0; x < neighbors.size(); x++){
 		uint64_t childID;
 		double edgeCost = env->GCost(currState, neighbors[x]);
 		if (neighbors[x] == parent || (backwardList.getElements().size()>1 && (backwardList.Lookup(env->GetStateHash(neighbors[x]), childID) == kClosedList || (backwardList.Lookup(env->GetStateHash(neighbors[x]), childID) == kOpenList && backwardList.Lookup(childID).g <= g + edgeCost)))) {
 			continue;
 		}
-		/*if (neighbors[x] == parent || backwardList.Lookup(env->GetStateHash(neighbors[x]), childID) == kClosedList) {
-			continue;
-		}*/
-		if (DoIterationBackward(env, currState, neighbors[x], g + edgeCost, midState, possibleMidState,otherH,otherError)) {
+		if (DoIterationBackward(env, currState, neighbors[x], g + edgeCost, midState, possibleMidState, possibleMidStateG, otherH, otherError)) {
 			return true;
 		}
 	}
@@ -451,15 +447,15 @@ bool IDMM<state, action, verbose>::DoIterationBackward(SearchEnvironment<state, 
 }
 
 template <class state, class action, bool verbose>
-void IDMM<state, action, verbose>::UpdateNextBound(double currBound, double fCost)
+void IDMM<state, action, verbose>::UpdateNextBound(double currBound, double fCost, int loc)
 {
-	if (!fgreater(nextBound, currBound))
+	if (!fgreater(nextBound[loc], currBound))
 	{
-		nextBound = fCost;
+		nextBound[loc] = fCost;
 	}
-	else if (fgreater(fCost, currBound) && fless(fCost, nextBound))
+	else if (fgreater(fCost, currBound) && fless(fCost, nextBound[loc]))
 	{
-		nextBound = fCost;
+		nextBound[loc] = fCost;
 	}
 }
 
