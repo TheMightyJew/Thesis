@@ -408,7 +408,7 @@ void StevenTest(int gap, int problems_num, bool randomPancake, vector<int> skipV
 						   nodesExpanded % idastar.GetNodesTouched() % necessaryNodesExpanded % t1.GetElapsedTime();
 					}
 					else{
-						myfile << boost::format("\t\t\tA*+IDA*_Reverse IDA* using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) failed after %1.4fs\n") % statesQuantityBoundforASPIDARS % stateSize % percentage % t1.GetElapsedTime();
+						myfile << boost::format("\t\t\tBAI IDA* using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) failed after %1.4fs\n") % statesQuantityBoundforASPIDARS % stateSize % percentage % t1.GetElapsedTime();
 						break;
 					}	
 				}
