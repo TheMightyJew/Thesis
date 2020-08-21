@@ -197,6 +197,7 @@ bool IDAStar<state, action, verbose>::BAI(SearchEnvironment<state, action> *env,
 	nextBound = 0;
 	nodesExpanded = nodesTouched = dAstarLastIterExpansions = 0;
 	thePath.resize(0);
+  this->statesList = statesList;
 	this->readyStatesList = false;
 	//double minF = std::numeric_limits<double>::max();
 	//for (AStarOpenClosedDataWithF<state> astarState : statesList.getElements()){
@@ -208,7 +209,7 @@ bool IDAStar<state, action, verbose>::BAI(SearchEnvironment<state, action> *env,
 		//}
 	//}
   uint64_t key = statesList.Peek();
-	minPerimeterF = statesList.Lookup(key).f;
+	minPerimeterF = statesList.Lookup(key).g+statesList.Lookup(key).h;
 
 	UpdateNextBound(0, std::max(minPerimeterF, heuristic->HCost(from, to)));
 	goal = to;
@@ -426,44 +427,53 @@ double IDAStar<state, action, verbose>::DoIteration(SearchEnvironment<state, act
 	// path max
 	if (usePathMax && fless(h, maxH))
 		h = maxH;
-	if (!reverseG && fgreater(g+h, bound))
+	if (fgreater(g+h, bound))
 	{
 		UpdateNextBound(bound, g+h);
 		//printf("Stopping at (%d, %d). g=%f h=%f\n", currState>>16, currState&0xFFFF, g, h);
 		return h;
 	}
-	else if(reverseG && (fgreater(g+perimeterG,bound) || fgreater(g+h, bound))){
-		UpdateNextBound(bound, std::max(g+perimeterG,g+h));
-		return h;
-	} else if (reverseF && isConsistent){
-    double error = g - heuristic->HCost(currState, start);
-    if (fgreater(minPerimeterF + error ,bound)){
-      UpdateNextBound(bound, minPerimeterF + error);
-      return h; 
-    }      
-  }
-	if (env->GoalTest(currState, goal)){
-		solved = true;
-		return 0;
-	}
-	else if(reverseF || (reverseG && perimeterG+g == bound)){
-    /*
-		for (AStarOpenClosedDataWithF<state> potenetionalMidState : perimeterList){
-			if (currState == potenetionalMidState.data){
-				solLength = g + potenetionalMidState.g;
+
+	else if(reverseG && perimeterG+g >= bound){
+
+    uint64_t ID;
+    if (statesList.Lookup(env->GetStateHash(currState), ID) != kNotFound){
+      if (statesList.Lookup(ID).g + g <= bound){
+				solLength = g + statesList.Lookup(ID).g;
 				solved = true;
 				return 0;
-			}
+      }
+      else{
+        UpdateNextBound(bound, statesList.Lookup(ID).g + g);
+        return h;
+      }
 		}
-    */
+    else{
+      UpdateNextBound(bound, g+perimeterG);
+      return h;
+    }
+	}
+  else if(reverseF){
     uint64_t ID;
     if (statesList.Lookup(env->GetStateHash(currState), ID) != kNotFound && statesList.Lookup(ID).g + g <= bound){
 				solLength = g + statesList.Lookup(ID).g;
 				solved = true;
 				return 0;
 		}
+    else if (isConsistent){
+      double error = g - heuristic->HCost(currState, start);
+      if (fgreater(minPerimeterF + error ,bound)){
+        UpdateNextBound(bound, minPerimeterF + error);
+        return h; 
+      }      
+    }
 	}
-		
+  
+  else if (env->GoalTest(currState, goal)){
+		solved = true;
+		return 0;
+	}
+  		
 	std::vector<state> neighbors;
 	env->GetSuccessors(currState, neighbors);
 	nodesTouched += neighbors.size();
