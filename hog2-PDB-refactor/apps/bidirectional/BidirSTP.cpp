@@ -40,6 +40,8 @@ static int secondsLimit = 60*30;
 static bool AstarRun=true;
 static bool AstarPIDAstarRun=true;
 static bool AstarPIDAstarReverseRun=false;
+static bool BAI=true;
+static bool Max_BAI=true;
 static bool ASTARpIDMM=true;
 static bool MMRun=true;
 static bool MMpIDMM=false;
@@ -300,7 +302,7 @@ void StevenTest(int problems_num, bool randomSTP, vector<int> skipVector)
 				goal.Reset();
 				start = original;
 				timer.StartTimer();
-				bool solved = astar.GetPathTime(&mnp, start, goal, astarPath, secondsLimit, true, statesQuantityBoundforASPIDARS, false);
+				bool solved = astar.GetPathTime(&mnp, goal, start, astarPath, secondsLimit, true, statesQuantityBoundforASPIDARS, false);
 				unsigned long nodesExpanded = astar.GetNodesExpanded();
 				unsigned long necessaryNodesExpanded = 0;
 				if(solved){
@@ -311,7 +313,7 @@ void StevenTest(int problems_num, bool randomSTP, vector<int> skipVector)
 				}
 				else{
 					IDAStar<MNPuzzleState<4, 4>, slideDir, false> idastar;
-					solved = idastar.ASpIDArev(&mnp, goal, start, idaPath, astar.getStatesList(), secondsLimit-timer.GetElapsedTime());
+					solved = idastar.ASpIDArev(&mnp, start, goal, idaPath, astar.getStatesList(), secondsLimit-timer.GetElapsedTime());
 					nodesExpanded += idastar.GetNodesExpanded();
 					necessaryNodesExpanded += idastar.GetNecessaryExpansions();
 					timer.EndTimer();
@@ -321,6 +323,74 @@ void StevenTest(int problems_num, bool randomSTP, vector<int> skipVector)
 					}
 					else{
 						myfile << boost::format("\t\t\tA*+IDA*_Reverse IDA* using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) failed after %1.4fs\n") % statesQuantityBoundforASPIDARS % stateSize % percentage % timer.GetElapsedTime();
+						break;
+					}	
+				}
+			}
+		}
+		if (BAI){
+			myfile << "\t\t_BAI_\n";
+			for(double percentage : percentages){
+				unsigned long statesQuantityBoundforASPIDARS = statesQuantityBound*percentage;
+				TemplateAStar<MNPuzzleState<4, 4>, slideDir, MNPuzzle<4, 4>> astar;
+				goal.Reset();
+				start = original;
+				timer.StartTimer();
+				bool solved = astar.GetPathTime(&mnp, goal, start, astarPath, secondsLimit, true, statesQuantityBoundforASPIDARS, false);
+				unsigned long nodesExpanded = astar.GetNodesExpanded();
+				unsigned long necessaryNodesExpanded = 0;
+				if(solved){
+					timer.EndTimer();
+					necessaryNodesExpanded = astar.GetNecessaryExpansions();
+					myfile << boost::format("\t\t\tBAI A* using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) found path length %1.0f; %llu expanded; %llu necessary; %1.4fs elapsed\n") % statesQuantityBoundforASPIDARS % stateSize % percentage % mnp.GetPathLength(astarPath) %
+					   nodesExpanded % necessaryNodesExpanded % timer.GetElapsedTime();
+				}
+				else{
+					IDAStar<MNPuzzleState<4, 4>, slideDir, false> idastar;
+					solved = idastar.BAI(&mnp, start, goal, idaPath, astar.getStatesList(), secondsLimit-timer.GetElapsedTime(),false);
+					nodesExpanded += idastar.GetNodesExpanded();
+					necessaryNodesExpanded += idastar.GetNecessaryExpansions();
+					timer.EndTimer();
+					if(solved){
+						myfile << boost::format("\t\t\tBAI IDA* using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) found path length %1.0f; %llu expanded; %llu generated; %llu necessary; %1.4fs elapsed\n") % statesQuantityBoundforASPIDARS % stateSize % percentage % idastar.getSolLength() %
+						   nodesExpanded % idastar.GetNodesTouched() % necessaryNodesExpanded % timer.GetElapsedTime();
+					}
+					else{
+						myfile << boost::format("\t\t\tBAI IDA* using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) failed after %1.4fs\n") % statesQuantityBoundforASPIDARS % stateSize % percentage % timer.GetElapsedTime();
+						break;
+					}	
+				}
+			}
+		}
+    if (Max_BAI){
+			myfile << "\t\t_Max_BAI_\n";
+			for(double percentage : percentages){
+				unsigned long statesQuantityBoundforASPIDARS = statesQuantityBound*percentage;
+				TemplateAStar<MNPuzzleState<4, 4>, slideDir, MNPuzzle<4, 4>> astar;
+				goal.Reset();
+				start = original;
+				timer.StartTimer();
+				bool solved = astar.GetPathTime(&mnp, goal, start, astarPath, secondsLimit, true, statesQuantityBoundforASPIDARS, false);
+				unsigned long nodesExpanded = astar.GetNodesExpanded();
+				unsigned long necessaryNodesExpanded = 0;
+				if(solved){
+					timer.EndTimer();
+					necessaryNodesExpanded = astar.GetNecessaryExpansions();
+					myfile << boost::format("\t\t\tMax_BAI A* using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) found path length %1.0f; %llu expanded; %llu necessary; %1.4fs elapsed\n") % statesQuantityBoundforASPIDARS % stateSize % percentage % mnp.GetPathLength(astarPath) %
+					   nodesExpanded % necessaryNodesExpanded % timer.GetElapsedTime();
+				}
+				else{
+					IDAStar<MNPuzzleState<4, 4>, slideDir, false> idastar;
+					solved = idastar.BAI(&mnp, start, goal, idaPath, astar.getStatesList(), secondsLimit-timer.GetElapsedTime(),true);
+					nodesExpanded += idastar.GetNodesExpanded();
+					necessaryNodesExpanded += idastar.GetNecessaryExpansions();
+					timer.EndTimer();
+					if(solved){
+						myfile << boost::format("\t\t\tMax_BAI IDA* using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) found path length %1.0f; %llu expanded; %llu generated; %llu necessary; %1.4fs elapsed\n") % statesQuantityBoundforASPIDARS % stateSize % percentage % idastar.getSolLength() %
+						   nodesExpanded % idastar.GetNodesTouched() % necessaryNodesExpanded % timer.GetElapsedTime();
+					}
+					else{
+						myfile << boost::format("\t\t\tMax_BAI IDA* using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) failed after %1.4fs\n") % statesQuantityBoundforASPIDARS % stateSize % percentage % timer.GetElapsedTime();
 						break;
 					}	
 				}

@@ -75,6 +75,7 @@ private:
 	}
 	void UpdateNextBound(double currBound, double fCost);
 	state goal;
+  state start;
 	double nextBound, currIterNextBound;
 	//NodeHashTable nodeTable;
 	bool usePathMax;
@@ -95,7 +96,9 @@ private:
 	bool readyStatesList;
 	bool reverseG = false;
 	bool reverseF = false;
-	double minError;
+	//double minError;
+  bool isConsistent = false;
+  double minPerimeterF;
 
 #ifdef DO_LOGGING
 public:
@@ -128,6 +131,7 @@ bool IDAStar<state, action, verbose>::ASpIDA(SearchEnvironment<state, action> *e
 	   return lhs.h < rhs.h;
 	});
 	goal = to;
+	start = from;
 	thePath.push_back(from);
 	unsigned long nodesExpandedSoFar = 0;
 	unsigned long previousIterationExpansions = 0;
@@ -187,29 +191,28 @@ template <class state, class action, bool verbose>
 bool IDAStar<state, action, verbose>::BAI(SearchEnvironment<state, action> *env, state from, state to,
 							 std::vector<state> &thePath, AStarOpenClosed<state, AStarCompareWithF<state>, AStarOpenClosedDataWithF<state>> statesList, int secondsLimit, bool isConsistent)
 {
-	if (isConsistent){
-	minError = std::numeric_limits<double>::max();
-	}
-	else{
-	minError = 0;
-	}
+  this->isConsistent = isConsistent;
 	reverseF = true;
 	heuristic = env;
 	nextBound = 0;
 	nodesExpanded = nodesTouched = dAstarLastIterExpansions = 0;
 	thePath.resize(0);
 	this->readyStatesList = false;
-	double minF = std::numeric_limits<double>::max();
-	for (AStarOpenClosedDataWithF<state> astarState : statesList.getElements()){
-		minF = std::min(minF, astarState.g + astarState.h);
+	//double minF = std::numeric_limits<double>::max();
+	//for (AStarOpenClosedDataWithF<state> astarState : statesList.getElements()){
+		//minF = std::min(minF, astarState.g + astarState.h);
 		//maxF = std::max(maxF, astarState.f);
 		//maxG = std::max(maxG, astarState.g);
-		if (isConsistent){
-			minError = std::min(minError, astarState.g - heuristic->HCost(astarState.data, from));
-		}
-	}
-	UpdateNextBound(0, std::max(minF, heuristic->HCost(from, to)));
+		//if (isConsistent){
+		//	minError = std::min(minError, astarState.g - heuristic->HCost(astarState.data, to));
+		//}
+	//}
+  uint64_t key = statesList.Peek();
+	minPerimeterF = statesList.Lookup(key).f;
+
+	UpdateNextBound(0, std::max(minPerimeterF, heuristic->HCost(from, to)));
 	goal = to;
+	start = from;
 	thePath.push_back(from);
 	unsigned long nodesExpandedSoFar = 0;
 	unsigned long previousIterationExpansions = 0;
@@ -260,6 +263,7 @@ bool IDAStar<state, action, verbose>::ASpIDArev(SearchEnvironment<state, action>
 	nextBound = 0;
 	nodesExpanded = nodesTouched = dAstarLastIterExpansions = 0;
 	thePath.resize(0);
+  this->isConsistent = isConsistent;
 	this->readyStatesList = false;
   this->statesList = statesList;
 	//double maxF = 0;
@@ -282,6 +286,7 @@ bool IDAStar<state, action, verbose>::ASpIDArev(SearchEnvironment<state, action>
   */
 	UpdateNextBound(0, std::max(minRealF, heuristic->HCost(from, to)));
 	goal = to;
+	start = from;
 	thePath.push_back(from);
 	unsigned long nodesExpandedSoFar = 0;
 	unsigned long previousIterationExpansions = 0;
@@ -339,6 +344,7 @@ bool IDAStar<state, action, verbose>::GetPath(SearchEnvironment<state, action> *
 	this->readyStatesList = false;
 	UpdateNextBound(0, heuristic->HCost(from, to));
 	goal = to;
+	start = from;
 	thePath.push_back(from);
 	unsigned long nodesExpandedSoFar = 0;
 	unsigned long previousIterationExpansions = 0;
@@ -393,6 +399,7 @@ bool IDAStar<state, action, verbose>::GetPath(SearchEnvironment<state, action> *
 	double rootH = heuristic->HCost(from, to);
 	UpdateNextBound(0, rootH);
 	goal = to;
+	start = from;
 	std::vector<action> act;
 	env->GetActions(from, act);
 	while (thePath.size() == 0)
@@ -415,7 +422,7 @@ double IDAStar<state, action, verbose>::DoIteration(SearchEnvironment<state, act
 										   std::vector<state> &thePath, double bound, double g,
 										   double maxH, double currStateH, bool updateH, AStarOpenClosedDataWithF<state> *stateObject)
 {
-	double h = std::max(heuristic->HCost(currState, goal) + minError, currStateH);
+	double h = std::max(heuristic->HCost(currState, goal), currStateH);
 	// path max
 	if (usePathMax && fless(h, maxH))
 		h = maxH;
@@ -428,7 +435,13 @@ double IDAStar<state, action, verbose>::DoIteration(SearchEnvironment<state, act
 	else if(reverseG && (fgreater(g+perimeterG,bound) || fgreater(g+h, bound))){
 		UpdateNextBound(bound, std::max(g+perimeterG,g+h));
 		return h;
-	}
+	} else if (reverseF && isConsistent){
+    double error = heuristic->HCost(currState, start);
+    if (fgreater(minPerimeterF + error ,bound)){
+      UpdateNextBound(bound, minPerimeterF + error);
+      return h; 
+    }      
+  }
 	if (env->GoalTest(currState, goal)){
 		solved = true;
 		return 0;
