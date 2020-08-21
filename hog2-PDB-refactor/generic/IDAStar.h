@@ -448,7 +448,7 @@ double IDAStar<state, action, verbose>::DoIteration(SearchEnvironment<state, act
         return h;
       }
 		}
-    else{
+    else if (fgreater(perimeterG+g,bound)){
       UpdateNextBound(bound, g+perimeterG);
       return h;
     }
