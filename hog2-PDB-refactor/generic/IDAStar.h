@@ -33,7 +33,8 @@ public:
 	bool GetPath(SearchEnvironment<state, action> *env, state from, state to,
 							 std::vector<state> &thePath, int secondsLimit=600);
 	bool ASpIDA(SearchEnvironment<state, action> *env, state from, state to, std::vector<state> &thePath, AStarOpenClosed<state, AStarCompareWithF<state>, AStarOpenClosedDataWithF<state>> statesList, int secondsLimit=600);
-	bool ASpIDArev(SearchEnvironment<state, action> *env, state from, state to, std::vector<state> &thePath, AStarOpenClosed<state, AStarCompareWithF<state>, AStarOpenClosedDataWithF<state>> statesList, int secondsLimit=600);
+	bool BAI(SearchEnvironment<state, action> *env, state from, state to, std::vector<state> &thePath, AStarOpenClosed<state, AStarCompareWithF<state>, AStarOpenClosedDataWithF<state>> statesList, int secondsLimit=600, bool isConsistent = false);
+  bool ASpIDArev(SearchEnvironment<state, action> *env, state from, state to, std::vector<state> &thePath, AStarOpenClosed<state, AStarCompareWithF<state>, AStarOpenClosedDataWithF<state>> statesList, int secondsLimit=600, bool isConsistent = false);
 	bool GetPath(SearchEnvironment<state, action> *env, state from, state to,
 				 std::vector<action> &thePath);
 
@@ -74,7 +75,7 @@ private:
 	}
 	void UpdateNextBound(double currBound, double fCost);
 	state goal;
-	double nextBound;
+	double nextBound, currIterNextBound;
 	//NodeHashTable nodeTable;
 	bool usePathMax;
 	bool useHashTable;
@@ -89,10 +90,12 @@ private:
 	unsigned long necessaryExpansions = 0;
 	AStarOpenClosed<state, AStarCompareWithF<state>, AStarOpenClosedDataWithF<state>> statesList;
 	std::vector<AStarOpenClosedDataWithF<state>> openList;
-	std::vector<AStarOpenClosedDataWithF<state>> perimeterList;
+	//std::vector<AStarOpenClosedDataWithF<state>> perimeterList;
 	double perimeterG;
 	bool readyStatesList;
-	bool reverse;
+	bool reverseG = false;
+	bool reverseF = false;
+	double minError;
 
 #ifdef DO_LOGGING
 public:
@@ -104,7 +107,7 @@ template <class state, class action, bool verbose>
 bool IDAStar<state, action, verbose>::ASpIDA(SearchEnvironment<state, action> *env, state from, state to,
 							 std::vector<state> &thePath, AStarOpenClosed<state, AStarCompareWithF<state>, AStarOpenClosedDataWithF<state>> statesList, int secondsLimit)
 {
-	reverse = false;
+	//reverseG = false;
 	heuristic = env;
 	nextBound = 0;
 	nodesExpanded = nodesTouched = dAstarLastIterExpansions = 0;
@@ -146,11 +149,15 @@ bool IDAStar<state, action, verbose>::ASpIDA(SearchEnvironment<state, action> *e
 		for(AStarOpenClosedDataWithF<state> openState:openList){
 			thePath.resize(0);
 			thePath.push_back(openState.data);
+			currIterNextBound = currentBound;
 			res = DoIteration(env, openState.data, openState.data, thePath, currentBound, openState.g, 0, openState.h, true, &openState);
 			if(res == 0 && solved){
 				solLength = env->GetPathLength(thePath) + openState.g;
 				break;
 			}
+			else{	
+				openState.h += currIterNextBound -(openState.g+openState.h);	
+            }
 		}
 		if (verbose)
 			printf("Nodes expanded: %llu(%llu)\n", nodesExpanded-nodesExpandedSoFar, nodesExpanded);
@@ -177,30 +184,102 @@ bool IDAStar<state, action, verbose>::ASpIDA(SearchEnvironment<state, action> *e
 }
 
 template <class state, class action, bool verbose>
-bool IDAStar<state, action, verbose>::ASpIDArev(SearchEnvironment<state, action> *env, state from, state to,
-							 std::vector<state> &thePath, AStarOpenClosed<state, AStarCompareWithF<state>, AStarOpenClosedDataWithF<state>> statesList, int secondsLimit)
+bool IDAStar<state, action, verbose>::BAI(SearchEnvironment<state, action> *env, state from, state to,
+							 std::vector<state> &thePath, AStarOpenClosed<state, AStarCompareWithF<state>, AStarOpenClosedDataWithF<state>> statesList, int secondsLimit, bool isConsistent)
 {
-	reverse = true;
+	if (isConsistent){
+	minError = std::numeric_limits<double>::max();
+	}
+	else{
+	minError = 0;
+	}
+	reverseF = true;
 	heuristic = env;
 	nextBound = 0;
 	nodesExpanded = nodesTouched = dAstarLastIterExpansions = 0;
 	thePath.resize(0);
 	this->readyStatesList = false;
-	double maxF = 0;
+	double minF = std::numeric_limits<double>::max();
+	for (AStarOpenClosedDataWithF<state> astarState : statesList.getElements()){
+		minF = std::min(minF, astarState.g + astarState.h);
+		//maxF = std::max(maxF, astarState.f);
+		//maxG = std::max(maxG, astarState.g);
+		if (isConsistent){
+			minError = std::min(minError, astarState.g - heuristic->HCost(astarState.data, from));
+		}
+	}
+	UpdateNextBound(0, std::max(minF, heuristic->HCost(from, to)));
+	goal = to;
+	thePath.push_back(from);
+	unsigned long nodesExpandedSoFar = 0;
+	unsigned long previousIterationExpansions = 0;
+	auto startTime = std::chrono::steady_clock::now();
+	while (true)
+	{
+		gCostHistogram.clear();
+		gCostHistogram.resize(nextBound+1);
+		dAstarLastIterExpansions = 0;
+		auto currentTime = std::chrono::steady_clock::now();
+		std::chrono::duration<double> elapsed_seconds = currentTime-startTime;
+		if(elapsed_seconds.count() >= secondsLimit){
+			return false;
+		}
+		if (verbose)
+			printf("\t\tStarting iteration with bound %1.1f: ", nextBound, nodesExpanded);
+		double res = DoIteration(env, from, from, thePath, nextBound, 0, 0);
+		if (verbose)
+			printf("Nodes expanded: %llu(%llu)\n", nodesExpanded-nodesExpandedSoFar, nodesExpanded);
+		if (res == 0 && solved){
+			if (verbose){
+				printf("\t\tStarting iteration with bound %f. ", nextBound, nodesExpanded);
+				printf("Nodes expanded: %llu(%llu)\n", nodesExpanded-nodesExpandedSoFar, nodesExpanded);
+			}
+			necessaryExpansions += nodesExpandedSoFar;
+			for (AStarOpenClosedDataWithF<state> astarState : statesList.getElements()){
+				if(astarState.where == kClosedList && astarState.f<solLength){
+					necessaryExpansions++;
+				}
+			}
+			break;
+		}
+		previousIterationExpansions = nodesExpanded-nodesExpandedSoFar;
+		nodesExpandedSoFar = nodesExpanded;
+		PrintGHistogram();
+	}
+	dAstarExpansions = previousIterationExpansions + dAstarLastIterExpansions;
+	PrintGHistogram();
+	return true;
+}
+
+template <class state, class action, bool verbose>
+bool IDAStar<state, action, verbose>::ASpIDArev(SearchEnvironment<state, action> *env, state from, state to,
+							 std::vector<state> &thePath, AStarOpenClosed<state, AStarCompareWithF<state>, AStarOpenClosedDataWithF<state>> statesList, int secondsLimit, bool isConsistent)
+{
+	reverseG = true;
+	heuristic = env;
+	nextBound = 0;
+	nodesExpanded = nodesTouched = dAstarLastIterExpansions = 0;
+	thePath.resize(0);
+	this->readyStatesList = false;
+  this->statesList = statesList;
+	//double maxF = 0;
 	double minRealF = std::numeric_limits<double>::max();
 	double maxG = 0;
 	for (AStarOpenClosedDataWithF<state> astarState : statesList.getElements()){
 		minRealF = std::min(minRealF, astarState.g + heuristic->HCost(astarState.data, from));
-		maxF = std::max(maxF, astarState.f);
-		maxG = std::max(maxG, astarState.g);
+		//maxF = std::max(maxF, astarState.f);
+		//maxG = std::max(maxG, astarState.g);
 	}
-	perimeterG = std::max(0.0, maxG-1);
+  uint64_t key = statesList.Peek();
+	perimeterG = std::max(0.0, statesList.Lookup(key).f - 1); // this needs to be fixed for non-integer domains
+  /*
 	for (AStarOpenClosedDataWithF<state> astarState : statesList.getElements()){
 		//changed
 		if(astarState.g < maxG){
 			perimeterList.push_back(astarState);
 		}
 	}
+  */
 	UpdateNextBound(0, std::max(minRealF, heuristic->HCost(from, to)));
 	goal = to;
 	thePath.push_back(from);
@@ -249,7 +328,6 @@ bool IDAStar<state, action, verbose>::GetPath(SearchEnvironment<state, action> *
 									 state from, state to,
 									 std::vector<state> &thePath, int secondsLimit)
 {
-	reverse = false;
 	if(verbose){
 		printf("\t\tStarting to solve with IDAStar\n");
 	}
@@ -337,34 +415,39 @@ double IDAStar<state, action, verbose>::DoIteration(SearchEnvironment<state, act
 										   std::vector<state> &thePath, double bound, double g,
 										   double maxH, double currStateH, bool updateH, AStarOpenClosedDataWithF<state> *stateObject)
 {
-	double h = std::max(heuristic->HCost(currState, goal), currStateH);
+	double h = std::max(heuristic->HCost(currState, goal) + minError, currStateH);
 	// path max
 	if (usePathMax && fless(h, maxH))
 		h = maxH;
-	if (fgreater(g+h, bound))
+	if (!reverseG && fgreater(g+h, bound))
 	{
-		if(reverse)
-			UpdateNextBound(bound, bound+1);
-		else
-			UpdateNextBound(bound, g+h);
+		UpdateNextBound(bound, g+h);
 		//printf("Stopping at (%d, %d). g=%f h=%f\n", currState>>16, currState&0xFFFF, g, h);
 		return h;
 	}
-	else if(reverse && g+perimeterG > bound){
-		UpdateNextBound(bound, bound+1);
+	else if(reverseG && (fgreater(g+perimeterG,bound) || fgreater(g+h, bound))){
+		UpdateNextBound(bound, std::max(g+perimeterG,g+h));
 		return h;
 	}
 	if (env->GoalTest(currState, goal)){
 		solved = true;
 		return 0;
 	}
-	else if(reverse && perimeterG+g == bound){
+	else if(reverseF || (reverseG && perimeterG+g == bound)){
+    /*
 		for (AStarOpenClosedDataWithF<state> potenetionalMidState : perimeterList){
 			if (currState == potenetionalMidState.data){
 				solLength = g + potenetionalMidState.g;
 				solved = true;
 				return 0;
 			}
+		}
+    */
+    uint64_t ID;
+    if (statesList.Lookup(env->GetStateHash(currState), ID) != kNotFound && statesList.Lookup(ID).g + g <= bound){
+				solLength = g + statesList.Lookup(ID).g;
+				solved = true;
+				return 0;
 		}
 	}
 		
@@ -378,8 +461,7 @@ double IDAStar<state, action, verbose>::DoIteration(SearchEnvironment<state, act
 	gCostHistogram[g]++;
 
 	double minNeighborF = std::numeric_limits<double>::max();
-	for (unsigned int x = 0; x < neighbors.size(); x++)
-	{
+	for (unsigned int x = 0; x < neighbors.size(); x++){
 		uint64_t childID;
 		if (neighbors[x] == parent || (readyStatesList && statesList.Lookup(env->GetStateHash(neighbors[x]), childID) == kClosedList)) {
 			continue;
@@ -388,9 +470,9 @@ double IDAStar<state, action, verbose>::DoIteration(SearchEnvironment<state, act
 		double edgeCost = env->GCost(currState, neighbors[x]);
 		double childH = DoIteration(env, currState, neighbors[x], thePath, bound,
 																g+edgeCost, maxH - edgeCost);
-    if (updateH){
-      minNeighborF = std::min(minNeighborF, g+edgeCost+heuristic->HCost(neighbors[x], goal));	
-    }
+		/*if (updateH){
+		  minNeighborF = std::min(minNeighborF, g+edgeCost+heuristic->HCost(neighbors[x], goal)+minError);	
+		}*/
 		if(solved){
 			return 0;
 		}
@@ -411,9 +493,9 @@ double IDAStar<state, action, verbose>::DoIteration(SearchEnvironment<state, act
 			}
 		}
 	}
-	if(updateH){
+	/*if(updateH){
 		stateObject->h = stateObject->h + (minNeighborF-g);
-	}
+	}*/
 	return h;
 }
 
@@ -493,12 +575,12 @@ void IDAStar<state, action, verbose>::UpdateNextBound(double currBound, double f
 {
 	if (!fgreater(nextBound, currBound))
 	{
-		nextBound = fCost;
+		nextBound = currIterNextBound = fCost;
 		//printf("Updating next bound to %f\n", nextBound);
 	}
 	else if (fgreater(fCost, currBound) && fless(fCost, nextBound))
 	{
-		nextBound = fCost;
+		nextBound = currIterNextBound = fCost;
 		//printf("Updating next bound to %f\n", nextBound);
 	}
 }

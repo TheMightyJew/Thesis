@@ -43,11 +43,11 @@ static bool AstarPIDAstarReverseRun=false;
 static bool ASTARpIDMM=true;
 static bool MMRun=true;
 static bool MMpIDMM=false;
-static bool IDAstarRun=true;
-static bool MBBDSRun=true;
-static bool threePhase=true;
+static bool IDAstarRun=false;
+static bool MBBDSRun=false;
+static bool threePhase=false;
 static bool twoPhase=false;
-static bool IDMMRun=true;
+static bool IDMMRun=false;
 static bool idmmF2fFlag=true;
 static bool isConsistent=false;
 
@@ -74,7 +74,7 @@ void TestSTP(int algorithm)
 	cout << "running..." << endl;
 	myfile.open (filename);
 	
-	StevenTest(100, false);
+	StevenTest(1, false);
 
 	myfile << "completed!" << endl;
 	myfile.close();
@@ -209,7 +209,8 @@ void StevenTest(int problems_num, bool randomSTP, vector<int> skipVector)
 				else{
 					IDMM<MNPuzzleState<4, 4>, slideDir, false> idmm(idmmF2fFlag,isConsistent);
 					MNPuzzleState<4, 4> midState;
-					bool solved = idmm.GetMidStateFromLists(&mnp, start, goal, midState, secondsLimit-timer.GetElapsedTime(), mm.getLastBound(), mm.GetForwardItems(), mm.GetBackwardItems());
+					//bool solved = idmm.GetMidStateFromLists(&mnp, start, goal, midState, secondsLimit-timer.GetElapsedTime(), mm.getLastBound(), mm.GetForwardItems(), mm.GetBackwardItems());
+					bool solved = false;
 					nodesExpanded += idmm.GetNodesExpanded();
 					necessaryNodesExpanded += idmm.GetNecessaryExpansions();
 					timer.EndTimer();
