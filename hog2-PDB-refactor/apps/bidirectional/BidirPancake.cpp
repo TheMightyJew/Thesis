@@ -244,7 +244,8 @@ void StevenTest(int gap, int problems_num, bool randomPancake, vector<int> skipV
 				else{
 					IDMM<PancakePuzzleState<pancakes_num>, PancakePuzzleAction, false> idmm(idmmF2fFlag,isConsistent);
 					PancakePuzzleState<pancakes_num> midState;
-					bool solved = idmm.GetMidStateFromLists(&pancake, start, goal, midState, secondsLimit-t1.GetElapsedTime(), mm.getLastBound(), mm.GetForwardItems(), mm.GetBackwardItems());
+					//bool solved = idmm.GetMidStateFromLists(&pancake, start, goal, midState, secondsLimit-t1.GetElapsedTime(), mm.getLastBound(), mm.GetForwardItems(), mm.GetBackwardItems());
+					bool solved = false;
 					nodesExpanded += idmm.GetNodesExpanded();
 					necessaryNodesExpanded += idmm.GetNecessaryExpansions();
 					t1.EndTimer();
