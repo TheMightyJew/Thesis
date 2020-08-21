@@ -436,7 +436,7 @@ double IDAStar<state, action, verbose>::DoIteration(SearchEnvironment<state, act
 		UpdateNextBound(bound, std::max(g+perimeterG,g+h));
 		return h;
 	} else if (reverseF && isConsistent){
-    double error = heuristic->HCost(currState, start);
+    double error = g - heuristic->HCost(currState, start);
     if (fgreater(minPerimeterF + error ,bound)){
       UpdateNextBound(bound, minPerimeterF + error);
       return h; 

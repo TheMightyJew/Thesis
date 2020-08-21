@@ -388,7 +388,7 @@ void StevenTest(int gap, int problems_num, bool randomPancake, vector<int> skipV
 				goal.Reset();
 				start = original;
 				t1.StartTimer();
-				bool solved = astar.GetPathTime(&pancake, goal, start, astarPath, secondsLimit, true, statesQuantityBoundforASPIDARS, false);
+				bool solved = astar.GetPathTime(&pancake, goal, start, astarPath, secondsLimit, true, statesQuantityBoundforASPIDARS);
 				unsigned long nodesExpanded = astar.GetNodesExpanded();
 				unsigned long necessaryNodesExpanded = 0;
 				if(solved){
@@ -422,7 +422,7 @@ void StevenTest(int gap, int problems_num, bool randomPancake, vector<int> skipV
 				goal.Reset();
 				start = original;
 				t1.StartTimer();
-				bool solved = astar.GetPathTime(&pancake, goal, start, astarPath, secondsLimit, true, statesQuantityBoundforASPIDARS, false);
+				bool solved = astar.GetPathTime(&pancake, goal, start, astarPath, secondsLimit, true, statesQuantityBoundforASPIDARS);
 				unsigned long nodesExpanded = astar.GetNodesExpanded();
 				unsigned long necessaryNodesExpanded = 0;
 				if(solved){

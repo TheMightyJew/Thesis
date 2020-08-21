@@ -336,7 +336,7 @@ void StevenTest(int problems_num, bool randomSTP, vector<int> skipVector)
 				goal.Reset();
 				start = original;
 				timer.StartTimer();
-				bool solved = astar.GetPathTime(&mnp, goal, start, astarPath, secondsLimit, true, statesQuantityBoundforASPIDARS, false);
+				bool solved = astar.GetPathTime(&mnp, goal, start, astarPath, secondsLimit, true, statesQuantityBoundforASPIDARS);
 				unsigned long nodesExpanded = astar.GetNodesExpanded();
 				unsigned long necessaryNodesExpanded = 0;
 				if(solved){
@@ -370,7 +370,7 @@ void StevenTest(int problems_num, bool randomSTP, vector<int> skipVector)
 				goal.Reset();
 				start = original;
 				timer.StartTimer();
-				bool solved = astar.GetPathTime(&mnp, goal, start, astarPath, secondsLimit, true, statesQuantityBoundforASPIDARS, false);
+				bool solved = astar.GetPathTime(&mnp, goal, start, astarPath, secondsLimit, true, statesQuantityBoundforASPIDARS);
 				unsigned long nodesExpanded = astar.GetNodesExpanded();
 				unsigned long necessaryNodesExpanded = 0;
 				if(solved){
