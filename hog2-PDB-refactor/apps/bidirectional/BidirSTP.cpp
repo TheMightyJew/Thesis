@@ -55,6 +55,7 @@ static bool twoPhase=false;
 static bool IDMMRun=false;
 static bool idmmF2fFlag=true;
 static bool isConsistent=false;
+static bool isUpdateByWorkload=true;
 
 
 static string datetime()
@@ -211,7 +212,7 @@ void StevenTest(int problems_num, bool randomSTP, vector<int> skipVector)
 		double percentages[3] = {0.5, 0.1, 0.01};
 		long stateSize = sizeof(original);
 		
-		if(MMpIDMM){
+		/*if(MMpIDMM){
 			myfile << "\t\t_MM+IDMM_\n";
 			for(double percentage : percentages){
 				unsigned long statesQuantityBoundforMMpIDMM = std::max(statesQuantityBound*percentage,2.0);
@@ -245,7 +246,7 @@ void StevenTest(int problems_num, bool randomSTP, vector<int> skipVector)
 					}	
 				}
 			}
-		}
+		}*/
 		if(ASTARpIDMM){
 			myfile << "\t\t_A*+IDMM_\n";
 			for(double percentage : percentages){
@@ -264,7 +265,7 @@ void StevenTest(int problems_num, bool randomSTP, vector<int> skipVector)
 					   nodesExpanded % necessaryNodesExpanded  % timer.GetElapsedTime();
 				}
 				else{
-					IDMM<MNPuzzleState<4, 4>, slideDir, false> idmm(idmmF2fFlag,isConsistent);
+					IDMM<MNPuzzleState<4, 4>, slideDir, false> idmm(idmmF2fFlag, isConsistent, isUpdateByWorkload);
 					MNPuzzleState<4, 4> midState;
 					bool solved = idmm.GetMidStateFromForwardList(&mnp, start, goal, midState, secondsLimit-timer.GetElapsedTime(), astar.getStatesList());
 					nodesExpanded += idmm.GetNodesExpanded();
@@ -456,7 +457,7 @@ void StevenTest(int problems_num, bool randomSTP, vector<int> skipVector)
 								myfile << boost::format("\t\t\tMBBDS(k=1,ThreePhase=%d) MBBDS using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) found path length %1.0f; %llu expanded; %llu necessary; %d iterations; %1.4fs elapsed;\n") % int(doThree) % statesQuantityBoundforMBBDS % stateSize % percentage % mbbds.getPathLength() % nodesExpanded % mbbds.GetNecessaryExpansions() % mbbds.getIterationNum() % timer.GetElapsedTime();
 							}
 							else{
-								IDMM<MNPuzzleState<4, 4>, slideDir, false> idmm(idmmF2fFlag,isConsistent);
+								IDMM<MNPuzzleState<4, 4>, slideDir, false> idmm(idmmF2fFlag, isConsistent, isUpdateByWorkload);
 								goal.Reset();
 								start = original;
 								solved = idmm.GetMidState(&mnp, start, goal, midState, secondsLimit-timer.GetElapsedTime(), int(lastBound));
@@ -480,7 +481,7 @@ void StevenTest(int problems_num, bool randomSTP, vector<int> skipVector)
 		if(IDMMRun)
 		{
 			myfile << "\t\t_IDMM_\n";
-			IDMM<MNPuzzleState<4, 4>, slideDir, false> idmm(idmmF2fFlag,isConsistent);
+			IDMM<MNPuzzleState<4, 4>, slideDir, false> idmm(idmmF2fFlag, isConsistent, isUpdateByWorkload);
 			goal.Reset();
 			start = original;
 			MNPuzzleState<4, 4> midState;
