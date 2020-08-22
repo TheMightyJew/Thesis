@@ -32,9 +32,9 @@ public:
 	virtual ~IDAStar() {}
 	bool GetPath(SearchEnvironment<state, action> *env, state from, state to,
 							 std::vector<state> &thePath, int secondsLimit=600);
-	bool ASpIDA(SearchEnvironment<state, action> *env, state from, state to, std::vector<state> &thePath, AStarOpenClosed<state, AStarCompareWithF<state>, AStarOpenClosedDataWithF<state>> statesList, int secondsLimit=600);
+	bool ASpIDA(SearchEnvironment<state, action> *env, state from, state to, std::vector<state> &thePath, AStarOpenClosed<state, AStarCompareWithF<state>, AStarOpenClosedDataWithF<state>> statesList, int secondsLimit=600, bool isDuplicateDetection = true);
 	bool BAI(SearchEnvironment<state, action> *env, state from, state to, std::vector<state> &thePath, AStarOpenClosed<state, AStarCompareWithF<state>, AStarOpenClosedDataWithF<state>> statesList, int secondsLimit=600, bool isConsistent = false);
-  bool ASpIDArev(SearchEnvironment<state, action> *env, state from, state to, std::vector<state> &thePath, AStarOpenClosed<state, AStarCompareWithF<state>, AStarOpenClosedDataWithF<state>> statesList, int secondsLimit=600, bool isConsistent = false);
+  bool ASpIDArev(SearchEnvironment<state, action> *env, state from, state to, std::vector<state> &thePath, AStarOpenClosed<state, AStarCompareWithF<state>, AStarOpenClosedDataWithF<state>> statesList, int secondsLimit=600, bool isConsistent = false, bool isComputeMaxH = false);
 	bool GetPath(SearchEnvironment<state, action> *env, state from, state to,
 				 std::vector<action> &thePath);
 
@@ -75,6 +75,7 @@ private:
 	}
 	void UpdateNextBound(double currBound, double fCost);
 	state goal;
+  state start;
 	double nextBound, currIterNextBound;
 	//NodeHashTable nodeTable;
 	bool usePathMax;
@@ -92,10 +93,13 @@ private:
 	std::vector<AStarOpenClosedDataWithF<state>> openList;
 	//std::vector<AStarOpenClosedDataWithF<state>> perimeterList;
 	double perimeterG;
-	bool readyStatesList;
+	bool isDuplicateDetection;
 	bool reverseG = false;
 	bool reverseF = false;
-	double minError;
+	//double minError;
+  bool isConsistent = false;
+  double minPerimeterF;
+  bool isComputeMaxH = false;
 
 #ifdef DO_LOGGING
 public:
@@ -105,14 +109,14 @@ public:
 
 template <class state, class action, bool verbose>
 bool IDAStar<state, action, verbose>::ASpIDA(SearchEnvironment<state, action> *env, state from, state to,
-							 std::vector<state> &thePath, AStarOpenClosed<state, AStarCompareWithF<state>, AStarOpenClosedDataWithF<state>> statesList, int secondsLimit)
+							 std::vector<state> &thePath, AStarOpenClosed<state, AStarCompareWithF<state>, AStarOpenClosedDataWithF<state>> statesList, int secondsLimit, bool isDuplicateDetection)
 {
 	//reverseG = false;
 	heuristic = env;
 	nextBound = 0;
 	nodesExpanded = nodesTouched = dAstarLastIterExpansions = 0;
 	thePath.resize(0);
-	this->readyStatesList = true;
+	this->isDuplicateDetection = isDuplicateDetection;
 	this->statesList = statesList;
 	double minF = std::numeric_limits<double>::max();
 	double maxF = 0;
@@ -128,6 +132,7 @@ bool IDAStar<state, action, verbose>::ASpIDA(SearchEnvironment<state, action> *e
 	   return lhs.h < rhs.h;
 	});
 	goal = to;
+	start = from;
 	thePath.push_back(from);
 	unsigned long nodesExpandedSoFar = 0;
 	unsigned long previousIterationExpansions = 0;
@@ -187,29 +192,29 @@ template <class state, class action, bool verbose>
 bool IDAStar<state, action, verbose>::BAI(SearchEnvironment<state, action> *env, state from, state to,
 							 std::vector<state> &thePath, AStarOpenClosed<state, AStarCompareWithF<state>, AStarOpenClosedDataWithF<state>> statesList, int secondsLimit, bool isConsistent)
 {
-	if (isConsistent){
-	minError = std::numeric_limits<double>::max();
-	}
-	else{
-	minError = 0;
-	}
+  this->isConsistent = isConsistent;
 	reverseF = true;
 	heuristic = env;
 	nextBound = 0;
 	nodesExpanded = nodesTouched = dAstarLastIterExpansions = 0;
 	thePath.resize(0);
-	this->readyStatesList = false;
-	double minF = std::numeric_limits<double>::max();
-	for (AStarOpenClosedDataWithF<state> astarState : statesList.getElements()){
-		minF = std::min(minF, astarState.g + astarState.h);
+  this->statesList = statesList;
+	this->isDuplicateDetection = false;
+	//double minF = std::numeric_limits<double>::max();
+	//for (AStarOpenClosedDataWithF<state> astarState : statesList.getElements()){
+		//minF = std::min(minF, astarState.g + astarState.h);
 		//maxF = std::max(maxF, astarState.f);
 		//maxG = std::max(maxG, astarState.g);
-		if (isConsistent){
-			minError = std::min(minError, astarState.g - heuristic->HCost(astarState.data, from));
-		}
-	}
-	UpdateNextBound(0, std::max(minF, heuristic->HCost(from, to)));
+		//if (isConsistent){
+		//	minError = std::min(minError, astarState.g - heuristic->HCost(astarState.data, to));
+		//}
+	//}
+  uint64_t key = statesList.Peek();
+	minPerimeterF = statesList.Lookup(key).g+statesList.Lookup(key).h;
+
+	UpdateNextBound(0, std::max(minPerimeterF, heuristic->HCost(from, to)));
 	goal = to;
+	start = from;
 	thePath.push_back(from);
 	unsigned long nodesExpandedSoFar = 0;
 	unsigned long previousIterationExpansions = 0;
@@ -253,14 +258,16 @@ bool IDAStar<state, action, verbose>::BAI(SearchEnvironment<state, action> *env,
 
 template <class state, class action, bool verbose>
 bool IDAStar<state, action, verbose>::ASpIDArev(SearchEnvironment<state, action> *env, state from, state to,
-							 std::vector<state> &thePath, AStarOpenClosed<state, AStarCompareWithF<state>, AStarOpenClosedDataWithF<state>> statesList, int secondsLimit, bool isConsistent)
+							 std::vector<state> &thePath, AStarOpenClosed<state, AStarCompareWithF<state>, AStarOpenClosedDataWithF<state>> statesList, int secondsLimit, bool isConsistent, bool isComputeMaxH)
 {
 	reverseG = true;
 	heuristic = env;
 	nextBound = 0;
 	nodesExpanded = nodesTouched = dAstarLastIterExpansions = 0;
 	thePath.resize(0);
-	this->readyStatesList = false;
+  this->isConsistent = isConsistent;
+  this->isComputeMaxH = isComputeMaxH;
+	this->isDuplicateDetection = false;
   this->statesList = statesList;
 	//double maxF = 0;
 	double minRealF = std::numeric_limits<double>::max();
@@ -282,6 +289,7 @@ bool IDAStar<state, action, verbose>::ASpIDArev(SearchEnvironment<state, action>
   */
 	UpdateNextBound(0, std::max(minRealF, heuristic->HCost(from, to)));
 	goal = to;
+	start = from;
 	thePath.push_back(from);
 	unsigned long nodesExpandedSoFar = 0;
 	unsigned long previousIterationExpansions = 0;
@@ -336,9 +344,10 @@ bool IDAStar<state, action, verbose>::GetPath(SearchEnvironment<state, action> *
 	nextBound = 0;
 	nodesExpanded = nodesTouched = dAstarLastIterExpansions = 0;
 	thePath.resize(0);
-	this->readyStatesList = false;
+	this->isDuplicateDetection = false;
 	UpdateNextBound(0, heuristic->HCost(from, to));
 	goal = to;
+	start = from;
 	thePath.push_back(from);
 	unsigned long nodesExpandedSoFar = 0;
 	unsigned long previousIterationExpansions = 0;
@@ -393,6 +402,7 @@ bool IDAStar<state, action, verbose>::GetPath(SearchEnvironment<state, action> *
 	double rootH = heuristic->HCost(from, to);
 	UpdateNextBound(0, rootH);
 	goal = to;
+	start = from;
 	std::vector<action> act;
 	env->GetActions(from, act);
 	while (thePath.size() == 0)
@@ -415,42 +425,73 @@ double IDAStar<state, action, verbose>::DoIteration(SearchEnvironment<state, act
 										   std::vector<state> &thePath, double bound, double g,
 										   double maxH, double currStateH, bool updateH, AStarOpenClosedDataWithF<state> *stateObject)
 {
-	double h = std::max(heuristic->HCost(currState, goal) + minError, currStateH);
+	double h = std::max(heuristic->HCost(currState, goal), currStateH);
 	// path max
 	if (usePathMax && fless(h, maxH))
 		h = maxH;
-	if (!reverseG && fgreater(g+h, bound))
+	if (fgreater(g+h, bound))
 	{
 		UpdateNextBound(bound, g+h);
 		//printf("Stopping at (%d, %d). g=%f h=%f\n", currState>>16, currState&0xFFFF, g, h);
 		return h;
 	}
-	else if(reverseG && (fgreater(g+perimeterG,bound) || fgreater(g+h, bound))){
-		UpdateNextBound(bound, std::max(g+perimeterG,g+h));
-		return h;
-	}
-	if (env->GoalTest(currState, goal)){
-		solved = true;
-		return 0;
-	}
-	else if(reverseF || (reverseG && perimeterG+g == bound)){
-    /*
-		for (AStarOpenClosedDataWithF<state> potenetionalMidState : perimeterList){
-			if (currState == potenetionalMidState.data){
-				solLength = g + potenetionalMidState.g;
+
+	else if(reverseG && perimeterG+g >= bound){
+
+    uint64_t ID;
+    if (statesList.Lookup(env->GetStateHash(currState), ID) != kNotFound){
+      if (statesList.Lookup(ID).g + g <= bound){
+				solLength = g + statesList.Lookup(ID).g;
 				solved = true;
 				return 0;
-			}
+      }
+      else{
+        UpdateNextBound(bound, statesList.Lookup(ID).g + g);
+        return h;
+      }
 		}
-    */
+    else if (fgreater(perimeterG+g,bound)){
+      UpdateNextBound(bound, g+perimeterG);
+      return h;
+    }
+	}
+  
+  else if (reverseG && isComputeMaxH){
+    double F2F_h = DBL_MAX;
+    	for (AStarOpenClosedDataWithF<state> astarState : statesList.getElements()){
+				if(astarState.g == perimeterG){ //perimeter frontier should be fixed and this should be updated to <= instead of ==
+					F2F_h = std::min(F2F_h,heuristic->HCost(currState, astarState.data) + astarState.g);
+				}
+			}
+      if (fgreater(g+F2F_h, bound))
+      {
+        UpdateNextBound(bound, g+F2F_h);
+        //printf("Stopping at (%d, %d). g=%f h=%f\n", currState>>16, currState&0xFFFF, g, h);
+        return F2F_h;
+      }
+  }
+  
+  else if(reverseF){
     uint64_t ID;
     if (statesList.Lookup(env->GetStateHash(currState), ID) != kNotFound && statesList.Lookup(ID).g + g <= bound){
 				solLength = g + statesList.Lookup(ID).g;
 				solved = true;
 				return 0;
 		}
+    else if (isConsistent){
+      double error = g - heuristic->HCost(currState, start);
+      if (fgreater(minPerimeterF + error ,bound)){
+        UpdateNextBound(bound, minPerimeterF + error);
+        return h; 
+      }      
+    }
 	}
-		
+  
+  else if (env->GoalTest(currState, goal)){
+		solved = true;
+		return 0;
+	}
+  		
 	std::vector<state> neighbors;
 	env->GetSuccessors(currState, neighbors);
 	nodesTouched += neighbors.size();
@@ -463,7 +504,7 @@ double IDAStar<state, action, verbose>::DoIteration(SearchEnvironment<state, act
 	double minNeighborF = std::numeric_limits<double>::max();
 	for (unsigned int x = 0; x < neighbors.size(); x++){
 		uint64_t childID;
-		if (neighbors[x] == parent || (readyStatesList && statesList.Lookup(env->GetStateHash(neighbors[x]), childID) == kClosedList)) {
+		if (neighbors[x] == parent || (isDuplicateDetection && statesList.Lookup(env->GetStateHash(neighbors[x]), childID) == kClosedList)) {
 			continue;
 		}
 		thePath.push_back(neighbors[x]);
