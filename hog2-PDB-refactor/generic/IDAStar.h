@@ -32,9 +32,9 @@ public:
 	virtual ~IDAStar() {}
 	bool GetPath(SearchEnvironment<state, action> *env, state from, state to,
 							 std::vector<state> &thePath, int secondsLimit=600);
-	bool ASpIDA(SearchEnvironment<state, action> *env, state from, state to, std::vector<state> &thePath, AStarOpenClosed<state, AStarCompareWithF<state>, AStarOpenClosedDataWithF<state>> statesList, int secondsLimit=600);
+	bool ASpIDA(SearchEnvironment<state, action> *env, state from, state to, std::vector<state> &thePath, AStarOpenClosed<state, AStarCompareWithF<state>, AStarOpenClosedDataWithF<state>> statesList, int secondsLimit=600, bool isDuplicateDetection = true);
 	bool BAI(SearchEnvironment<state, action> *env, state from, state to, std::vector<state> &thePath, AStarOpenClosed<state, AStarCompareWithF<state>, AStarOpenClosedDataWithF<state>> statesList, int secondsLimit=600, bool isConsistent = false);
-  bool ASpIDArev(SearchEnvironment<state, action> *env, state from, state to, std::vector<state> &thePath, AStarOpenClosed<state, AStarCompareWithF<state>, AStarOpenClosedDataWithF<state>> statesList, int secondsLimit=600, bool isConsistent = false);
+  bool ASpIDArev(SearchEnvironment<state, action> *env, state from, state to, std::vector<state> &thePath, AStarOpenClosed<state, AStarCompareWithF<state>, AStarOpenClosedDataWithF<state>> statesList, int secondsLimit=600, bool isConsistent = false, bool isComputeMaxH = false);
 	bool GetPath(SearchEnvironment<state, action> *env, state from, state to,
 				 std::vector<action> &thePath);
 
@@ -93,12 +93,13 @@ private:
 	std::vector<AStarOpenClosedDataWithF<state>> openList;
 	//std::vector<AStarOpenClosedDataWithF<state>> perimeterList;
 	double perimeterG;
-	bool readyStatesList;
+	bool isDuplicateDetection;
 	bool reverseG = false;
 	bool reverseF = false;
 	//double minError;
   bool isConsistent = false;
   double minPerimeterF;
+  bool isComputeMaxH = false;
 
 #ifdef DO_LOGGING
 public:
@@ -108,14 +109,14 @@ public:
 
 template <class state, class action, bool verbose>
 bool IDAStar<state, action, verbose>::ASpIDA(SearchEnvironment<state, action> *env, state from, state to,
-							 std::vector<state> &thePath, AStarOpenClosed<state, AStarCompareWithF<state>, AStarOpenClosedDataWithF<state>> statesList, int secondsLimit)
+							 std::vector<state> &thePath, AStarOpenClosed<state, AStarCompareWithF<state>, AStarOpenClosedDataWithF<state>> statesList, int secondsLimit, bool isDuplicateDetection)
 {
 	//reverseG = false;
 	heuristic = env;
 	nextBound = 0;
 	nodesExpanded = nodesTouched = dAstarLastIterExpansions = 0;
 	thePath.resize(0);
-	this->readyStatesList = true;
+	this->isDuplicateDetection = isDuplicateDetection;
 	this->statesList = statesList;
 	double minF = std::numeric_limits<double>::max();
 	double maxF = 0;
@@ -198,7 +199,7 @@ bool IDAStar<state, action, verbose>::BAI(SearchEnvironment<state, action> *env,
 	nodesExpanded = nodesTouched = dAstarLastIterExpansions = 0;
 	thePath.resize(0);
   this->statesList = statesList;
-	this->readyStatesList = false;
+	this->isDuplicateDetection = false;
 	//double minF = std::numeric_limits<double>::max();
 	//for (AStarOpenClosedDataWithF<state> astarState : statesList.getElements()){
 		//minF = std::min(minF, astarState.g + astarState.h);
@@ -257,7 +258,7 @@ bool IDAStar<state, action, verbose>::BAI(SearchEnvironment<state, action> *env,
 
 template <class state, class action, bool verbose>
 bool IDAStar<state, action, verbose>::ASpIDArev(SearchEnvironment<state, action> *env, state from, state to,
-							 std::vector<state> &thePath, AStarOpenClosed<state, AStarCompareWithF<state>, AStarOpenClosedDataWithF<state>> statesList, int secondsLimit, bool isConsistent)
+							 std::vector<state> &thePath, AStarOpenClosed<state, AStarCompareWithF<state>, AStarOpenClosedDataWithF<state>> statesList, int secondsLimit, bool isConsistent, bool isComputeMaxH)
 {
 	reverseG = true;
 	heuristic = env;
@@ -265,7 +266,8 @@ bool IDAStar<state, action, verbose>::ASpIDArev(SearchEnvironment<state, action>
 	nodesExpanded = nodesTouched = dAstarLastIterExpansions = 0;
 	thePath.resize(0);
   this->isConsistent = isConsistent;
-	this->readyStatesList = false;
+  this->isComputeMaxH = isComputeMaxH;
+	this->isDuplicateDetection = false;
   this->statesList = statesList;
 	//double maxF = 0;
 	double minRealF = std::numeric_limits<double>::max();
@@ -342,7 +344,7 @@ bool IDAStar<state, action, verbose>::GetPath(SearchEnvironment<state, action> *
 	nextBound = 0;
 	nodesExpanded = nodesTouched = dAstarLastIterExpansions = 0;
 	thePath.resize(0);
-	this->readyStatesList = false;
+	this->isDuplicateDetection = false;
 	UpdateNextBound(0, heuristic->HCost(from, to));
 	goal = to;
 	start = from;
@@ -453,6 +455,22 @@ double IDAStar<state, action, verbose>::DoIteration(SearchEnvironment<state, act
       return h;
     }
 	}
+  
+  else if (reverseG && isComputeMaxH){
+    double F2F_h = DBL_MAX;
+    	for (AStarOpenClosedDataWithF<state> astarState : statesList.getElements()){
+				if(astarState.g == perimeterG){ //perimeter frontier should be fixed and this should be updated to <= instead of ==
+					F2F_h = std::min(F2F_h,heuristic->HCost(currState, astarState.data) + astarState.g);
+				}
+			}
+      if (fgreater(g+F2F_h, bound))
+      {
+        UpdateNextBound(bound, g+F2F_h);
+        //printf("Stopping at (%d, %d). g=%f h=%f\n", currState>>16, currState&0xFFFF, g, h);
+        return F2F_h;
+      }
+  }
+  
   else if(reverseF){
     uint64_t ID;
     if (statesList.Lookup(env->GetStateHash(currState), ID) != kNotFound && statesList.Lookup(ID).g + g <= bound){
@@ -486,7 +504,7 @@ double IDAStar<state, action, verbose>::DoIteration(SearchEnvironment<state, act
 	double minNeighborF = std::numeric_limits<double>::max();
 	for (unsigned int x = 0; x < neighbors.size(); x++){
 		uint64_t childID;
-		if (neighbors[x] == parent || (readyStatesList && statesList.Lookup(env->GetStateHash(neighbors[x]), childID) == kClosedList)) {
+		if (neighbors[x] == parent || (isDuplicateDetection && statesList.Lookup(env->GetStateHash(neighbors[x]), childID) == kClosedList)) {
 			continue;
 		}
 		thePath.push_back(neighbors[x]);

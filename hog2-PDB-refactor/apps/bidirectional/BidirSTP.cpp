@@ -12,6 +12,7 @@
 #include "LexPermutationPDB.h"
 #include "MR1PermutationPDB.h"
 
+#include <climits>
 #include <algorithm>
 #include "STPHasher.h"
 #include "TemplateAStar.h"
@@ -35,9 +36,11 @@ static void StevenTest(int problems_num=1, bool randomSTP=true, vector<int> skip
 static int walkLength = 120;
 static unsigned long MMstatesQuantityBound;
 static unsigned long ASTARstatesQuantityBound;
-static unsigned long statesQuantityBound = 1000000;
+static unsigned long statesQuantityBound;
+static unsigned long statesQuantityBoundDefault = 1000000;
 static int secondsLimit = 60*30;
 static bool AstarRun=true;
+static bool RevAstarRun=true;
 static bool AstarPIDAstarRun=true;
 static bool AstarPIDAstarReverseRun=false;
 static bool BAI=true;
@@ -117,6 +120,9 @@ void StevenTest(int problems_num, bool randomSTP, vector<int> skipVector)
 		myfile << "\tGoal state: " << goal << endl;
 		myfile <<"\tInitial heuristic " << mnp.HCost(original, goal) << endl;
 		// A*
+    
+    statesQuantityBound = ULONG_MAX;
+    
 		vector<AStarOpenClosedDataWithF<MNPuzzleState<4, 4>>> astarOpenList;
 		if (AstarRun)
 		{
@@ -131,10 +137,29 @@ void StevenTest(int problems_num, bool randomSTP, vector<int> skipVector)
 				myfile << boost::format("\t\t\tA* found path length %1.0f; %llu expanded; %llu necessary; using %1.0llu states in memory; %1.4fs elapsed\n") % mnp.GetPathLength(astarPath) %
 				   astar.GetNodesExpanded() % astar.GetNecessaryExpansions() % ASTARstatesQuantityBound % timer.GetElapsedTime();
 				myfile << boost::format("\t\t\tI-A* ; %llu expanded;\n") % astar.getIAstarExpansions();	
+        statesQuantityBound =  std::min(statesQuantityBound, ASTARstatesQuantityBound);
 			}
 			else{
 				myfile << boost::format("\t\t\tA* failed after %1.4fs\n") % timer.GetElapsedTime();
 				myfile << "\t\t\tI-A* failed after because A* failed\n";	
+			}
+		}
+    if (RevAstarRun)
+		{
+			myfile <<"\t\t_A*_\n";
+			TemplateAStar<MNPuzzleState<4, 4>, slideDir, MNPuzzle<4, 4>> astar;
+			start = original;
+			timer.StartTimer();
+			bool solved = astar.GetPathTime(&mnp, goal, start, astarPath, secondsLimit);
+			ASTARstatesQuantityBound = astar.getMemoryStatesUse();
+			timer.EndTimer();
+			if(solved){
+				myfile << boost::format("\t\t\tRev-A* found path length %1.0f; %llu expanded; %llu necessary; using %1.0llu states in memory; %1.4fs elapsed\n") % mnp.GetPathLength(astarPath) %
+				   astar.GetNodesExpanded() % astar.GetNecessaryExpansions() % ASTARstatesQuantityBound % timer.GetElapsedTime();
+        statesQuantityBound =  std::min(statesQuantityBound, ASTARstatesQuantityBound);
+			}
+			else{
+				myfile << boost::format("\t\t\tRev-A* failed after %1.4fs\n") % timer.GetElapsedTime();
 			}
 		}
 		// MM
@@ -151,21 +176,16 @@ void StevenTest(int problems_num, bool randomSTP, vector<int> skipVector)
 			if(solved){
 				myfile << boost::format("\t\t\tMM found path length %1.0f; %llu expanded; %llu necessary; using %1.0llu states in memory; %1.4fs elapsed\n") % mnp.GetPathLength(mmPath) %
 					   mm.GetNodesExpanded() % mm.GetNecessaryExpansions() % MMstatesQuantityBound % timer.GetElapsedTime();
-				myfile << boost::format("\t\t\tI-MM ; %llu expanded;\n") % mm.getIMMExpansions();				
+				myfile << boost::format("\t\t\tI-MM ; %llu expanded;\n") % mm.getIMMExpansions();		
+        statesQuantityBound =  std::min(statesQuantityBound, MMstatesQuantityBound);        
 			}
 			else{
 				myfile << boost::format("\t\t\tMM failed after %1.4fs\n") % timer.GetElapsedTime();
 				myfile << "\t\t\tI-MM failed because MM failed\n";
 			}
 		}
-		if(MMRun && AstarRun){
-			statesQuantityBound = min(ASTARstatesQuantityBound, MMstatesQuantityBound);
-		}
-		else if(MMRun && !AstarRun){
-			statesQuantityBound = MMstatesQuantityBound;
-		}
-		else if(!MMRun && AstarRun){
-			statesQuantityBound = ASTARstatesQuantityBound;
+		if(statesQuantityBound == ULONG_MAX){
+			statesQuantityBound = statesQuantityBoundDefault;
 		}
 		// IDA*
 		if (IDAstarRun)
@@ -188,13 +208,13 @@ void StevenTest(int problems_num, bool randomSTP, vector<int> skipVector)
 			}					   
 		}
 		//double percentages[6] = {1, 0.9, 0.75, 0.5, 0.25, 0.1};
-		double percentages[5] = {0.9, 0.75, 0.5, 0.25, 0.1};
+		double percentages[3] = {0.5, 0.1, 0.01};
 		long stateSize = sizeof(original);
 		
 		if(MMpIDMM){
 			myfile << "\t\t_MM+IDMM_\n";
 			for(double percentage : percentages){
-				unsigned long statesQuantityBoundforMMpIDMM = statesQuantityBound*percentage;
+				unsigned long statesQuantityBoundforMMpIDMM = std::max(statesQuantityBound*percentage,2.0);
 				MM<MNPuzzleState<4, 4>, slideDir, MNPuzzle<4, 4>> mm;
 				goal.Reset();
 				start = original;
@@ -229,7 +249,7 @@ void StevenTest(int problems_num, bool randomSTP, vector<int> skipVector)
 		if(ASTARpIDMM){
 			myfile << "\t\t_A*+IDMM_\n";
 			for(double percentage : percentages){
-				unsigned long statesQuantityBoundforASPIDMM = statesQuantityBound*percentage;
+				unsigned long statesQuantityBoundforASPIDMM = std::max(statesQuantityBound*percentage,2.0);
 				TemplateAStar<MNPuzzleState<4, 4>, slideDir, MNPuzzle<4, 4>> astar;
 				goal.Reset();
 				start = original;
@@ -263,7 +283,7 @@ void StevenTest(int problems_num, bool randomSTP, vector<int> skipVector)
 		if (AstarPIDAstarRun){
 			myfile << "\t\t_Astar+IDAstar_\n";
 			for(double percentage : percentages){
-				unsigned long statesQuantityBoundforASPIDAS = statesQuantityBound*percentage;
+				unsigned long statesQuantityBoundforASPIDAS = std::max(statesQuantityBound*percentage,2.0);
 				TemplateAStar<MNPuzzleState<4, 4>, slideDir, MNPuzzle<4, 4>> astar;
 				goal.Reset();
 				start = original;
@@ -297,7 +317,7 @@ void StevenTest(int problems_num, bool randomSTP, vector<int> skipVector)
 		if (AstarPIDAstarReverseRun){
 			myfile << "\t\t_Astar+IDAstar+Reverse_\n";
 			for(double percentage : percentages){
-				unsigned long statesQuantityBoundforASPIDARS = statesQuantityBound*percentage;
+				unsigned long statesQuantityBoundforASPIDARS = std::max(statesQuantityBound*percentage,2.0);
 				TemplateAStar<MNPuzzleState<4, 4>, slideDir, MNPuzzle<4, 4>> astar;
 				goal.Reset();
 				start = original;
@@ -331,7 +351,7 @@ void StevenTest(int problems_num, bool randomSTP, vector<int> skipVector)
 		if (BAI){
 			myfile << "\t\t_BAI_\n";
 			for(double percentage : percentages){
-				unsigned long statesQuantityBoundforASPIDARS = statesQuantityBound*percentage;
+				unsigned long statesQuantityBoundforASPIDARS = std::max(statesQuantityBound*percentage,2.0);
 				TemplateAStar<MNPuzzleState<4, 4>, slideDir, MNPuzzle<4, 4>> astar;
 				goal.Reset();
 				start = original;
@@ -365,7 +385,7 @@ void StevenTest(int problems_num, bool randomSTP, vector<int> skipVector)
     if (Max_BAI){
 			myfile << "\t\t_Max_BAI_\n";
 			for(double percentage : percentages){
-				unsigned long statesQuantityBoundforASPIDARS = statesQuantityBound*percentage;
+				unsigned long statesQuantityBoundforASPIDARS = std::max(statesQuantityBound*percentage,2.0);
 				TemplateAStar<MNPuzzleState<4, 4>, slideDir, MNPuzzle<4, 4>> astar;
 				goal.Reset();
 				start = original;
@@ -407,7 +427,7 @@ void StevenTest(int problems_num, bool randomSTP, vector<int> skipVector)
 					unsigned long nodesExpanded;
 					for(double percentage : percentages){
 						timer.StartTimer();
-						unsigned long statesQuantityBoundforMBBDS = statesQuantityBound*percentage;
+						unsigned long statesQuantityBoundforMBBDS = std::max(statesQuantityBound*percentage,2.0);
 						solved = false;
 						unsigned long nodesExpanded = 0;
 						double lastBound = 0;
