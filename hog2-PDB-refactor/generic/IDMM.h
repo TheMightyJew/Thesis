@@ -118,7 +118,7 @@ bool IDMM<state, action, verbose>::GetMidStateFromLists(SearchEnvironment<state,
 	for (int x = 0; x < backwardList.OpenSize(); x++){
 		AStarOpenClosedDataWithF<state> openState = backwardList.getElements()[backwardList.GetOpenItem(x)];
 		minFbackward = std::min(minFbackward, openState.f);
-		minBackwardError = std::min(minBackwardError, openState.g - env->HCost(openState.data,originGoal));
+		minBackwardError = std::min(minBackwardError, openState.g - env->HCost(openState.data, originGoal));
 		backwardOpenList.push_back(openState);
 	}
 	if (!isConsistent){
@@ -241,8 +241,6 @@ bool IDMM<state, action, verbose>::GetMidState(SearchEnvironment<state, action>*
 		if(elapsed_seconds.count() >= secondsLimit){
 			return false;
 		}
-		forwardExpandedInLastIter = 0;
-		backwardExpandedInLastIter = 0;
 		if (verbose){
 			printf("\t\tBounds: %1.1f and %1.1f: ", forwardBound, backwardBound);
 		}
@@ -265,6 +263,8 @@ bool IDMM<state, action, verbose>::GetMidState(SearchEnvironment<state, action>*
 				forwardBound = updateBoundByWorkload(nextFbound, fBound, forwardBound, forwardExpandedInLastIter, backwardExpandedInLastIter);
 			}
 			fBound = nextFbound;
+			forwardExpandedInLastIter = 0;
+			backwardExpandedInLastIter = 0;
 		}
 		previousIterationExpansions = nodesExpanded-nodesExpandedSoFar;
 		nodesExpandedSoFar = nodesExpanded;

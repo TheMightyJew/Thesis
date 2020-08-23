@@ -17,8 +17,10 @@
 template <class state, class action, class BloomFilter, bool verbose = true>
 class MBBDS {
 public:
-	MBBDS(unsigned long statesQuantityBound) {
+	MBBDS(unsigned long statesQuantityBound, bool isUpdateByWorkload=false, bool isConsistent = false) {
 		this->statesQuantityBound = statesQuantityBound;
+		this->isUpdateByWorkload = isUpdateByWorkload;
+		this->isConsistent = isConsistent;
 	}
 	virtual ~MBBDS() {}
 	bool GetMidState(SearchEnvironment<state, action>* env, state fromState, state toState, state &midState, int secondsLimit=600, double startingFBound=0);
@@ -31,7 +33,7 @@ public:
 	void ResetNodeCount() { nodesExpanded = nodesTouched = 0; }
 private:
 	void UpdateNextBound(double fCost);
-
+	double updateBoundByWorkload(double newbound, double prevBound, double oldForwardBound,uint64_t forwardLoad,uint64_t backwardLoad);
 	unsigned long nodesExpanded, nodesTouched, statesQuantityBound, necessaryExpansions, lastIterBoundExpansions;
 ;
 	int iteration_num;
@@ -40,8 +42,9 @@ private:
 	bool listReady;
 	bool outOfSpace;
 	bool firstRun;
-	double backwardBound;
-	double forwardBound;
+	double backwardBound, forwardBound , fBound;
+	unsigned long forwardExpandedInLastIter = 0;
+	unsigned long backwardExpandedInLastIter = 0;
 	double pathLength;
 	std::unordered_set<state> middleStates;
 	unsigned long memoryBound;
@@ -50,12 +53,27 @@ private:
 		state parent, state currState, double bound, double g, state& midState);
 	bool checkState(state midState);
 	double nextBound;
+	bool forwardSearch;
+	bool isUpdateByWorkload;
+	bool isConsistent;
+	double minCurrentError = std::numeric_limits<double>::max();
+	double minPreviousError = 0;
 	state goal;
 	state start;
 
 
 
 };
+template <class state, class action, class BloomFilter, bool verbose>
+double MBBDS<state, action, BloomFilter, verbose>::updateBoundByWorkload(double newbound, double prevBound, double oldForwardBound, uint64_t forwardLoad,uint64_t backwardLoad){
+	//printf("forwardLoad: %llu,backwardLoad: %llu,oldForwardBound%d\n",forwardLoad,backwardLoad,oldForwardBound);
+	if (forwardLoad <= backwardLoad){
+		return oldForwardBound + newbound - prevBound;
+	}
+	else{
+		return oldForwardBound;
+	}
+}
 
 template <class state, class action, class BloomFilter, bool verbose>
 bool MBBDS<state, action, BloomFilter, verbose>::GetMidState(SearchEnvironment<state, action>* env,
@@ -69,11 +87,10 @@ bool MBBDS<state, action, BloomFilter, verbose>::GetMidState(SearchEnvironment<s
 	nodesExpanded = nodesTouched = 0;
 	state from;
 	double initialHeuristic = env->HCost(fromState, toState);
-	startingFBound = round(std::max(initialHeuristic, startingFBound));
-	nextBound = startingFBound;
+	fBound = round(std::max(initialHeuristic, startingFBound));
+	nextBound = fBound;
 	forwardBound = ceil(startingFBound / 2);
 	backwardBound = startingFBound - forwardBound;
-	bool forwardSearch;
 	int saturationIncreased = 0;
 	//changed
 	int saturationMaxIncreasements = 10;
@@ -106,24 +123,33 @@ bool MBBDS<state, action, BloomFilter, verbose>::GetMidState(SearchEnvironment<s
 				printf("start forwardSearch = %d\n", forwardSearch);
 			}
 			if (forwardSearch) {
+				forwardExpandedInLastIter = 0;
 				bound = forwardBound;
 				from = fromState;
 				goal = toState;
 			}
 			else {
+				backwardExpandedInLastIter = 0;
 				bound = backwardBound;
 				from = toState;
 				goal = fromState;
 			}
 			outOfSpace = false;
 			bool solved = DoIteration(env, from, from, bound, 0, midState);
-			if(verbose){
-				printf("Nodes expanded: %d(%d)\n", nodesExpanded-nodesExpandedSoFar, nodesExpanded);
-			}
+			unsigned long nodesExpandedThisIter = nodesExpanded-nodesExpandedSoFar;
 			nodesExpandedSoFar = nodesExpanded;
+			if(verbose){
+				printf("Nodes expanded: %d(%d)\n", nodesExpandedThisIter, nodesExpanded);
+			}
+			if (forwardSearch) {
+				forwardExpandedInLastIter = std::max(forwardExpandedInLastIter, nodesExpandedThisIter);
+			}
+			else {
+				backwardExpandedInLastIter = std::max(backwardExpandedInLastIter, nodesExpandedThisIter);;
+			}
 			iteration_num++;
 			if (solved) {
-				pathLength = backwardBound + forwardBound;
+				pathLength = fBound;
 				necessaryExpansions = nodesExpanded - lastIterBoundExpansions;
 				return true;
 			}
@@ -166,6 +192,13 @@ bool MBBDS<state, action, BloomFilter, verbose>::GetMidState(SearchEnvironment<s
 			}
 			firstRun = false;
 			forwardSearch = !forwardSearch;
+			if(minCurrentError != std::numeric_limits<double>::max()){
+				minPreviousError = minCurrentError;
+			}
+			else{
+				minPreviousError = 0;
+			}
+			minCurrentError = std::numeric_limits<double>::max();
 		}	
 		
 		last_saturation = 1;
@@ -175,11 +208,20 @@ bool MBBDS<state, action, BloomFilter, verbose>::GetMidState(SearchEnvironment<s
 		forwardSearch = true;
 		listReady = false;
 		middleStates.clear();
-		if(nextBound <= forwardBound+backwardBound){
-			nextBound = forwardBound+backwardBound+1;
+		minCurrentError = std::numeric_limits<double>::max();
+		minPreviousError = 0;
+		nextBound = std::max(nextBound, forwardBound+backwardBound+1);
+		
+		if (!isUpdateByWorkload){
+			forwardBound = ceil(nextBound / 2);
+		} 
+		else{
+			forwardBound = updateBoundByWorkload(nextBound, fBound, forwardBound, forwardExpandedInLastIter, backwardExpandedInLastIter);
 		}
-		forwardBound = ceil(nextBound/2);
-		backwardBound = nextBound - forwardBound;
+		fBound = nextBound;	
+		backwardBound = fBound - forwardBound;
+		forwardExpandedInLastIter = 0;
+		backwardExpandedInLastIter = 0;
 	}
 	return false;
 }
@@ -190,7 +232,25 @@ bool MBBDS<state, action, BloomFilter, verbose>::DoIteration(SearchEnvironment<s
 	state parent, state currState, double bound, double g, state& midState)
 {
 	double h = env->HCost(currState, goal);
+	
+	
+	if (g > bound  || fgreater(g + h, fBound))
+	{
+		UpdateNextBound(g + h);
+		return false;
+	}
+	
+	if(isConsistent && g < bound){
+		h += minPreviousError;
+	}
+	
 	if (g == bound) {
+		if(forwardSearch){
+			minCurrentError = std::min(minCurrentError, g - env->HCost(start, currState));
+		}
+		else{
+			minCurrentError = std::min(minCurrentError, g - env->HCost(currState, goal));
+		}
 		if (checkState(currState)){
 			midState = currState;
 			return true;
@@ -199,16 +259,12 @@ bool MBBDS<state, action, BloomFilter, verbose>::DoIteration(SearchEnvironment<s
 			return false;
 		}
 	}
-	else if (g > bound  || fgreater(g + h, backwardBound + forwardBound))
-	{
-		UpdateNextBound(g + h);
-		return false;
-	}
+	
 	std::vector<state> neighbors;
 	env->GetSuccessors(currState, neighbors);
 	nodesTouched += neighbors.size();
 	nodesExpanded++;
-	if(g + h == backwardBound + forwardBound){
+	if(g + h == fBound){
 		lastIterBoundExpansions++;
 	}
 	for (unsigned int x = 0; x < neighbors.size(); x++)
@@ -257,12 +313,11 @@ bool MBBDS<state, action, BloomFilter, verbose>::checkState(state midState)
 template<class state, class action, class BloomFilter, bool verbose>
 void MBBDS<state, action, BloomFilter, verbose>::UpdateNextBound(double fCost)
 {
-	double currBound = backwardBound + forwardBound;
-	if (!fgreater(nextBound, currBound))
+	if (!fgreater(nextBound, fBound))
 	{
 		nextBound = fCost;
 	}
-	else if (fgreater(fCost, currBound) && fless(fCost, nextBound))
+	else if (fgreater(fCost, fBound) && fless(fCost, nextBound))
 	{
 		nextBound = fCost;
 	}

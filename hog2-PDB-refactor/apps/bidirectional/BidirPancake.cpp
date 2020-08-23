@@ -45,8 +45,8 @@ static bool ASTARpIDMM=true;
 static bool MMRun=true;
 static bool MMpIDMM=false;
 static bool IDAstarRun=false;
-static bool MBBDSRun=false;
-static bool threePhase=false;
+static bool MBBDSRun=true;
+static bool threePhase=true;
 static bool twoPhase=false;
 static bool IDMMRun=true;
 static bool idmmF2fFlag=true;
@@ -514,7 +514,7 @@ void StevenTest(int gap, int problems_num, bool randomPancake, vector<int> skipV
 							   nodesExpanded % mm.GetNecessaryExpansions() % 0 % timer.GetElapsedTime();
 						}
 						else{
-							MBBDS<PancakePuzzleState<pancakes_num>, PancakePuzzleAction, MbbdsBloomFilter<PancakePuzzleState<pancakes_num>, PancakeHasher<pancakes_num>>, false> mbbds(statesQuantityBoundforMBBDS) ;
+							MBBDS<PancakePuzzleState<pancakes_num>, PancakePuzzleAction, MbbdsBloomFilter<PancakePuzzleState<pancakes_num>, PancakeHasher<pancakes_num>>, false> mbbds(statesQuantityBoundforMBBDS, isUpdateByWorkload, isConsistent) ;
 							goal.Reset();
 							start = original;
 							solved = mbbds.GetMidState(&pancake, start, goal, midState, secondsLimit - timer.GetElapsedTime(), int(lastBound));
