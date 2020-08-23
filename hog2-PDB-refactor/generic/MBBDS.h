@@ -59,7 +59,7 @@ private:
 	double minCurrentError = std::numeric_limits<double>::max();
 	double minPreviousError = 0;
 	state goal;
-	state start;
+	state from;
 
 
 
@@ -85,7 +85,6 @@ bool MBBDS<state, action, BloomFilter, verbose>::GetMidState(SearchEnvironment<s
 		printf("\nStarting to solve with MBBDS\n");
 	}
 	nodesExpanded = nodesTouched = 0;
-	state from;
 	double initialHeuristic = env->HCost(fromState, toState);
 	fBound = round(std::max(initialHeuristic, startingFBound));
 	nextBound = fBound;
@@ -233,24 +232,18 @@ bool MBBDS<state, action, BloomFilter, verbose>::DoIteration(SearchEnvironment<s
 {
 	double h = env->HCost(currState, goal);
 	
+	if(isConsistent && g < bound){
+		h += minPreviousError;
+	}
 	
 	if (g > bound  || fgreater(g + h, fBound))
 	{
 		UpdateNextBound(g + h);
 		return false;
 	}
-	
-	if(isConsistent && g < bound){
-		h += minPreviousError;
-	}
-	
+
 	if (g == bound) {
-		if(forwardSearch){
-			minCurrentError = std::min(minCurrentError, g - env->HCost(start, currState));
-		}
-		else{
-			minCurrentError = std::min(minCurrentError, g - env->HCost(currState, goal));
-		}
+		minCurrentError = std::min(minCurrentError, g - env->HCost(from, currState));
 		if (checkState(currState)){
 			midState = currState;
 			return true;

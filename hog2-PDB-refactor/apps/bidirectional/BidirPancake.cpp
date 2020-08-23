@@ -51,7 +51,7 @@ static bool twoPhase=false;
 static bool IDMMRun=true;
 static bool idmmF2fFlag=true;
 static bool isConsistent=true;
-static bool isUpdateByWorkload=true;
+static bool isUpdateByWorkload=false;
 
 
 
