@@ -39,23 +39,33 @@ static unsigned long ASTARstatesQuantityBound;
 static unsigned long statesQuantityBound;
 static unsigned long statesQuantityBoundDefault = 1000000;
 static int secondsLimit = 60*30;
+
 static bool AstarRun=true;
 static bool RevAstarRun=true;
+
+static bool IDAstarRun=true;
+
 static bool AstarPIDAstarRun=true;
-static bool AstarPIDAstarReverseRun=false;
+static bool AstarPIDAstarReverseRun=true;
+static bool AstarPIDAstarReverseMinHRun=false;
+
 static bool BAI=true;
 static bool Max_BAI=true;
-static bool ASTARpIDMM=true;
+
 static bool MMRun=true;
-static bool MMpIDMM=false;
-static bool IDAstarRun=false;
-static bool MBBDSRun=false;
-static bool threePhase=false;
-static bool twoPhase=false;
-static bool IDMMRun=false;
+
+static bool IDMMRun=true;
 static bool idmmF2fFlag=true;
+
+static bool ASTARpIDMM=true;
+static bool MMpIDMM=false;
+
+static bool MBBDSRun=true;
+static bool threePhase=true;
+static bool twoPhase=false;
+
 static bool isConsistent=false;
-static bool isUpdateByWorkload=true;
+static bool isUpdateByWorkload=false;
 
 
 static string datetime()
@@ -80,7 +90,7 @@ void TestSTP(int algorithm)
 	cout << "running..." << endl;
 	myfile.open (filename);
 	
-	StevenTest(1, false);
+	StevenTest(10, false);
 
 	myfile << "completed!" << endl;
 	myfile.close();
@@ -446,7 +456,7 @@ void StevenTest(int problems_num, bool randomSTP, vector<int> skipVector)
 							   nodesExpanded % mm.GetNecessaryExpansions() % 0 % timer.GetElapsedTime();
 						}
 						else{
-							MBBDS<MNPuzzleState<4, 4>, slideDir, MbbdsBloomFilter<MNPuzzleState<4, 4>, STPHasher>, false> mbbds(statesQuantityBoundforMBBDS) ;
+							MBBDS<MNPuzzleState<4, 4>, slideDir, MbbdsBloomFilter<MNPuzzleState<4, 4>, STPHasher>, false> mbbds(statesQuantityBoundforMBBDS, isUpdateByWorkload, isConsistent) ;
 							goal.Reset();
 							start = original;
 							solved = mbbds.GetMidState(&mnp, start, goal, midState, secondsLimit - timer.GetElapsedTime(), int(lastBound));

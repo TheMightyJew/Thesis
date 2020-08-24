@@ -34,25 +34,33 @@ static unsigned long ASTARstatesQuantityBound;
 static unsigned long statesQuantityBound;
 static unsigned long statesQuantityBoundDefault = 1000000;
 static int secondsLimit = 60*30;
+
 static bool AstarRun=true;
-static bool RevAstarRun=false;
-static bool AstarPIDAstarRun=false;
-static bool AstarPIDAstarReverseRun=false;
+static bool RevAstarRun=true;
+
+static bool IDAstarRun=true;
+
+static bool AstarPIDAstarRun=true;
+static bool AstarPIDAstarReverseRun=true;
 static bool AstarPIDAstarReverseMinHRun=false;
-static bool BAI=false;
-static bool Max_BAI=false;
-static bool ASTARpIDMM=true;
+
+static bool BAI=true;
+static bool Max_BAI=true;
+
 static bool MMRun=true;
+
+static bool IDMMRun=true;
+static bool idmmF2fFlag=true;
+
+static bool ASTARpIDMM=true;
 static bool MMpIDMM=false;
-static bool IDAstarRun=false;
+
 static bool MBBDSRun=true;
 static bool threePhase=true;
 static bool twoPhase=false;
-static bool IDMMRun=true;
-static bool idmmF2fFlag=true;
-static bool isConsistent=true;
-static bool isUpdateByWorkload=false;
 
+static bool isConsistent=true;
+static bool isUpdateByWorkload=true;
 
 
 string datetime()
@@ -78,10 +86,10 @@ void TestPancake()
 	myfile.open (filename);
 	
 
-	StevenTest(0, 10, true);
-	StevenTest(1, 10, true);
-	StevenTest(2, 10, true);
-	StevenTest(3, 10, true);
+	StevenTest(0, 100, true);
+	StevenTest(1, 100, true);
+	StevenTest(2, 100, true);
+	StevenTest(3, 100, true);
 
 	myfile << "completed!" << endl;
 	myfile.close();
@@ -402,7 +410,7 @@ void StevenTest(int gap, int problems_num, bool randomPancake, vector<int> skipV
 				}
 				else{
 					IDAStar<PancakePuzzleState<pancakes_num>, PancakePuzzleAction, false> idastar;
-					solved = idastar.ASpIDArev(&pancake, start, goal, idaPath, astar.getStatesList(), secondsLimit-t1.GetElapsedTime(),false,true);
+					solved = idastar.ASpIDArev(&pancake, start, goal, idaPath, astar.getStatesList(), secondsLimit-t1.GetElapsedTime(),isConsistent, true);
 					nodesExpanded += idastar.GetNodesExpanded();
 					necessaryNodesExpanded += idastar.GetNecessaryExpansions();
 					t1.EndTimer();
