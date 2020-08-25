@@ -310,8 +310,9 @@ bool IDAStar<state, action, verbose>::ASpIDArev(SearchEnvironment<state, action>
 		if (verbose)
 			printf("\t\tStarting iteration with bound %1.1f: ", bound, nodesExpanded);
 		
-		/*heuristicList.clear();
-		if(isComputeMaxH){
+		
+		if(isComputeMaxH && isConsistent){
+      heuristicList.clear();
 			for (AStarOpenClosedDataWithF<state> astarState : statesList.getElements()){
 				if(astarState.g == perimeterG){
 					double calculatedF = heuristic->HCost(from, astarState.data) + astarState.g;
@@ -325,9 +326,9 @@ bool IDAStar<state, action, verbose>::ASpIDArev(SearchEnvironment<state, action>
 					}
 				}
 			}	
-		}*/
+		}
 		double res;
-		if(false && isComputeMaxH && heuristicList.size() == 0)
+		if(false && isComputeMaxH && isConsistent && heuristicList.size() == 0)
 			res = 1;
 		else
 			res = DoIteration(env, from, from, thePath, bound, 0, 0);
@@ -480,38 +481,42 @@ double IDAStar<state, action, verbose>::DoIteration(SearchEnvironment<state, act
 	}
 	else if (reverseG && isComputeMaxH){
 		double F2F_h = DBL_MAX;
-		/*int counter = 0;
-		for (uint64_t childID : heuristicList){
-			AStarOpenClosedDataWithF<state> perimeterState = statesList.Lookup(childID);
-			if(perimeterState.g == perimeterG){ //perimeter frontier should be fixed and this should be updated to <= instead 
-				double calculatedF = g + heuristic->HCost(currState, perimeterState.data) + perimeterState.g;
-				F2F_h = std::min(F2F_h, calculatedF);
-				if(fgreater(calculatedF, bound)){
-					UpdateNextBound(bound, calculatedF);
-					ignoreList.push_back(childID);
-					heuristicList.erase(heuristicList.begin()+counter);
-					counter--;
-				}
-			}
-			counter++;
-		}
-		if(counter==0){
-			for (uint64_t childID : ignoreList){
-				heuristicList.push_back(childID);
-			}
-			ignoreList.clear();
-			return F2F_h;
-		}*/
-    	for (AStarOpenClosedDataWithF<state> astarState : statesList.getElements()){
-			if(astarState.g == perimeterG){ //perimeter frontier should be fixed and this should be updated to <= instead of ==
-				F2F_h = std::min(F2F_h,heuristic->HCost(currState, astarState.data) + astarState.g);
-			}
-		}
-		if (fgreater(g+F2F_h, bound)){
-			UpdateNextBound(bound, g+F2F_h);
-			//printf("Stopping at (%d, %d). g=%f h=%f\n", currState>>16, currState&0xFFFF, g, h);
-			return F2F_h;
-		}
+    if (isConsistent){
+      for (int i = 0; i < heuristicList.size(); i++){
+        uint64_t childID = heuristicList[i];
+        AStarOpenClosedDataWithF<state> perimeterState = statesList.Lookup(childID);
+        if(perimeterState.g == perimeterG){ //perimeter frontier should be fixed and this should be updated to <= instead 
+          double calculatedF = g + heuristic->HCost(currState, perimeterState.data) + perimeterState.g;
+          F2F_h = std::min(F2F_h, calculatedF);
+          if(fgreater(calculatedF, bound)){
+            UpdateNextBound(bound, calculatedF);
+            ignoreList.push_back(childID);
+            heuristicList.erase(heuristicList.begin()+i);
+            i--;
+          }
+        }
+      }
+      if(heuristicList.size() ==0){
+        for (uint64_t childID : ignoreList){
+          heuristicList.push_back(childID);
+        }
+        ignoreList.clear();
+        return F2F_h;
+      }
+    }
+    else{
+      for (AStarOpenClosedDataWithF<state> astarState : statesList.getElements()){
+        if(astarState.g == perimeterG){ //perimeter frontier should be fixed and this should be updated to <= instead of ==
+          F2F_h = std::min(F2F_h,heuristic->HCost(currState, astarState.data) + astarState.g);
+        }
+      }
+      if (fgreater(g+F2F_h, bound)){
+        UpdateNextBound(bound, g+F2F_h);
+        //printf("Stopping at (%d, %d). g=%f h=%f\n", currState>>16, currState&0xFFFF, g, h);
+        return F2F_h;
+      }
+    }
+
 	}
   
 	else if(reverseF){
