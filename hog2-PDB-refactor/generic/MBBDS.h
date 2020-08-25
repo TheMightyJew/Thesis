@@ -243,7 +243,9 @@ bool MBBDS<state, action, BloomFilter, verbose>::DoIteration(SearchEnvironment<s
 	}
 
 	if (g == bound) {
-		minCurrentError = std::min(minCurrentError, g - env->HCost(from, currState));
+    if (isConsistent){
+      minCurrentError = std::min(minCurrentError, g - env->HCost(currState,from)); 
+    }
 		if (checkState(currState)){
 			midState = currState;
 			return true;
