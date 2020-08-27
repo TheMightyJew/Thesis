@@ -37,6 +37,9 @@ public:
   bool ASpIDArev(SearchEnvironment<state, action> *env, state from, state to, std::vector<state> &thePath, AStarOpenClosed<state, AStarCompareWithF<state>, AStarOpenClosedDataWithF<state>> statesList, int secondsLimit=600, bool isConsistent = false, bool isComputeMaxH = false);
 	bool GetPath(SearchEnvironment<state, action> *env, state from, state to,
 				 std::vector<action> &thePath);
+         
+  bool SFBDS(SearchEnvironment<state, action> *env, state from, state to,
+							 std::vector<state> &thePath, int secondsLimit, int lookahead);
 
 	uint64_t GetNodesExpanded() { return nodesExpanded; }
 	uint64_t GetNecessaryExpansions() { return necessaryExpansions; }
@@ -57,6 +60,10 @@ private:
 					   action forbiddenAction, state &currState,
 					   std::vector<action> &thePath, double bound, double g,
 					   double maxH, double parentH);
+  bool DoSFBDSIteration(SearchEnvironment<state, action> *env,
+             state parentStart, state currStart, state parentGoal, state currGoal,
+             std::vector<state> &startPath, std::vector<state> &goalPath, double bound, double g_from, double g_to, int k,uint64_t b);
+  double computeKlook(SearchEnvironment<state, action> *env,state parent, state curr, state opposite,double bound,double g_curr,double g_opposite,double prevf,int k,std::vector<state> &thePath,bool &isSolved, uint64_t b);
 	void PrintGHistogram()
 	{
 //		uint64_t early = 0, late = 0;
@@ -670,6 +677,185 @@ void IDAStar<state, action, verbose>::UpdateNextBound(double currBound, double f
 		nextBound = currIterNextBound = fCost;
 		//printf("Updating next bound to %f\n", nextBound);
 	}
+}
+
+
+template <class state, class action, bool verbose>
+bool IDAStar<state, action, verbose>::SFBDS(SearchEnvironment<state, action> *env, state from, state to,
+							 std::vector<state> &thePath, int secondsLimit, int lookahead)
+{
+	if(verbose){
+		printf("\t\tStarting to solve with SFBDS\n");
+	}
+	if (!storedHeuristic)
+		heuristic = env;
+	nextBound = 0;
+	nodesExpanded = nodesTouched = dAstarLastIterExpansions = 0;
+	thePath.resize(0);
+	UpdateNextBound(0, heuristic->HCost(from, to));
+	goal = to;
+	start = from;
+  std::vector<state> startPath;
+  std::vector<state> goalPath;
+	startPath.push_back(from);
+  goalPath.push_back(to);
+	unsigned long nodesExpandedSoFar = 0;
+	unsigned long previousIterationExpansions = 0;
+	auto startTime = std::chrono::steady_clock::now();
+	while (true) //thePath.size() == 0)
+	{
+		dAstarLastIterExpansions = 0;
+		auto currentTime = std::chrono::steady_clock::now();
+		std::chrono::duration<double> elapsed_seconds = currentTime-startTime;
+		if(elapsed_seconds.count() >= secondsLimit){
+			return false;
+		}
+		//nodeTable.clear();
+		gCostHistogram.clear();
+		gCostHistogram.resize(nextBound+1);
+		if (verbose)
+			printf("\t\tStarting iteration with bound %1.1f: ", nextBound, nodesExpanded);
+		if (verbose)
+			printf("Nodes expanded: %llu(%llu)\n", nodesExpanded-nodesExpandedSoFar, nodesExpanded);
+		if (DoSFBDSIteration(env, from,from, to,to, startPath,goalPath, nextBound, 0, 0,lookahead,1)){
+			if (verbose){
+				printf("Nodes expanded: %llu(%llu)\n", nodesExpanded-nodesExpandedSoFar, nodesExpanded);
+			}
+			necessaryExpansions += nodesExpandedSoFar;
+			break;
+		}
+    if (verbose){
+			printf("Nodes expanded: %llu(%llu)\n", nodesExpanded-nodesExpandedSoFar, nodesExpanded);
+		}
+		previousIterationExpansions = nodesExpanded-nodesExpandedSoFar;
+		nodesExpandedSoFar = nodesExpanded;
+		PrintGHistogram();
+	}
+	dAstarExpansions = previousIterationExpansions + dAstarLastIterExpansions;
+  goalPath.pop_back();
+  std::reverse(goalPath.begin(),goalPath.end());
+	startPath.insert( startPath.end(), goalPath.begin(), goalPath.end() );
+  thePath = startPath;
+	return true;
+}
+
+template <class state, class action, bool verbose>
+bool IDAStar<state, action, verbose>::DoSFBDSIteration(SearchEnvironment<state, action> *env,
+										   state parentStart, state currStart, state parentGoal, state currGoal,
+										   std::vector<state> &startPath, std::vector<state> &goalPath, double bound, double g_from, double g_to, int k,uint64_t b)
+{
+	if (currStart == currGoal && !fgreater(g_from + g_to,bound)){
+		return true;
+  }
+  double h = heuristic->HCost(currStart, currGoal);
+	// path max
+
+	if (fgreater(g_from +h +g_to, bound))
+	{
+		UpdateNextBound(bound, g_from +h +g_to);
+		return false;
+	}
+  bool isSolved = false;
+  uint64_t forwardValue = computeKlook(env,parentStart,currStart,currGoal,bound,g_from,g_to,g_from +h +g_to,k,startPath,isSolved,b);
+  if (isSolved){
+    return true;
+  }
+  uint64_t backwardValue = computeKlook(env,parentGoal, currGoal, currStart,bound,g_to,g_from,g_from +h +g_to,k,goalPath,isSolved,b);
+  if (isSolved){
+    return true;
+  }
+  if (forwardValue <= backwardValue){
+    std::vector<state> startNeighbors;
+    env->GetSuccessors(currStart, startNeighbors);
+    nodesTouched += startNeighbors.size();
+    nodesExpanded++;
+    for (unsigned int x = 0; x < startNeighbors.size(); x++){
+      uint64_t childID;
+      if (startNeighbors[x] == parentStart) {
+        continue;
+      }
+      startPath.push_back(startNeighbors[x]);
+      double edgeCost = env->GCost(currStart, startNeighbors[x]);
+      isSolved = DoSFBDSIteration(env, currStart, startNeighbors[x], parentGoal,currGoal,startPath,goalPath, bound,
+                                  g_from+edgeCost, g_to,k,startNeighbors.size());
+      if(isSolved){
+        return true;
+      }
+      startPath.pop_back();
+    }
+    return false;
+  }
+  else{
+    std::vector<state> goalNeighbors;
+    env->GetSuccessors(currGoal, goalNeighbors);
+    nodesTouched += goalNeighbors.size();
+    nodesExpanded++;
+    for (unsigned int x = 0; x < goalNeighbors.size(); x++){
+      uint64_t childID;
+      if (goalNeighbors[x] == parentGoal) {
+        continue;
+      }
+      goalPath.push_back(goalNeighbors[x]);
+      double edgeCost = env->GCost(currGoal, goalNeighbors[x]);
+      isSolved = DoSFBDSIteration(env, parentStart,currStart, currGoal,goalNeighbors[x],startPath,goalPath, bound,
+                                  g_from,g_to+edgeCost,k,goalNeighbors.size());
+      if(isSolved){
+        return true;
+      }
+      goalPath.pop_back();
+    }
+    return false;
+  }
+  return false;
+}
+
+template <class state, class action, bool verbose>
+double IDAStar<state, action, verbose>::computeKlook(SearchEnvironment<state, action> *env,state parent, state curr, state opposite,double bound,double g_curr,double g_opposite,double prevf,int k,std::vector<state> &thePath,bool &isSolved, uint64_t b){
+  
+  if (curr == opposite && !fgreater(g_curr + g_opposite,bound)){
+		isSolved = true;
+    return 0;
+  }
+  double h = heuristic->HCost(curr, opposite);
+	// path max
+  double nodesBound = g_curr + g_opposite +h;
+	if (fgreater(nodesBound, bound))
+	{
+		return 0;
+	}
+  uint64_t value = 0;
+  if (nodesBound == bound){
+    value = 1;
+  }
+  else if (nodesBound == prevf){
+    value = b;
+  }
+  else{
+    value = 1;
+  }
+  if (k==0){
+    return value;
+  }
+  std::vector<state> neighbors;
+  env->GetSuccessors(curr, neighbors);
+  nodesTouched += neighbors.size();
+  nodesExpanded++;
+  for (unsigned int x = 0; x < neighbors.size(); x++){
+    uint64_t childID;
+    if (neighbors[x] == parent) {
+      continue;
+    }
+
+    thePath.push_back(neighbors[x]);
+    double edgeCost = env->GCost(curr, neighbors[x]);
+    value += computeKlook(env, curr,neighbors[x],opposite, bound,
+                                g_curr+edgeCost,g_opposite,nodesBound,k-1,thePath,isSolved,b);
+    if(isSolved){
+      return value;
+    }
+    thePath.pop_back();
+  }
+  return value;
 }
 
 
