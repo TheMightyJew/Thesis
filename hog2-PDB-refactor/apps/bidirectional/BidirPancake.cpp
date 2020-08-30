@@ -38,27 +38,29 @@ static int secondsLimit = 60*30;
 static bool AstarRun=true;
 static bool RevAstarRun=true;
 
-static bool IDAstarRun=true;
+static bool IDAstarRun=false;
 
-static bool AstarPIDAstarRun=true;
-static bool AstarPIDAstarReverseRun=true;
+static bool AstarPIDAstarRun=false;
+static bool AstarPIDAstarReverseRun=false;
 static bool AstarPIDAstarReverseMinHRun=false;
 
-static bool BAI=true;
-static bool Max_BAI=true;
+static bool BAI=false;
+static bool Max_BAI=false;
 
 static bool MMRun=true;
 
-static bool IDMMRun=true;
+static bool IDMMRun=false;
 static bool idmmF2fFlag=true;
 
-static bool ASTARpIDMM=true;
+static bool ASTARpIDMM=false;
 static bool MMpIDMM=false;
 
 static bool MBBDSRun=true;
+static bool revAlgo=true;
 static bool threePhase=true;
 static bool twoPhase=false;
 
+static bool detectDuplicate=true;
 static bool isConsistent=true;
 static bool isUpdateByWorkload=true;
 
@@ -99,7 +101,7 @@ void TestPancake()
 
 void StevenTest(int gap, int problems_num, bool randomPancake, vector<int> skipVector)
 {
-	const int pancakes_num = 10;
+	const int pancakes_num = 8;
 	srandom(2017218);
 	PancakePuzzleState<pancakes_num> start;
 	PancakePuzzleState<pancakes_num> original;
@@ -130,11 +132,8 @@ void StevenTest(int gap, int problems_num, bool randomPancake, vector<int> skipV
 		if(std::find(skipVector.begin(), skipVector.end(), count+1) != skipVector.end()) {
 			continue;
 		}
-    /*
-    if (count +1 < 49){
-      continue;
-    }
-    */
+		//cout << "new prob" << endl;
+    
 		myfile << boost::format("\tProblem %d of %d\n") % (count+1) % problems_num;
 		myfile << "\tStart state: " << original << endl;
 		myfile << "\tGoal state: " << goal << endl;
@@ -166,7 +165,7 @@ void StevenTest(int gap, int problems_num, bool randomPancake, vector<int> skipV
 		}
     if (RevAstarRun)
 		{
-			myfile <<"\t\t_A*_\n";
+			myfile <<"\t\t_Rev-A*_\n";
 			TemplateAStar<PancakePuzzleState<pancakes_num>, PancakePuzzleAction, PancakePuzzle<pancakes_num>> astar;
 			start = original;
 			t1.StartTimer();
@@ -309,7 +308,7 @@ void StevenTest(int gap, int problems_num, bool randomPancake, vector<int> skipV
 				else{
 					IDMM<PancakePuzzleState<pancakes_num>, PancakePuzzleAction, false> idmm(idmmF2fFlag, isConsistent, isUpdateByWorkload);
 					PancakePuzzleState<pancakes_num> midState;
-					bool solved = idmm.GetMidStateFromForwardList(&pancake, start, goal, midState, secondsLimit-t1.GetElapsedTime(), astar.getStatesList());
+					bool solved = idmm.GetMidStateFromForwardList(&pancake, start, goal, midState, secondsLimit-t1.GetElapsedTime(), astar.getStatesList(), detectDuplicate);
 					nodesExpanded += idmm.GetNodesExpanded();
 					necessaryNodesExpanded += idmm.GetNecessaryExpansions();
 					t1.EndTimer();
@@ -342,7 +341,7 @@ void StevenTest(int gap, int problems_num, bool randomPancake, vector<int> skipV
 				}
 				else{
 					IDAStar<PancakePuzzleState<pancakes_num>, PancakePuzzleAction, false> idastar;
-					solved = idastar.ASpIDA(&pancake, start, goal, idaPath, astar.getStatesList(), secondsLimit-t1.GetElapsedTime());
+					solved = idastar.ASpIDA(&pancake, start, goal, idaPath, astar.getStatesList(), secondsLimit-t1.GetElapsedTime(), detectDuplicate);
 					nodesExpanded += idastar.GetNodesExpanded();
 					necessaryNodesExpanded += idastar.GetNecessaryExpansions();
 					t1.EndTimer();
@@ -503,6 +502,7 @@ void StevenTest(int gap, int problems_num, bool randomPancake, vector<int> skipV
 					bool solved;
 					unsigned long nodesExpanded;
 					for(double percentage : percentages){
+						//printf("precentage= %1.2f\n", percentage);
 						timer.StartTimer();
 						unsigned long statesQuantityBoundforMBBDS = std::max(statesQuantityBound*percentage,2.0);;
 						solved = false;
@@ -522,7 +522,7 @@ void StevenTest(int gap, int problems_num, bool randomPancake, vector<int> skipV
 							   nodesExpanded % mm.GetNecessaryExpansions() % 0 % timer.GetElapsedTime();
 						}
 						else{
-							MBBDS<PancakePuzzleState<pancakes_num>, PancakePuzzleAction, MbbdsBloomFilter<PancakePuzzleState<pancakes_num>, PancakeHasher<pancakes_num>>, false> mbbds(statesQuantityBoundforMBBDS, isUpdateByWorkload, isConsistent) ;
+							MBBDS<PancakePuzzleState<pancakes_num>, PancakePuzzleAction, MbbdsBloomFilter<PancakePuzzleState<pancakes_num>, PancakeHasher<pancakes_num>>, false> mbbds(statesQuantityBoundforMBBDS, isUpdateByWorkload, isConsistent, revAlgo) ;
 							goal.Reset();
 							start = original;
 							solved = mbbds.GetMidState(&pancake, start, goal, midState, secondsLimit - timer.GetElapsedTime(), int(lastBound));

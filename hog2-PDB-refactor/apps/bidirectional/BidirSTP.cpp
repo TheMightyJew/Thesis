@@ -47,7 +47,7 @@ static bool IDAstarRun=true;
 
 static bool AstarPIDAstarRun=true;
 static bool AstarPIDAstarReverseRun=true;
-static bool AstarPIDAstarReverseMinHRun=false;
+static bool AstarPIDAstarReverseMinHRun=true;
 
 static bool BAI=true;
 static bool Max_BAI=true;
@@ -64,8 +64,8 @@ static bool MBBDSRun=true;
 static bool threePhase=true;
 static bool twoPhase=false;
 
-static bool isConsistent=false;
-static bool isUpdateByWorkload=false;
+static bool isConsistent=true;
+static bool isUpdateByWorkload=true;
 
 
 static string datetime()

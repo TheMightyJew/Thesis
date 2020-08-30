@@ -9,7 +9,7 @@
 #define MBBDS_H
 
 #include <iostream>
-#include<algorithm> 
+#include <algorithm> 
 #include <unordered_set>
 #include "SearchEnvironment.h"
 #include <math.h>
@@ -17,10 +17,14 @@
 template <class state, class action, class BloomFilter, bool verbose = true>
 class MBBDS {
 public:
-	MBBDS(unsigned long statesQuantityBound, bool isUpdateByWorkload=false, bool isConsistent = false) {
+	MBBDS(unsigned long statesQuantityBound, bool isUpdateByWorkload=false, bool isConsistent = false, bool revAlgo=false) {
 		this->statesQuantityBound = statesQuantityBound;
 		this->isUpdateByWorkload = isUpdateByWorkload;
 		this->isConsistent = isConsistent;
+		if(isConsistent)
+			this->revAlgo = revAlgo;
+		else
+			this->revAlgo = false;
 	}
 	virtual ~MBBDS() {}
 	bool GetMidState(SearchEnvironment<state, action>* env, state fromState, state toState, state &midState, int secondsLimit=600, double startingFBound=0);
@@ -56,6 +60,7 @@ private:
 	bool forwardSearch;
 	bool isUpdateByWorkload;
 	bool isConsistent;
+	bool revAlgo;
 	double minCurrentError = std::numeric_limits<double>::max();
 	double minPreviousError = 0;
 	state goal;
@@ -91,7 +96,6 @@ bool MBBDS<state, action, BloomFilter, verbose>::GetMidState(SearchEnvironment<s
 	forwardBound = ceil(startingFBound / 2);
 	backwardBound = startingFBound - forwardBound;
 	int saturationIncreased = 0;
-	//changed
 	int saturationMaxIncreasements = 10;
 	iteration_num = 0;
 	double bound;
@@ -134,6 +138,19 @@ bool MBBDS<state, action, BloomFilter, verbose>::GetMidState(SearchEnvironment<s
 				goal = fromState;
 			}
 			outOfSpace = false;
+			if(revAlgo && listReady){
+				for (auto it = middleStates.begin(); it != middleStates.end(); ) {
+					state perimeterState = *it;
+					double calculatedF = env->HCost(from, perimeterState) + minPreviousError + (fBound-bound);
+					if(fgreater(calculatedF, fBound)){
+						UpdateNextBound(calculatedF);
+						it = middleStates.erase(it);
+					}
+					else {
+						++it;
+					}
+				}
+			}
 			bool solved = DoIteration(env, from, from, bound, 0, midState);
 			unsigned long nodesExpandedThisIter = nodesExpanded-nodesExpandedSoFar;
 			nodesExpandedSoFar = nodesExpanded;
@@ -209,7 +226,6 @@ bool MBBDS<state, action, BloomFilter, verbose>::GetMidState(SearchEnvironment<s
 		middleStates.clear();
 		minCurrentError = std::numeric_limits<double>::max();
 		minPreviousError = 0;
-		nextBound = std::max(nextBound, forwardBound+backwardBound+1);
 		
 		if (!isUpdateByWorkload){
 			forwardBound = ceil(nextBound / 2);
@@ -231,26 +247,53 @@ bool MBBDS<state, action, BloomFilter, verbose>::DoIteration(SearchEnvironment<s
 	state parent, state currState, double bound, double g, state& midState)
 {
 	double h = env->HCost(currState, goal);
-	
+	std::vector<state> ignoreList;
 	if(isConsistent && g < bound){
 		h += minPreviousError;
 	}
 	
-	if (g > bound  || fgreater(g + h, fBound))
+	if (g > bound)
+	{
+		return false;
+	}
+	
+	if (fgreater(g + h, fBound))
 	{
 		UpdateNextBound(g + h);
 		return false;
 	}
 
 	if (g == bound) {
-    if (isConsistent){
-      minCurrentError = std::min(minCurrentError, g - env->HCost(currState,from)); 
-    }
+		if (isConsistent){
+		  minCurrentError = std::min(minCurrentError, g - env->HCost(from, currState)); 
+		}
 		if (checkState(currState)){
 			midState = currState;
 			return true;
 		}
 		else{
+			return false;
+		}
+	}
+	
+	if(revAlgo && listReady){
+		for (auto it = middleStates.begin(); it != middleStates.end(); ) {
+			state perimeterState = *it;
+			double calculatedF = g + env->HCost(currState, perimeterState) + (fBound-bound);
+			if(fgreater(calculatedF, fBound)){
+				UpdateNextBound(calculatedF);
+				ignoreList.push_back(perimeterState);
+				it = middleStates.erase(it);
+			}
+			else {
+				++it;
+			}
+		}
+		if(middleStates.size() == 0){
+			for (state middleState : ignoreList){
+			  middleStates.insert(middleState);
+			}
+			ignoreList.clear();
 			return false;
 		}
 	}
@@ -272,6 +315,14 @@ bool MBBDS<state, action, BloomFilter, verbose>::DoIteration(SearchEnvironment<s
 			return true;
 		}
 	}
+	
+	if(revAlgo && listReady){
+		for (state middleState : ignoreList){
+		  middleStates.insert(middleState);
+		}
+		ignoreList.clear();
+	}
+	
 	return false;
 }
 
@@ -310,11 +361,11 @@ void MBBDS<state, action, BloomFilter, verbose>::UpdateNextBound(double fCost)
 {
 	if (!fgreater(nextBound, fBound))
 	{
-		nextBound = fCost;
+		nextBound = std::max(fBound, fCost);
 	}
-	else if (fgreater(fCost, fBound) && fless(fCost, nextBound))
+	else if (fgreater(fCost, fBound))
 	{
-		nextBound = fCost;
+		nextBound = std::min(fCost, nextBound);
 	}
 }
 #endif

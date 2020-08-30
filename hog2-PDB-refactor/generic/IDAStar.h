@@ -312,7 +312,7 @@ bool IDAStar<state, action, verbose>::ASpIDArev(SearchEnvironment<state, action>
 		
 		
 		if(isComputeMaxH && isConsistent){
-      heuristicList.clear();
+			heuristicList.clear();
 			for (AStarOpenClosedDataWithF<state> astarState : statesList.getElements()){
 				if(astarState.g == perimeterG){
 					double calculatedF = heuristic->HCost(from, astarState.data) + astarState.g;
@@ -328,7 +328,7 @@ bool IDAStar<state, action, verbose>::ASpIDArev(SearchEnvironment<state, action>
 			}	
 		}
 		double res;
-		if(false && isComputeMaxH && isConsistent && heuristicList.size() == 0)
+		if(isComputeMaxH && isConsistent && heuristicList.size() == 0)
 			res = 1;
 		else
 			res = DoIteration(env, from, from, thePath, bound, 0, 0);
