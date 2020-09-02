@@ -17,6 +17,7 @@
 #include "MBBDS.h"
 #include "FullMBBDS.h"
 #include "IDMM.h"
+#include "IDTHSwTrans.h"
 #include "MbbdsBloomFilter.h"
 #include "PancakeHasher.h"
 #include <fstream>
@@ -43,6 +44,7 @@ static bool IDAstarRun=false;
 static bool AstarPIDAstarRun=false;
 static bool AstarPIDAstarReverseRun=false;
 static bool AstarPIDAstarReverseMinHRun=false;
+static bool IDTHSpTrans = true;
 
 static bool BAI=false;
 static bool Max_BAI=false;
@@ -56,12 +58,13 @@ static bool ASTARpIDMM=false;
 static bool MMpIDMM=false;
 
 static bool MBBDSRun=true;
-static bool revAlgo=false;
+static bool revAlgo=true;
+
 static bool threePhase=true;
 static bool twoPhase=false;
 
 static bool detectDuplicate=true;
-static bool isConsistent=false;
+static bool isConsistent=true;
 static bool isUpdateByWorkload=true;
 
 
@@ -104,7 +107,7 @@ void TestPancake(string file)
 
 void StevenTest(int gap, int problems_num, bool randomPancake, vector<int> skipVector)
 {
-	const int pancakes_num = 10;
+	const int pancakes_num = 8;
 	srandom(2017218);
 	PancakePuzzleState<pancakes_num> start;
 	PancakePuzzleState<pancakes_num> original;
@@ -136,6 +139,10 @@ void StevenTest(int gap, int problems_num, bool randomPancake, vector<int> skipV
 			continue;
 		}
 		//cout << "new prob" << endl;
+    
+    /*if (count != 38 || gap!=2){
+      continue;
+    }*/
     
 		myfile << boost::format("\tProblem %d of %d\n") % (count+1) % problems_num;
 		myfile << "\tStart state: " << original << endl;
@@ -230,6 +237,7 @@ void StevenTest(int gap, int problems_num, bool randomPancake, vector<int> skipV
 				myfile << "\t\t\tD-A* failed because IDA* failed\n";
 			}					   
 		}
+    
 		//FullMBBDS
 		/*if (false){
 			bool threePhase = false;
@@ -325,6 +333,60 @@ void StevenTest(int gap, int problems_num, bool randomPancake, vector<int> skipV
 				}
 			}
 		}
+    if(IDTHSpTrans){
+      {
+        myfile << "\t\t_IDTHSpTrans_\n";
+        for(double percentage : percentages){
+          unsigned long statesQuantityBoundforASPIDMM = std::max(statesQuantityBound*percentage,2.0);;
+          goal.Reset();
+          start = original;
+          t1.StartTimer();
+          unsigned long nodesExpanded = 0;
+          unsigned long necessaryNodesExpanded = 0;
+
+          IDTHSwTrans<PancakePuzzleState<pancakes_num>, PancakePuzzleAction, false> idmm(idmmF2fFlag, isConsistent, isUpdateByWorkload, 1 , true);
+          PancakePuzzleState<pancakes_num> midState;
+          bool solved = idmm.GetPath(&pancake, start, goal, /*astarPath, */secondsLimit, statesQuantityBoundforASPIDMM);
+          nodesExpanded += idmm.GetNodesExpanded();
+          necessaryNodesExpanded += idmm.GetNecessaryExpansions();
+          t1.EndTimer();
+          if(solved){
+            myfile << boost::format("\t\t\tIDTHSpTrans IDMM using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) found path length %1.0f; %llu expanded; %llu necessary; %1.4fs elapsed\n") % statesQuantityBoundforASPIDMM % stateSize % percentage % idmm.getPathLength() % nodesExpanded % necessaryNodesExpanded % t1.GetElapsedTime();
+          }
+          else{
+            myfile << boost::format("\t\t\tIDTHSpTrans IDMM using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) failed after %1.4fs\n") % statesQuantityBoundforASPIDMM % stateSize % percentage % t1.GetElapsedTime();
+            break;
+          }	
+          
+        }
+      }
+            {
+        myfile << "\t\t_IDTHSpTrans_NDD_\n";
+        for(double percentage : percentages){
+          unsigned long statesQuantityBoundforASPIDMM = std::max(statesQuantityBound*percentage,2.0);;
+          goal.Reset();
+          start = original;
+          t1.StartTimer();
+          unsigned long nodesExpanded = 0;
+          unsigned long necessaryNodesExpanded = 0;
+
+          IDTHSwTrans<PancakePuzzleState<pancakes_num>, PancakePuzzleAction, false> idmm(idmmF2fFlag, isConsistent, isUpdateByWorkload, 1 , false);
+          PancakePuzzleState<pancakes_num> midState;
+          bool solved = idmm.GetPath(&pancake, start, goal, /*astarPath, */secondsLimit, statesQuantityBoundforASPIDMM);
+          nodesExpanded += idmm.GetNodesExpanded();
+          necessaryNodesExpanded += idmm.GetNecessaryExpansions();
+          t1.EndTimer();
+          if(solved){
+            myfile << boost::format("\t\t\tIDTHSpTrans_NDD IDMM using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) found path length %1.0f; %llu expanded; %llu necessary; %1.4fs elapsed\n") % statesQuantityBoundforASPIDMM % stateSize % percentage % idmm.getPathLength() % nodesExpanded % necessaryNodesExpanded % t1.GetElapsedTime();
+          }
+          else{
+            myfile << boost::format("\t\t\tIDTHSpTrans_NDD IDMM using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) failed after %1.4fs\n") % statesQuantityBoundforASPIDMM % stateSize % percentage % t1.GetElapsedTime();
+            break;
+          }	
+          
+        }
+      }
+		}
 		if (AstarPIDAstarRun){
 			myfile << "\t\t_Astar+IDAstar_\n";
 			for(double percentage : percentages){
@@ -362,7 +424,7 @@ void StevenTest(int gap, int problems_num, bool randomPancake, vector<int> skipV
 		if (AstarPIDAstarReverseRun){
 			myfile << "\t\t_Astar+IDAstar+Reverse_\n";
 			for(double percentage : percentages){
-				unsigned long statesQuantityBoundforASPIDARS = std::max(statesQuantityBound*percentage,2.0);;
+				unsigned long statesQuantityBoundforASPIDARS = std::max(statesQuantityBound*percentage,2.0);
 				TemplateAStar<PancakePuzzleState<pancakes_num>, PancakePuzzleAction, PancakePuzzle<pancakes_num>> astar;
 				goal.Reset();
 				start = original;
