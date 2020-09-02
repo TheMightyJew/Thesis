@@ -82,11 +82,14 @@ static string datetime()
 }
 
 static ofstream myfile;
-static string filename = "Test_Results/STP/results_" + datetime() + ".txt";
+static string filename;;
 
 
-void TestSTP(int algorithm)
+void TestSTP(string file)
 {
+	if(file == "")
+		file = "results_" + datetime();
+	filename = "Test_Results/STP/" + file + ".txt";
 	cout << "running..." << endl;
 	myfile.open (filename);
 	

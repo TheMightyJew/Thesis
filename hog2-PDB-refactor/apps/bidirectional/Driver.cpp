@@ -319,7 +319,10 @@ int MyCLHandler(char *argument[], int maxNumArgs)
 	}
 	else if (strcmp(argument[0], "-pancake") == 0)
 	{
-		TestPancake();
+		if(maxNumArgs==2)
+			TestPancake(argument[1]);
+		else
+			TestPancake();
 		return 1;
 	}
 	else if (strcmp(argument[0], "-ts") == 0)
@@ -384,10 +387,18 @@ int MyCLHandler(char *argument[], int maxNumArgs)
 		AnalyzeMap(argument[1], argument[2], weight);
 		return 3;
 	}
-	//else if (strcmp(argument[0], "-stp") == 0 && maxNumArgs > 1)
+	/*else if (strcmp(argument[0], "-stp") == 0 && maxNumArgs > 1)
 	else if (strcmp(argument[0], "-stp") == 0)
 	{
 		TestSTP();
+	}*/
+	else if (strcmp(argument[0], "-stp") == 0)
+	{
+		if(maxNumArgs==2)
+			TestSTP(argument[1]);
+		else
+			TestSTP();
+		return 1;
 	}
 	else if (strcmp(argument[0], "-rubik") == 0 && maxNumArgs > 1)
 	{

@@ -56,12 +56,12 @@ static bool ASTARpIDMM=false;
 static bool MMpIDMM=false;
 
 static bool MBBDSRun=true;
-static bool revAlgo=true;
+static bool revAlgo=false;
 static bool threePhase=true;
 static bool twoPhase=false;
 
 static bool detectDuplicate=true;
-static bool isConsistent=true;
+static bool isConsistent=false;
 static bool isUpdateByWorkload=true;
 
 
@@ -79,11 +79,14 @@ string datetime()
 }
 
 ofstream myfile;
-string filename = "Test_Results/PancakeSorting/results_" + datetime() + ".txt";
+string filename;
 
 
-void TestPancake()
+void TestPancake(string file)
 {
+	if(file == "")
+		file = "results_" + datetime();
+	filename = "Test_Results/PancakeSorting/" + file + ".txt";
 	cout << "running..." << endl;
 	myfile.open (filename);
 	
@@ -101,7 +104,7 @@ void TestPancake()
 
 void StevenTest(int gap, int problems_num, bool randomPancake, vector<int> skipVector)
 {
-	const int pancakes_num = 8;
+	const int pancakes_num = 10;
 	srandom(2017218);
 	PancakePuzzleState<pancakes_num> start;
 	PancakePuzzleState<pancakes_num> original;

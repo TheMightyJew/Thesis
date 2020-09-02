@@ -21,10 +21,11 @@ public:
 		this->statesQuantityBound = statesQuantityBound;
 		this->isUpdateByWorkload = isUpdateByWorkload;
 		this->isConsistent = isConsistent;
-		if(isConsistent)
+		/*if(isConsistent)
 			this->revAlgo = revAlgo;
 		else
-			this->revAlgo = false;
+			this->revAlgo = false;*/
+		this->revAlgo = revAlgo;
 	}
 	virtual ~MBBDS() {}
 	bool GetMidState(SearchEnvironment<state, action>* env, state fromState, state toState, state &midState, int secondsLimit=600, double startingFBound=0);
@@ -54,8 +55,8 @@ private:
 	unsigned long memoryBound;
 
 	bool DoIteration(SearchEnvironment<state, action>* env,
-		state parent, state currState, double bound, double g, state& midState);
-	bool checkState(state midState);
+		state &parent, state &currState, double bound, double g, state& midState);
+	bool checkState(state &midState);
 	double nextBound;
 	bool forwardSearch;
 	bool isUpdateByWorkload;
@@ -93,8 +94,8 @@ bool MBBDS<state, action, BloomFilter, verbose>::GetMidState(SearchEnvironment<s
 	double initialHeuristic = env->HCost(fromState, toState);
 	fBound = round(std::max(initialHeuristic, startingFBound));
 	nextBound = fBound;
-	forwardBound = ceil(startingFBound / 2);
-	backwardBound = startingFBound - forwardBound;
+	forwardBound = ceil(fBound / 2);
+	backwardBound = fBound - forwardBound;
 	int saturationIncreased = 0;
 	int saturationMaxIncreasements = 10;
 	iteration_num = 0;
@@ -141,7 +142,7 @@ bool MBBDS<state, action, BloomFilter, verbose>::GetMidState(SearchEnvironment<s
 			if(revAlgo && listReady){
 				for (auto it = middleStates.begin(); it != middleStates.end(); ) {
 					state perimeterState = *it;
-					double calculatedF = env->HCost(from, perimeterState) + minPreviousError + (fBound-bound);
+					double calculatedF = env->HCost(from, perimeterState) + (fBound-bound);
 					if(fgreater(calculatedF, fBound)){
 						UpdateNextBound(calculatedF);
 						it = middleStates.erase(it);
@@ -244,7 +245,7 @@ bool MBBDS<state, action, BloomFilter, verbose>::GetMidState(SearchEnvironment<s
 
 template <class state, class action, class BloomFilter, bool verbose>
 bool MBBDS<state, action, BloomFilter, verbose>::DoIteration(SearchEnvironment<state, action>* env,
-	state parent, state currState, double bound, double g, state& midState)
+	state &parent, state &currState, double bound, double g, state& midState)
 {
 	double h = env->HCost(currState, goal);
 	std::vector<state> ignoreList;
@@ -265,7 +266,7 @@ bool MBBDS<state, action, BloomFilter, verbose>::DoIteration(SearchEnvironment<s
 
 	if (g == bound) {
 		if (isConsistent){
-		  minCurrentError = std::min(minCurrentError, g - env->HCost(from, currState)); 
+		  minCurrentError = std::min(minCurrentError, g - env->HCost(currState, from)); 
 		}
 		if (checkState(currState)){
 			midState = currState;
@@ -327,7 +328,7 @@ bool MBBDS<state, action, BloomFilter, verbose>::DoIteration(SearchEnvironment<s
 }
 
 template<class state, class action, class BloomFilter, bool verbose>
-bool MBBDS<state, action, BloomFilter, verbose>::checkState(state midState)
+bool MBBDS<state, action, BloomFilter, verbose>::checkState(state &midState)
 {
 	if (listReady) {
 		if (middleStates.find(midState) != middleStates.end()) {
