@@ -25,6 +25,21 @@
 #include "WeightedVertexGraph.h"
 #include "Timer.h"
 
+#include "GridHasher.h"
+#include "TemplateAStar.h"
+#include "AStarOpenClosed.h"
+#include "IDAStar.h"
+#include "MM.h"
+#include "MBBDS.h"
+#include "IDMM.h"
+#include "MbbdsBloomFilter.h"
+#include <fstream>
+#include <iostream>
+#include <boost/format.hpp>
+#include <math.h> 
+#include <ctime>
+
+
 Map *map = 0;
 MapEnvironment *me = 0;
 MapOverlay *mo;
@@ -88,7 +103,22 @@ const char *bibfs_desc[10] = {
 	"", "NN", "NF", "NR", "FN", "FF", "FR", "RN", "RF", "RR"
 };
 
+static string datetime()
+{
+    time_t rawtime;
+    struct tm * timeinfo;
+    char buffer[80];
 
+    time (&rawtime);
+    timeinfo = localtime(&rawtime);
+
+    strftime(buffer,80,"%d-%m-%Y_%H-%M-%S",timeinfo);
+    return string(buffer);
+}
+
+static std::ofstream myfile;
+//static string filename = "Test_Results/Grid/results_" + datetime() + ".txt";
+static string filename = "Test_Results/Grid/results.txt";
 
 void InstallHandlers()
 {
@@ -432,7 +462,7 @@ void MyFrameHandler(unsigned long windowID, unsigned int viewport, void *)
 
 	if (recording && viewport == GetNumPorts(windowID)-1)
 	{
-		static int cnt = 0;
+		 int cnt = 0;
 		char fname[255];
 		sprintf(fname, "/Users/nathanst/Movies/tmp/BI-%d%d%d%d", (cnt/1000)%10, (cnt/100)%10, (cnt/10)%10, cnt%10);
 		SaveScreenshot(windowID, fname);
@@ -450,7 +480,7 @@ void MyFrameHandler(unsigned long windowID, unsigned int viewport, void *)
 bool MyClickHandler(unsigned long windowID, int, int, point3d loc, tButtonType button, tMouseEventType mType)
 {
 	//	return false;
-	static point3d startLoc;
+	 point3d startLoc;
 	if (mType == kMouseDown)
 	{
 		switch (button)
@@ -512,8 +542,8 @@ bool MyClickHandler(unsigned long windowID, int, int, point3d loc, tButtonType b
 //				goal.y = 116;//132-10;
 				
 //				forward.GetPath(me,
-//								{static_cast<uint16_t>(goal.x-17),
-//									static_cast<uint16_t>(goal.y+22)}, goal, goalPath);
+//								{_cast<uint16_t>(goal.x-17),
+//									_cast<uint16_t>(goal.y+22)}, goal, goalPath);
 //				recording = true;
 				if ((0))
 				{
@@ -915,7 +945,7 @@ void SetupMapOverlay()
 #include "WeightedVertexGraph.h"
 const char *strip(const char *str)
 {
-	static std::string s;
+	 std::string s;
 	s = "";
 	const char *p1 = strrchr(str, '.');
 	const char *p2 = strrchr(str, '/');
@@ -937,6 +967,7 @@ void AnalyzeProblem(Map *m, int whichProblem, Experiment e, double weight)
 	goal.x = e.GetGoalX();
 	goal.y = e.GetGoalY();
 	
+  if (0)
 	{
 		Timer timer;
 		NBS<xyLoc, tDirection, MapEnvironment, NBSQueue<xyLoc, 1>> nbse1;
@@ -944,7 +975,7 @@ void AnalyzeProblem(Map *m, int whichProblem, Experiment e, double weight)
 		NBS<xyLoc, tDirection, MapEnvironment, NBSQueue<xyLoc, 1>> nbs0e1;
 		TemplateAStar<xyLoc, tDirection, MapEnvironment> astar;
 
-		if (1)
+		if (0)
 		{
 			nbs0e1.GetPath(me, start, goal, &z, &z, path);
 			printf("NBS0e1 found path length %1.0f; %llu expanded; %llu necessary\n", me->GetPathLength(path),
@@ -1007,112 +1038,507 @@ void AnalyzeProblem(Map *m, int whichProblem, Experiment e, double weight)
 		}
 		return;
 	}
+  
+   unsigned long MMstatesQuantityBound;
+   unsigned long ASTARstatesQuantityBound;
+   unsigned long statesQuantityBound;
+   unsigned long statesQuantityBoundDefault = 1000000;
+   int secondsLimit = 60*30;
 
-	
-	forward.GetPath(me, start, goal, path);
-	backward.GetPath(me, goal, start, path);
+   bool AstarRun=true;
+   bool RevAstarRun=true;
 
-	double optimal;
-	forward.GetClosedListGCost(goal, optimal);
+   bool IDAstarRun=true;
 
-	compare.GetPath(me, start, goal, path);
-	assert(me->GetPathLength(path) == optimal);
-	//printf("A* path length: %1.2f\t", me->GetPathLength(path));
-	mm.GetPath(me, start, goal, &wh, &wh, path);
-	//printf("MM path length: %1.2f\n", me->GetPathLength(path));
+   bool AstarPIDAstarRun=false;
+   bool AstarPIDAstarReverseRun=false;
+   bool AstarPIDAstarReverseMinHRun=false;
 
-	// full state space
-	{
-		counts.resize(0);
-		counts.resize(10);
-		for (int x = 0; x < m->GetMapWidth(); x++)
+   bool BAI=false;
+   bool Max_BAI=false;
+
+   bool MMRun=false;
+
+   bool IDMMRun=true;
+   bool idmmF2fFlag=true;
+
+   bool ASTARpIDMM=false;
+   bool MMpIDMM=false;
+
+   bool MBBDSRun=false;
+   bool threePhase=true;
+   bool twoPhase=false;
+
+   bool isConsistent=true;
+   bool isUpdateByWorkload=true;
+   
+   statesQuantityBound = ULONG_MAX;
+   
+
+
+    
+
+    xyLoc midState;
+    
+    Timer t1, t2, t3, t4, t5, timer, t7, t8;
+    
+		// A*
+		std::vector<AStarOpenClosedDataWithF<xyLoc>> astarOpenList;
+		if (AstarRun)
 		{
-			for (int y = 0; y < m->GetMapHeight(); y++)
-			{
-				if (m->GetTerrainType(x, y) == kGround)
-				{
-					counts[GetLocationClassification(xyLoc(x, y), optimal)]++;
+			cout <<"\t\t_A*_\n";
+			TemplateAStar<xyLoc, tDirection, MapEnvironment> astar;
+			t1.StartTimer();
+			bool solved = astar.GetPathTime(me, start, goal, path, secondsLimit);
+			ASTARstatesQuantityBound = astar.getMemoryStatesUse();
+			t1.EndTimer();
+			if(solved){
+				cout << boost::format("\t\t\tA* found path length %1.0f; %llu expanded; %llu necessary; using %1.0llu states in memory; %1.4fs elapsed\n") % me->GetPathLength(path) %
+				   astar.GetNodesExpanded() % astar.GetNecessaryExpansions() % ASTARstatesQuantityBound % t1.GetElapsedTime();
+				cout << boost::format("\t\t\tI-A* ; %llu expanded;\n") % astar.getIAstarExpansions();	
+        statesQuantityBound =  std::min(statesQuantityBound, ASTARstatesQuantityBound);
+			}
+			else{
+				cout << boost::format("\t\t\tA* failed after %1.4fs\n") % t1.GetElapsedTime();
+				cout << "\t\t\tI-A* failed after because A* failed\n";	
+			}
+		}
+    if (RevAstarRun)
+		{
+			cout <<"\t\t_A*_\n";
+			TemplateAStar<xyLoc, tDirection, MapEnvironment> astar;
+			t1.StartTimer();
+			bool solved = astar.GetPathTime(me, goal, start, path, secondsLimit);
+			ASTARstatesQuantityBound = astar.getMemoryStatesUse();
+			t1.EndTimer();
+			if(solved){
+				cout << boost::format("\t\t\tRev-A* found path length %1.0f; %llu expanded; %llu necessary; using %1.0llu states in memory; %1.4fs elapsed\n") % me->GetPathLength(path) %
+				   astar.GetNodesExpanded() % astar.GetNecessaryExpansions() % ASTARstatesQuantityBound % t1.GetElapsedTime();
+           statesQuantityBound =  std::min(statesQuantityBound, ASTARstatesQuantityBound);
+			}
+			else{
+				cout << boost::format("\t\t\tRev-A* failed after %1.4fs\n") % t1.GetElapsedTime();
+
+			}
+		}
+		// MM
+		if (MMRun)
+		{
+			cout << "\t\t_MM_\n";				
+			MM<xyLoc, tDirection, MapEnvironment> mm;
+			t4.StartTimer();
+			bool solved = mm.GetPath(me, start, goal, me, me, path, secondsLimit);
+			MMstatesQuantityBound = mm.getMemoryStatesUse();
+			t4.EndTimer();
+			if(solved){
+				cout << boost::format("\t\t\tMM found path length %1.0f; %llu expanded; %llu necessary; using %1.0llu states in memory; %1.4fs elapsed\n") % me->GetPathLength(path) %
+					   mm.GetNodesExpanded() % mm.GetNecessaryExpansions() % MMstatesQuantityBound % t4.GetElapsedTime();
+				cout << boost::format("\t\t\tI-MM ; %llu expanded;\n") % mm.getIMMExpansions();
+        statesQuantityBound =  std::min(statesQuantityBound, MMstatesQuantityBound);				
+			}
+			else{
+				cout << boost::format("\t\t\tMM failed after %1.4fs\n") % t4.GetElapsedTime();
+				cout << "\t\t\tI-MM failed because MM failed\n";
+			}
+		}
+		if(statesQuantityBound == ULONG_MAX){
+			statesQuantityBound = statesQuantityBoundDefault;
+		}
+		// IDA*
+		if (IDAstarRun)
+		{
+			cout << "\t\t_IDA*_\n";
+			IDAStar<xyLoc, tDirection, false> idastar;
+			t3.StartTimer();
+			bool solved = idastar.GetPath(me, start, goal, path, secondsLimit);
+			t3.EndTimer();
+			if(solved){
+				cout << boost::format("\t\t\tIDA* found path length %1.0f; %llu expanded; %llu generated; %llu necessary; %1.4fs elapsed\n") % me->GetPathLength(path) %
+				   idastar.GetNodesExpanded() % idastar.GetNodesTouched() % idastar.GetNecessaryExpansions() % t3.GetElapsedTime();
+				cout << boost::format("\t\t\tD-A* ; %llu expanded;\n") % idastar.getDAstarExpansions();
+			}
+			else{
+				cout << boost::format("\t\t\tIDA* failed after %1.4fs\n") % t3.GetElapsedTime();
+				cout << "\t\t\tD-A* failed because IDA* failed\n";
+			}					   
+		}
+
+		double percentages[3] = {0.5, 0.1, 0.01};
+		long stateSize = sizeof(start);
+		
+
+		if(ASTARpIDMM){
+			cout << "\t\t_A*+IDMM_\n";
+			for(double percentage : percentages){
+				unsigned long statesQuantityBoundforASPIDMM = std::max(statesQuantityBound*percentage,2.0);;
+				TemplateAStar<xyLoc, tDirection, MapEnvironment> astar;
+						t1.StartTimer();
+				bool solved = astar.GetPathTime(me, start, goal, path, secondsLimit, true, statesQuantityBoundforASPIDMM);
+				unsigned long nodesExpanded = astar.GetNodesExpanded();
+				unsigned long necessaryNodesExpanded = 0;
+				if(solved){
+					t1.EndTimer();
+					necessaryNodesExpanded = astar.GetNecessaryExpansions();
+					cout << boost::format("\t\t\tA*+IDMM A* using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) found path length %1.0f; %llu expanded; %llu necessary; %1.4fs elapsed\n") % statesQuantityBoundforASPIDMM % stateSize % percentage % me->GetPathLength(path) %
+					   nodesExpanded % necessaryNodesExpanded  % t1.GetElapsedTime();
+				}
+				else{
+					IDMM<xyLoc, tDirection, false> idmm(idmmF2fFlag, isConsistent, isUpdateByWorkload);
+					xyLoc midState;
+					bool solved = idmm.GetMidStateFromForwardList(me, start, goal, midState, secondsLimit-t1.GetElapsedTime(), astar.getStatesList());
+					nodesExpanded += idmm.GetNodesExpanded();
+					necessaryNodesExpanded += idmm.GetNecessaryExpansions();
+					t1.EndTimer();
+					if(solved){
+					  cout << boost::format("\t\t\tA*+IDMM IDMM using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) found path length %1.0f; %llu expanded; %llu necessary; %1.4fs elapsed\n") % statesQuantityBoundforASPIDMM % stateSize % percentage % idmm.getPathLength() % nodesExpanded % necessaryNodesExpanded % t1.GetElapsedTime();
+					}
+					else{
+					  cout << boost::format("\t\t\tA*+IDMM IDMM using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) failed after %1.4fs\n") % statesQuantityBoundforASPIDMM % stateSize % percentage % t1.GetElapsedTime();
+					  break;
+					}	
 				}
 			}
 		}
-		printf("MAP: %d\t", std::accumulate(counts.begin(), counts.end(), 1));
-		for (int x = 0; x < counts.size(); x++)
-		{
-			switch (x)
-			{
-				case 1: printf("NN: %d\t", counts[x]); break;
-				case 2: printf("NF: %d\t", counts[x]); break;
-				case 3: printf("NR: %d\t", counts[x]); break;
-				case 4: printf("FN: %d\t", counts[x]); break;
-				case 5: printf("FF: %d\t", counts[x]); break;
-				case 6: printf("FR: %d\t", counts[x]); break;
-				case 7: printf("RN: %d\t", counts[x]); break;
-				case 8: printf("RF: %d\t", counts[x]); break;
-				case 9: printf("RR: %d\t", counts[x]); break;
-				default: break;
+		if (AstarPIDAstarRun){
+			cout << "\t\t_Astar+IDAstar_\n";
+			for(double percentage : percentages){
+				unsigned long statesQuantityBoundforASPIDAS = std::max(statesQuantityBound*percentage,2.0);;
+				TemplateAStar<xyLoc, tDirection, MapEnvironment> astar;
+						t1.StartTimer();
+				bool solved = astar.GetPathTime(me, start, goal, path, secondsLimit, true, statesQuantityBoundforASPIDAS);
+				unsigned long nodesExpanded = astar.GetNodesExpanded();
+				unsigned long necessaryNodesExpanded = 0;
+				if(solved){
+					t1.EndTimer();
+					necessaryNodesExpanded = astar.GetNecessaryExpansions();
+					cout << boost::format("\t\t\tA*+IDA* A* using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) found path length %1.0f; %llu expanded; %llu necessary; %1.4fs elapsed\n") % statesQuantityBoundforASPIDAS % stateSize % percentage % me->GetPathLength(path) %
+					   nodesExpanded % necessaryNodesExpanded % t1.GetElapsedTime();
+				}
+				else{
+					IDAStar<xyLoc, tDirection, false> idastar;
+					solved = idastar.ASpIDA(me, start, goal, path, astar.getStatesList(), secondsLimit-t1.GetElapsedTime());
+					nodesExpanded += idastar.GetNodesExpanded();
+					necessaryNodesExpanded += idastar.GetNecessaryExpansions();
+					t1.EndTimer();
+					if(solved){
+						cout << boost::format("\t\t\tA*+IDA* IDA* using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) found path length %1.0f; %llu expanded; %llu generated; %llu necessary; %1.4fs elapsed\n") % statesQuantityBoundforASPIDAS % stateSize % percentage % idastar.getSolLength() %
+						   nodesExpanded % idastar.GetNodesTouched() % necessaryNodesExpanded % t1.GetElapsedTime();
+					}
+					else{
+						cout << boost::format("\t\t\tA*+IDA* IDA* using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) failed after %1.4fs\n") % statesQuantityBoundforASPIDAS % stateSize % percentage % t1.GetElapsedTime();
+						break;
+					}	
+				}
 			}
 		}
-	}
-	printf("\nA*: %llu\t%llu\t", compare.GetNodesExpanded(), compare.GetNecessaryExpansions());
-	// A*
-	{
-		counts.resize(0);
-		counts.resize(10);
-		for (int x = 0; x < compare.GetNumItems(); x++)
-		{
-			if (compare.GetItem(x).where == kClosedList)
-				counts[GetLocationClassification(compare.GetItem(x).data, optimal)]++;
-		}
-		for (int x = 0; x < counts.size(); x++)
-		{
-			switch (x)
-			{
-				case 1: printf("NN: %d\t", counts[x]); break;
-				case 2: printf("NF: %d\t", counts[x]); break;
-				case 3: printf("NR: %d\t", counts[x]); break;
-				case 4: printf("FN: %d\t", counts[x]); break;
-				case 5: printf("FF: %d\t", counts[x]); break;
-				case 6: printf("FR: %d\t", counts[x]); break;
-				case 7: printf("RN: %d\t", counts[x]); break;
-				case 8: printf("RF: %d\t", counts[x]); break;
-				case 9: printf("RR: %d\t", counts[x]); break;
-				default: break;
+		if (AstarPIDAstarReverseRun){
+			cout << "\t\t_Astar+IDAstar+Reverse_\n";
+			for(double percentage : percentages){
+				unsigned long statesQuantityBoundforASPIDARS = std::max(statesQuantityBound*percentage,2.0);;
+				TemplateAStar<xyLoc, tDirection, MapEnvironment> astar;
+						t1.StartTimer();
+				bool solved = astar.GetPathTime(me, goal, start, path, secondsLimit, true, statesQuantityBoundforASPIDARS, false);
+				unsigned long nodesExpanded = astar.GetNodesExpanded();
+				unsigned long necessaryNodesExpanded = 0;
+				if(solved){
+					t1.EndTimer();
+					necessaryNodesExpanded = astar.GetNecessaryExpansions();
+					cout << boost::format("\t\t\tA*+IDA*_Reverse A* using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) found path length %1.0f; %llu expanded; %llu necessary; %1.4fs elapsed\n") % statesQuantityBoundforASPIDARS % stateSize % percentage % me->GetPathLength(path) %
+					   nodesExpanded % necessaryNodesExpanded % t1.GetElapsedTime();
+				}
+				else{
+					IDAStar<xyLoc, tDirection, false> idastar;
+					solved = idastar.ASpIDArev(me, start, goal, path, astar.getStatesList(), secondsLimit-t1.GetElapsedTime());
+					nodesExpanded += idastar.GetNodesExpanded();
+					necessaryNodesExpanded += idastar.GetNecessaryExpansions();
+					t1.EndTimer();
+					if(solved){
+						cout << boost::format("\t\t\tA*+IDA*_Reverse IDA* using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) found path length %1.0f; %llu expanded; %llu generated; %llu necessary; %1.4fs elapsed\n") % statesQuantityBoundforASPIDARS % stateSize % percentage % idastar.getSolLength() %
+						   nodesExpanded % idastar.GetNodesTouched() % necessaryNodesExpanded % t1.GetElapsedTime();
+					}
+					else{
+						cout << boost::format("\t\t\tA*+IDA*_Reverse IDA* using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) failed after %1.4fs\n") % statesQuantityBoundforASPIDARS % stateSize % percentage % t1.GetElapsedTime();
+						break;
+					}	
+				}
 			}
 		}
-	}
-	// MM
-	printf("\nMM: %llu\t%llu\t", mm.GetNodesExpanded(), mm.GetNecessaryExpansions());
-	{
-		counts.resize(0);
-		counts.resize(10);
-		for (int x = 0; x < mm.GetNumForwardItems(); x++)
-		{
-			if (mm.GetForwardItem(x).where == kClosedList)
-				counts[GetLocationClassification(mm.GetForwardItem(x).data, optimal)]++;
-		}
-		for (int x = 0; x < mm.GetNumBackwardItems(); x++)
-		{
-			if (mm.GetBackwardItem(x).where == kClosedList)
-				counts[GetLocationClassification(mm.GetBackwardItem(x).data, optimal)]++;
-		}
-		for (int x = 0; x < counts.size(); x++)
-		{
-			switch (x)
-			{
-				case 1: printf("NN: %d\t", counts[x]); break;
-				case 2: printf("NF: %d\t", counts[x]); break;
-				case 3: printf("NR: %d\t", counts[x]); break;
-				case 4: printf("FN: %d\t", counts[x]); break;
-				case 5: printf("FF: %d\t", counts[x]); break;
-				case 6: printf("FR: %d\t", counts[x]); break;
-				case 7: printf("RN: %d\t", counts[x]); break;
-				case 8: printf("RF: %d\t", counts[x]); break;
-				case 9: printf("RR: %d\t", counts[x]); break;
-				default: break;
+		if (AstarPIDAstarReverseMinHRun){
+			cout << "\t\t_Astar+IDAstar+Reverse+MinH_\n";
+			for(double percentage : percentages){
+				unsigned long statesQuantityBoundforASPIDARS = std::max(statesQuantityBound*percentage,2.0);;
+				TemplateAStar<xyLoc, tDirection, MapEnvironment> astar;
+						t1.StartTimer();
+				bool solved = astar.GetPathTime(me, goal, start, path, secondsLimit, true, statesQuantityBoundforASPIDARS, false);
+				unsigned long nodesExpanded = astar.GetNodesExpanded();
+				unsigned long necessaryNodesExpanded = 0;
+				if(solved){
+					t1.EndTimer();
+					necessaryNodesExpanded = astar.GetNecessaryExpansions();
+					cout << boost::format("\t\t\tA*+IDA*_Reverse+MinH A* using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) found path length %1.0f; %llu expanded; %llu necessary; %1.4fs elapsed\n") % statesQuantityBoundforASPIDARS % stateSize % percentage % me->GetPathLength(path) %
+					   nodesExpanded % necessaryNodesExpanded % t1.GetElapsedTime();
+				}
+				else{
+					IDAStar<xyLoc, tDirection, false> idastar;
+					solved = idastar.ASpIDArev(me, start, goal, path, astar.getStatesList(), secondsLimit-t1.GetElapsedTime(),isConsistent, true);
+					nodesExpanded += idastar.GetNodesExpanded();
+					necessaryNodesExpanded += idastar.GetNecessaryExpansions();
+					t1.EndTimer();
+					if(solved){
+						cout << boost::format("\t\t\tA*+IDA*_Reverse+MinH IDA* using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) found path length %1.0f; %llu expanded; %llu generated; %llu necessary; %1.4fs elapsed\n") % statesQuantityBoundforASPIDARS % stateSize % percentage % idastar.getSolLength() %
+						   nodesExpanded % idastar.GetNodesTouched() % necessaryNodesExpanded % t1.GetElapsedTime();
+					}
+					else{
+						cout << boost::format("\t\t\tA*+IDA*_Reverse+MinH IDA* using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) failed after %1.4fs\n") % statesQuantityBoundforASPIDARS % stateSize % percentage % t1.GetElapsedTime();
+						break;
+					}	
+				}
 			}
 		}
-	}
-	printf("\n");
+		if (BAI){
+			cout << "\t\t_BAI_\n";
+			for(double percentage : percentages){
+				unsigned long statesQuantityBoundforASPIDARS = std::max(statesQuantityBound*percentage,2.0);;
+				TemplateAStar<xyLoc, tDirection, MapEnvironment> astar;
+						t1.StartTimer();
+				bool solved = astar.GetPathTime(me, goal, start, path, secondsLimit, true, statesQuantityBoundforASPIDARS);
+				unsigned long nodesExpanded = astar.GetNodesExpanded();
+				unsigned long necessaryNodesExpanded = 0;
+				if(solved){
+					t1.EndTimer();
+					necessaryNodesExpanded = astar.GetNecessaryExpansions();
+					cout << boost::format("\t\t\tBAI A* using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) found path length %1.0f; %llu expanded; %llu necessary; %1.4fs elapsed\n") % statesQuantityBoundforASPIDARS % stateSize % percentage % me->GetPathLength(path) %
+					   nodesExpanded % necessaryNodesExpanded % t1.GetElapsedTime();
+				}
+				else{
+					IDAStar<xyLoc, tDirection, false> idastar;
+					solved = idastar.BAI(me, start, goal, path, astar.getStatesList(), secondsLimit-t1.GetElapsedTime(), false);
+					nodesExpanded += idastar.GetNodesExpanded();
+					necessaryNodesExpanded += idastar.GetNecessaryExpansions();
+					t1.EndTimer();
+					if(solved){
+						cout << boost::format("\t\t\tBAI IDA* using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) found path length %1.0f; %llu expanded; %llu generated; %llu necessary; %1.4fs elapsed\n") % statesQuantityBoundforASPIDARS % stateSize % percentage % idastar.getSolLength() %
+						   nodesExpanded % idastar.GetNodesTouched() % necessaryNodesExpanded % t1.GetElapsedTime();
+					}
+					else{
+						cout << boost::format("\t\t\tBAI IDA* using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) failed after %1.4fs\n") % statesQuantityBoundforASPIDARS % stateSize % percentage % t1.GetElapsedTime();
+						break;
+					}	
+				}
+			}
+		}
+		if (Max_BAI){
+			cout << "\t\t_Max_BAI_\n";
+			for(double percentage : percentages){
+				unsigned long statesQuantityBoundforASPIDARS = std::max(statesQuantityBound*percentage,2.0);;
+				TemplateAStar<xyLoc, tDirection, MapEnvironment> astar;
+						t1.StartTimer();
+				bool solved = astar.GetPathTime(me, goal, start, path, secondsLimit, true, statesQuantityBoundforASPIDARS);
+				unsigned long nodesExpanded = astar.GetNodesExpanded();
+				unsigned long necessaryNodesExpanded = 0;
+				if(solved){
+					t1.EndTimer();
+					necessaryNodesExpanded = astar.GetNecessaryExpansions();
+					cout << boost::format("\t\t\tMax_BAI A* using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) found path length %1.0f; %llu expanded; %llu necessary; %1.4fs elapsed\n") % statesQuantityBoundforASPIDARS % stateSize % percentage % me->GetPathLength(path) %
+					   nodesExpanded % necessaryNodesExpanded % t1.GetElapsedTime();
+				}
+				else{
+					IDAStar<xyLoc, tDirection, false> idastar;
+					solved = idastar.BAI(me, start, goal, path, astar.getStatesList(), secondsLimit-t1.GetElapsedTime(), true);
+					nodesExpanded += idastar.GetNodesExpanded();
+					necessaryNodesExpanded += idastar.GetNecessaryExpansions();
+					t1.EndTimer();
+					if(solved){
+						cout << boost::format("\t\t\tMax_BAI IDA* using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) found path length %1.0f; %llu expanded; %llu generated; %llu necessary; %1.4fs elapsed\n") % statesQuantityBoundforASPIDARS % stateSize % percentage % idastar.getSolLength() %
+						   nodesExpanded % idastar.GetNodesTouched() % necessaryNodesExpanded % t1.GetElapsedTime();
+					}
+					else{
+						cout << boost::format("\t\t\tMax_BAI IDA* using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) failed after %1.4fs\n") % statesQuantityBoundforASPIDARS % stateSize % percentage % t1.GetElapsedTime();
+						break;
+					}	
+				}
+			}
+		}
+		// MBBDS
+		if (MBBDSRun && (threePhase || twoPhase)){
+			bool doThree = threePhase;
+			bool doTwo = twoPhase;
+			for(int i=0;i<2;i++){
+				if((i==0 && doThree) || (i==1 && twoPhase)){
+					cout << boost::format("\t\t_MBBDS(ThreePhase=%d)_\n")% int(doThree);
+					bool solved;
+					unsigned long nodesExpanded;
+					for(double percentage : percentages){
+						timer.StartTimer();
+						unsigned long statesQuantityBoundforMBBDS = std::max(statesQuantityBound*percentage,2.0);;
+						solved = false;
+						unsigned long nodesExpanded = 0;
+						double lastBound = 0;
+						MM<xyLoc, tDirection, MapEnvironment> mm;
+						if(doThree){
+															solved = mm.GetPath(me, start, goal, me, me, path, secondsLimit, statesQuantityBoundforMBBDS);
+							nodesExpanded += mm.GetNodesExpanded();
+							lastBound = mm.getLastBound();
+						}
+						if(solved){
+							timer.EndTimer();
+							cout << boost::format("\t\t\tMBBDS(k=1,ThreePhase=%d) MM using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) found path length %1.0f; %llu expanded; %llu necessary; %d iterations; %1.4fs elapsed;\n") % int(doThree) % statesQuantityBoundforMBBDS % stateSize % percentage % me->GetPathLength(path) %
+							   nodesExpanded % mm.GetNecessaryExpansions() % 0 % timer.GetElapsedTime();
+						}
+						else{
+							MBBDS<xyLoc, tDirection, MbbdsBloomFilter<xyLoc, GridHasher>, false> mbbds(statesQuantityBoundforMBBDS, isUpdateByWorkload, isConsistent) ;
+															solved = mbbds.GetMidState(me, start, goal, midState, secondsLimit - timer.GetElapsedTime(), int(lastBound));
+							nodesExpanded += mbbds.GetNodesExpanded();
+							lastBound = mbbds.getLastBound();
+							if(solved){
+								timer.EndTimer();
+								cout << boost::format("\t\t\tMBBDS(k=1,ThreePhase=%d) MBBDS using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) found path length %1.0f; %llu expanded; %llu necessary; %d iterations; %1.4fs elapsed;\n") % int(doThree) % statesQuantityBoundforMBBDS % stateSize % percentage % mbbds.getPathLength() % nodesExpanded % mbbds.GetNecessaryExpansions() % mbbds.getIterationNum() % timer.GetElapsedTime();
+							}
+							else{
+								IDMM<xyLoc, tDirection, false> idmm(idmmF2fFlag, isConsistent, isUpdateByWorkload);
+																		solved = idmm.GetMidState(me, start, goal, midState, secondsLimit-timer.GetElapsedTime(), int(lastBound));
+								nodesExpanded += idmm.GetNodesExpanded();
+								timer.EndTimer();
+								if(solved){
+									cout << boost::format("\t\t\tMBBDS(k=1,ThreePhase=%d) IDMM using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) found path length %1.0f; %llu expanded; %llu necessary; %d iterations; %1.4fs elapsed;\n") % int(doThree) % statesQuantityBoundforMBBDS % stateSize % percentage % idmm.getPathLength() % nodesExpanded % mbbds.GetNecessaryExpansions() % mbbds.getIterationNum() % timer.GetElapsedTime();
+								}
+								else{
+									cout << boost::format("\t\t\tMBBDS(k=1,ThreePhase=%d) IDMM using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) failed after %1.4fs and %d iterations\n") % int(doThree) % statesQuantityBoundforMBBDS % stateSize % percentage % timer.GetElapsedTime() % mbbds.getIterationNum();
+									break;
+								} 
+							}
+						}
+					}
+				}
+				doThree = false;
+			}
+		}
+		//IDMM
+		if(IDMMRun){
+			cout << "\t\t_IDMM_\n";
+			IDMM<xyLoc, tDirection, false> idmm(idmmF2fFlag, isConsistent, isUpdateByWorkload);
+			xyLoc midState;
+			t8.StartTimer();
+			bool solved = idmm.GetMidState(me, start, goal, midState, secondsLimit);
+			t8.EndTimer();
+			if(solved){
+				cout << boost::format("\t\t\tIDMM found path length %1.0f; %llu expanded; %llu generated; %llu necessary; %1.4fs elapsed; ") % idmm.getPathLength() %
+				   idmm.GetNodesExpanded() % idmm.GetNodesTouched() % idmm.GetNecessaryExpansions() % t8.GetElapsedTime();
+				cout << "Mid state: " << midState << std::endl;
+				cout << boost::format("\t\t\tD-MM ; %llu expanded;\n") % idmm.getDMMExpansions();
+			}
+			else{
+				cout << boost::format("\t\t\tIDMM failed after %1.4fs\n") % t8.GetElapsedTime();
+				cout << "\t\t\tD-MM failed because IDMM failed\n";
+			}   				
+		}
+
+	if (0){
+    forward.GetPath(me, start, goal, path);
+    backward.GetPath(me, goal, start, path);
+
+    double optimal;
+    forward.GetClosedListGCost(goal, optimal);
+
+    compare.GetPath(me, start, goal, path);
+    assert(me->GetPathLength(path) == optimal);
+    //printf("A* path length: %1.2f\t", me->GetPathLength(path));
+    mm.GetPath(me, start, goal, &wh, &wh, path);
+    //printf("MM path length: %1.2f\n", me->GetPathLength(path));
+
+    // full state space
+    {
+      counts.resize(0);
+      counts.resize(10);
+      for (int x = 0; x < m->GetMapWidth(); x++)
+      {
+        for (int y = 0; y < m->GetMapHeight(); y++)
+        {
+          if (m->GetTerrainType(x, y) == kGround)
+          {
+            counts[GetLocationClassification(xyLoc(x, y), optimal)]++;
+          }
+        }
+      }
+      printf("MAP: %d\t", std::accumulate(counts.begin(), counts.end(), 1));
+      for (int x = 0; x < counts.size(); x++)
+      {
+        switch (x)
+        {
+          case 1: printf("NN: %d\t", counts[x]); break;
+          case 2: printf("NF: %d\t", counts[x]); break;
+          case 3: printf("NR: %d\t", counts[x]); break;
+          case 4: printf("FN: %d\t", counts[x]); break;
+          case 5: printf("FF: %d\t", counts[x]); break;
+          case 6: printf("FR: %d\t", counts[x]); break;
+          case 7: printf("RN: %d\t", counts[x]); break;
+          case 8: printf("RF: %d\t", counts[x]); break;
+          case 9: printf("RR: %d\t", counts[x]); break;
+          default: break;
+        }
+      }
+    }
+    printf("\nA*: %llu\t%llu\t", compare.GetNodesExpanded(), compare.GetNecessaryExpansions());
+    // A*
+    {
+      counts.resize(0);
+      counts.resize(10);
+      for (int x = 0; x < compare.GetNumItems(); x++)
+      {
+        if (compare.GetItem(x).where == kClosedList)
+          counts[GetLocationClassification(compare.GetItem(x).data, optimal)]++;
+      }
+      for (int x = 0; x < counts.size(); x++)
+      {
+        switch (x)
+        {
+          case 1: printf("NN: %d\t", counts[x]); break;
+          case 2: printf("NF: %d\t", counts[x]); break;
+          case 3: printf("NR: %d\t", counts[x]); break;
+          case 4: printf("FN: %d\t", counts[x]); break;
+          case 5: printf("FF: %d\t", counts[x]); break;
+          case 6: printf("FR: %d\t", counts[x]); break;
+          case 7: printf("RN: %d\t", counts[x]); break;
+          case 8: printf("RF: %d\t", counts[x]); break;
+          case 9: printf("RR: %d\t", counts[x]); break;
+          default: break;
+        }
+      }
+    }
+    // MM
+    printf("\nMM: %llu\t%llu\t", mm.GetNodesExpanded(), mm.GetNecessaryExpansions());
+    {
+      counts.resize(0);
+      counts.resize(10);
+      for (int x = 0; x < mm.GetNumForwardItems(); x++)
+      {
+        if (mm.GetForwardItem(x).where == kClosedList)
+          counts[GetLocationClassification(mm.GetForwardItem(x).data, optimal)]++;
+      }
+      for (int x = 0; x < mm.GetNumBackwardItems(); x++)
+      {
+        if (mm.GetBackwardItem(x).where == kClosedList)
+          counts[GetLocationClassification(mm.GetBackwardItem(x).data, optimal)]++;
+      }
+      for (int x = 0; x < counts.size(); x++)
+      {
+        switch (x)
+        {
+          case 1: printf("NN: %d\t", counts[x]); break;
+          case 2: printf("NF: %d\t", counts[x]); break;
+          case 3: printf("NR: %d\t", counts[x]); break;
+          case 4: printf("FN: %d\t", counts[x]); break;
+          case 5: printf("FF: %d\t", counts[x]); break;
+          case 6: printf("FR: %d\t", counts[x]); break;
+          case 7: printf("RN: %d\t", counts[x]); break;
+          case 8: printf("RF: %d\t", counts[x]); break;
+          case 9: printf("RR: %d\t", counts[x]); break;
+          default: break;
+        }
+      }
+    }
+    printf("\n");
+  }
 }
 
 void AnalyzeMap(const char *map, const char *scenario, double weight)
@@ -1122,15 +1548,19 @@ void AnalyzeMap(const char *map, const char *scenario, double weight)
 	Map *m = new Map(map);
 	me = new MapEnvironment(m);
 	me->SetDiagonalCost(1.5);
+  //myfile.open(filename);
+  //myfile << "started" << std::endl;
 	for (int x = 0; x < s.GetNumExperiments(); x++)
 	{
 //		if (x+1 != 813)
 //			continue;
 		if (s.GetNthExperiment(x).GetDistance() <= 0)
 			continue;
-		printf("Problem %d of %d\n", x+1, s.GetNumExperiments());
+		printf("Problem %d of %d\n", x+1, s.GetNumExperiments()); 
 		AnalyzeProblem(m, x, s.GetNthExperiment(x), weight);
 	}
+  //myfile << "completed!" << std::endl;
+	//myfile.close();
 	exit(0);
 }
 
@@ -1166,7 +1596,7 @@ void AnalyzeNBS(const char *map, const char *scenario, double weight)
 //		printf("Problem %d of %d from ", x, s.GetNumExperiments());
 //		std::cout << start << " to " << goal << "\n";
 		std::vector<xyLoc> correctPath;
-		std::vector<xyLoc> mmPath;
+		std::vector<xyLoc> path;
 		std::vector<xyLoc> mm0Path;
 		std::vector<xyLoc> nbsPath;
 		std::vector<xyLoc> bsPath;
@@ -1176,8 +1606,8 @@ void AnalyzeNBS(const char *map, const char *scenario, double weight)
 //		printf("%d %1.1f A* nodes: %llu necessary %llu\n", x, me->GetPathLength(correctPath), astar.GetNodesExpanded(), astar.GetNecessaryExpansions());
 //		bs.GetPath(me, start, goal, me, me, bsPath);
 //		printf("%d %1.1f BS nodes: %llu necessary %llu\n", x, me->GetPathLength(bsPath), bs.GetNodesExpanded(), bs.GetNecessaryExpansions());
-//		mm.GetPath(me, start, goal, me, me, mmPath);
-//		printf("%d %1.1f MM nodes: %llu necessary %llu\n", x, me->GetPathLength(mmPath), mm.GetNodesExpanded(), mm.GetNecessaryExpansions());
+//		mm.GetPath(me, start, goal, me, me, path);
+//		printf("%d %1.1f MM nodes: %llu necessary %llu\n", x, me->GetPathLength(path), mm.GetNodesExpanded(), mm.GetNecessaryExpansions());
 		nbs.GetPath(me, start, goal, me, me, nbsPath);
 		printf("%d %1.1f NBS nodes: %llu necessary %llu meeting: %f\n", x, me->GetPathLength(nbsPath), nbs.GetNodesExpanded(), nbs.GetNecessaryExpansions(), nbs.GetMeetingPoint());
 
