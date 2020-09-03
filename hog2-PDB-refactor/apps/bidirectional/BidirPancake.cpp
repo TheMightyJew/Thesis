@@ -82,11 +82,14 @@ string datetime()
 }
 
 ofstream myfile;
-string filename = "Test_Results/PancakeSorting/results_" + datetime() + ".txt";
+string filename;
 
 
-void TestPancake()
+void TestPancake(string file)
 {
+	if(file == "")
+		file = "results_" + datetime();
+	filename = "Test_Results/PancakeSorting/" + file + ".txt";
 	cout << "running..." << endl;
 	myfile.open (filename);
 	

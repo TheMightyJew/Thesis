@@ -10,7 +10,10 @@
 #define BidirSTP_h
 
 #include <stdio.h>
+#include<iostream> 
+#include<string>
+using namespace std;
 
-void TestSTP(int algorithm=0);
+void TestSTP(string filename = "");
 
 #endif /* BidirSTP_hpp */
