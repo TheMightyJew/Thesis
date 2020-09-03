@@ -10,6 +10,7 @@
 #include <fstream>
 #include <numeric>
 #include "GUICode.h"
+#include "CanonicalGrid.h"
 #include "ScenarioLoader.h"
 #include "Map2DEnvironment.h"
 #include "MapGenerators.h"
@@ -42,8 +43,10 @@
 
 Map *map = 0;
 MapEnvironment *me = 0;
+CanonicalGrid::CanonicalGrid *cg = 0;
 MapOverlay *mo;
 xyLoc start, goal;
+CanonicalGrid::xyLoc cstart, cgoal;
 
 std::vector<int> counts;
 
@@ -962,10 +965,15 @@ void AnalyzeProblem(Map *m, int whichProblem, Experiment e, double weight)
 	forward.SetStopAfterGoal(false);
 	backward.SetStopAfterGoal(false);
 	std::vector<xyLoc> path;
+  std::vector<CanonicalGrid::xyLoc> cpath;
 	start.x = e.GetStartX();
 	start.y = e.GetStartY();
 	goal.x = e.GetGoalX();
 	goal.y = e.GetGoalY();
+  cstart.x = e.GetStartX();
+	cstart.y = e.GetStartY();
+	cgoal.x = e.GetGoalX();
+	cgoal.y = e.GetGoalY();
 	
   if (0)
 	{
@@ -1078,22 +1086,22 @@ void AnalyzeProblem(Map *m, int whichProblem, Experiment e, double weight)
 
     
 
-    xyLoc midState;
+    CanonicalGrid::xyLoc midState;
     
     Timer t1, t2, t3, t4, t5, timer, t7, t8;
     
 		// A*
-		std::vector<AStarOpenClosedDataWithF<xyLoc>> astarOpenList;
+		std::vector<AStarOpenClosedDataWithF<CanonicalGrid::xyLoc>> astarOpenList;
 		if (AstarRun)
 		{
 			cout <<"\t\t_A*_\n";
-			TemplateAStar<xyLoc, tDirection, MapEnvironment> astar;
+			TemplateAStar<CanonicalGrid::xyLoc, CanonicalGrid::tDirection, CanonicalGrid::CanonicalGrid> astar;
 			t1.StartTimer();
-			bool solved = astar.GetPathTime(me, start, goal, path, secondsLimit);
+			bool solved = astar.GetPathTime(cg, cstart, cgoal, cpath, secondsLimit);
 			ASTARstatesQuantityBound = astar.getMemoryStatesUse();
 			t1.EndTimer();
 			if(solved){
-				cout << boost::format("\t\t\tA* found path length %1.0f; %llu expanded; %llu necessary; using %1.0llu states in memory; %1.4fs elapsed\n") % me->GetPathLength(path) %
+				cout << boost::format("\t\t\tA* found path length %1.0f; %llu expanded; %llu necessary; using %1.0llu states in memory; %1.4fs elapsed\n") % cg->GetPathLength(cpath) %
 				   astar.GetNodesExpanded() % astar.GetNecessaryExpansions() % ASTARstatesQuantityBound % t1.GetElapsedTime();
 				cout << boost::format("\t\t\tI-A* ; %llu expanded;\n") % astar.getIAstarExpansions();	
         statesQuantityBound =  std::min(statesQuantityBound, ASTARstatesQuantityBound);
@@ -1106,13 +1114,13 @@ void AnalyzeProblem(Map *m, int whichProblem, Experiment e, double weight)
     if (RevAstarRun)
 		{
 			cout <<"\t\t_A*_\n";
-			TemplateAStar<xyLoc, tDirection, MapEnvironment> astar;
+			TemplateAStar<CanonicalGrid::xyLoc, CanonicalGrid::tDirection, CanonicalGrid::CanonicalGrid> astar;
 			t1.StartTimer();
-			bool solved = astar.GetPathTime(me, goal, start, path, secondsLimit);
+			bool solved = astar.GetPathTime(cg, cgoal, cstart, cpath, secondsLimit);
 			ASTARstatesQuantityBound = astar.getMemoryStatesUse();
 			t1.EndTimer();
 			if(solved){
-				cout << boost::format("\t\t\tRev-A* found path length %1.0f; %llu expanded; %llu necessary; using %1.0llu states in memory; %1.4fs elapsed\n") % me->GetPathLength(path) %
+				cout << boost::format("\t\t\tRev-A* found path length %1.0f; %llu expanded; %llu necessary; using %1.0llu states in memory; %1.4fs elapsed\n") % cg->GetPathLength(cpath) %
 				   astar.GetNodesExpanded() % astar.GetNecessaryExpansions() % ASTARstatesQuantityBound % t1.GetElapsedTime();
            statesQuantityBound =  std::min(statesQuantityBound, ASTARstatesQuantityBound);
 			}
@@ -1125,13 +1133,13 @@ void AnalyzeProblem(Map *m, int whichProblem, Experiment e, double weight)
 		if (MMRun)
 		{
 			cout << "\t\t_MM_\n";				
-			MM<xyLoc, tDirection, MapEnvironment> mm;
+			MM<CanonicalGrid::xyLoc, CanonicalGrid::tDirection, CanonicalGrid::CanonicalGrid> mm;
 			t4.StartTimer();
-			bool solved = mm.GetPath(me, start, goal, me, me, path, secondsLimit);
+			bool solved = mm.GetPath(cg, cstart, cgoal, cg, cg, cpath, secondsLimit);
 			MMstatesQuantityBound = mm.getMemoryStatesUse();
 			t4.EndTimer();
 			if(solved){
-				cout << boost::format("\t\t\tMM found path length %1.0f; %llu expanded; %llu necessary; using %1.0llu states in memory; %1.4fs elapsed\n") % me->GetPathLength(path) %
+				cout << boost::format("\t\t\tMM found path length %1.0f; %llu expanded; %llu necessary; using %1.0llu states in memory; %1.4fs elapsed\n") % cg->GetPathLength(cpath) %
 					   mm.GetNodesExpanded() % mm.GetNecessaryExpansions() % MMstatesQuantityBound % t4.GetElapsedTime();
 				cout << boost::format("\t\t\tI-MM ; %llu expanded;\n") % mm.getIMMExpansions();
         statesQuantityBound =  std::min(statesQuantityBound, MMstatesQuantityBound);				
@@ -1148,12 +1156,12 @@ void AnalyzeProblem(Map *m, int whichProblem, Experiment e, double weight)
 		if (IDAstarRun)
 		{
 			cout << "\t\t_IDA*_\n";
-			IDAStar<xyLoc, tDirection, false> idastar;
+			IDAStar<CanonicalGrid::xyLoc, CanonicalGrid::tDirection, false> idastar;
 			t3.StartTimer();
-			bool solved = idastar.GetPath(me, start, goal, path, secondsLimit);
+			bool solved = idastar.GetPath(cg, cstart, cgoal, cpath, secondsLimit);
 			t3.EndTimer();
 			if(solved){
-				cout << boost::format("\t\t\tIDA* found path length %1.0f; %llu expanded; %llu generated; %llu necessary; %1.4fs elapsed\n") % me->GetPathLength(path) %
+				cout << boost::format("\t\t\tIDA* found path length %1.0f; %llu expanded; %llu generated; %llu necessary; %1.4fs elapsed\n") % cg->GetPathLength(cpath) %
 				   idastar.GetNodesExpanded() % idastar.GetNodesTouched() % idastar.GetNecessaryExpansions() % t3.GetElapsedTime();
 				cout << boost::format("\t\t\tD-A* ; %llu expanded;\n") % idastar.getDAstarExpansions();
 			}
@@ -1164,28 +1172,28 @@ void AnalyzeProblem(Map *m, int whichProblem, Experiment e, double weight)
 		}
 
 		double percentages[3] = {0.5, 0.1, 0.01};
-		long stateSize = sizeof(start);
+		long stateSize = sizeof(cstart);
 		
 
 		if(ASTARpIDMM){
 			cout << "\t\t_A*+IDMM_\n";
 			for(double percentage : percentages){
 				unsigned long statesQuantityBoundforASPIDMM = std::max(statesQuantityBound*percentage,2.0);;
-				TemplateAStar<xyLoc, tDirection, MapEnvironment> astar;
+				TemplateAStar<CanonicalGrid::xyLoc, CanonicalGrid::tDirection, CanonicalGrid::CanonicalGrid> astar;
 						t1.StartTimer();
-				bool solved = astar.GetPathTime(me, start, goal, path, secondsLimit, true, statesQuantityBoundforASPIDMM);
+				bool solved = astar.GetPathTime(cg, cstart, cgoal, cpath, secondsLimit, true, statesQuantityBoundforASPIDMM);
 				unsigned long nodesExpanded = astar.GetNodesExpanded();
 				unsigned long necessaryNodesExpanded = 0;
 				if(solved){
 					t1.EndTimer();
 					necessaryNodesExpanded = astar.GetNecessaryExpansions();
-					cout << boost::format("\t\t\tA*+IDMM A* using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) found path length %1.0f; %llu expanded; %llu necessary; %1.4fs elapsed\n") % statesQuantityBoundforASPIDMM % stateSize % percentage % me->GetPathLength(path) %
+					cout << boost::format("\t\t\tA*+IDMM A* using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) found path length %1.0f; %llu expanded; %llu necessary; %1.4fs elapsed\n") % statesQuantityBoundforASPIDMM % stateSize % percentage % cg->GetPathLength(cpath) %
 					   nodesExpanded % necessaryNodesExpanded  % t1.GetElapsedTime();
 				}
 				else{
-					IDMM<xyLoc, tDirection, false> idmm(idmmF2fFlag, isConsistent, isUpdateByWorkload);
-					xyLoc midState;
-					bool solved = idmm.GetMidStateFromForwardList(me, start, goal, midState, secondsLimit-t1.GetElapsedTime(), astar.getStatesList());
+					IDMM<CanonicalGrid::xyLoc, CanonicalGrid::tDirection, false> idmm(idmmF2fFlag, isConsistent, isUpdateByWorkload);
+					CanonicalGrid::xyLoc midState;
+					bool solved = idmm.GetMidStateFromForwardList(cg, cstart, cgoal, midState, secondsLimit-t1.GetElapsedTime(), astar.getStatesList());
 					nodesExpanded += idmm.GetNodesExpanded();
 					necessaryNodesExpanded += idmm.GetNecessaryExpansions();
 					t1.EndTimer();
@@ -1203,20 +1211,20 @@ void AnalyzeProblem(Map *m, int whichProblem, Experiment e, double weight)
 			cout << "\t\t_Astar+IDAstar_\n";
 			for(double percentage : percentages){
 				unsigned long statesQuantityBoundforASPIDAS = std::max(statesQuantityBound*percentage,2.0);;
-				TemplateAStar<xyLoc, tDirection, MapEnvironment> astar;
+				TemplateAStar<CanonicalGrid::xyLoc, CanonicalGrid::tDirection, CanonicalGrid::CanonicalGrid> astar;
 						t1.StartTimer();
-				bool solved = astar.GetPathTime(me, start, goal, path, secondsLimit, true, statesQuantityBoundforASPIDAS);
+				bool solved = astar.GetPathTime(cg, cstart, cgoal, cpath, secondsLimit, true, statesQuantityBoundforASPIDAS);
 				unsigned long nodesExpanded = astar.GetNodesExpanded();
 				unsigned long necessaryNodesExpanded = 0;
 				if(solved){
 					t1.EndTimer();
 					necessaryNodesExpanded = astar.GetNecessaryExpansions();
-					cout << boost::format("\t\t\tA*+IDA* A* using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) found path length %1.0f; %llu expanded; %llu necessary; %1.4fs elapsed\n") % statesQuantityBoundforASPIDAS % stateSize % percentage % me->GetPathLength(path) %
+					cout << boost::format("\t\t\tA*+IDA* A* using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) found path length %1.0f; %llu expanded; %llu necessary; %1.4fs elapsed\n") % statesQuantityBoundforASPIDAS % stateSize % percentage % cg->GetPathLength(cpath) %
 					   nodesExpanded % necessaryNodesExpanded % t1.GetElapsedTime();
 				}
 				else{
-					IDAStar<xyLoc, tDirection, false> idastar;
-					solved = idastar.ASpIDA(me, start, goal, path, astar.getStatesList(), secondsLimit-t1.GetElapsedTime());
+					IDAStar<CanonicalGrid::xyLoc, CanonicalGrid::tDirection, false> idastar;
+					solved = idastar.ASpIDA(cg, cstart, cgoal, cpath, astar.getStatesList(), secondsLimit-t1.GetElapsedTime());
 					nodesExpanded += idastar.GetNodesExpanded();
 					necessaryNodesExpanded += idastar.GetNecessaryExpansions();
 					t1.EndTimer();
@@ -1235,20 +1243,20 @@ void AnalyzeProblem(Map *m, int whichProblem, Experiment e, double weight)
 			cout << "\t\t_Astar+IDAstar+Reverse_\n";
 			for(double percentage : percentages){
 				unsigned long statesQuantityBoundforASPIDARS = std::max(statesQuantityBound*percentage,2.0);;
-				TemplateAStar<xyLoc, tDirection, MapEnvironment> astar;
+				TemplateAStar<CanonicalGrid::xyLoc, CanonicalGrid::tDirection, CanonicalGrid::CanonicalGrid> astar;
 						t1.StartTimer();
-				bool solved = astar.GetPathTime(me, goal, start, path, secondsLimit, true, statesQuantityBoundforASPIDARS, false);
+				bool solved = astar.GetPathTime(cg, cgoal, cstart, cpath, secondsLimit, true, statesQuantityBoundforASPIDARS, false);
 				unsigned long nodesExpanded = astar.GetNodesExpanded();
 				unsigned long necessaryNodesExpanded = 0;
 				if(solved){
 					t1.EndTimer();
 					necessaryNodesExpanded = astar.GetNecessaryExpansions();
-					cout << boost::format("\t\t\tA*+IDA*_Reverse A* using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) found path length %1.0f; %llu expanded; %llu necessary; %1.4fs elapsed\n") % statesQuantityBoundforASPIDARS % stateSize % percentage % me->GetPathLength(path) %
+					cout << boost::format("\t\t\tA*+IDA*_Reverse A* using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) found path length %1.0f; %llu expanded; %llu necessary; %1.4fs elapsed\n") % statesQuantityBoundforASPIDARS % stateSize % percentage % cg->GetPathLength(cpath) %
 					   nodesExpanded % necessaryNodesExpanded % t1.GetElapsedTime();
 				}
 				else{
-					IDAStar<xyLoc, tDirection, false> idastar;
-					solved = idastar.ASpIDArev(me, start, goal, path, astar.getStatesList(), secondsLimit-t1.GetElapsedTime());
+					IDAStar<CanonicalGrid::xyLoc, CanonicalGrid::tDirection, false> idastar;
+					solved = idastar.ASpIDArev(cg, cstart, cgoal, cpath, astar.getStatesList(), secondsLimit-t1.GetElapsedTime());
 					nodesExpanded += idastar.GetNodesExpanded();
 					necessaryNodesExpanded += idastar.GetNecessaryExpansions();
 					t1.EndTimer();
@@ -1267,20 +1275,20 @@ void AnalyzeProblem(Map *m, int whichProblem, Experiment e, double weight)
 			cout << "\t\t_Astar+IDAstar+Reverse+MinH_\n";
 			for(double percentage : percentages){
 				unsigned long statesQuantityBoundforASPIDARS = std::max(statesQuantityBound*percentage,2.0);;
-				TemplateAStar<xyLoc, tDirection, MapEnvironment> astar;
+				TemplateAStar<CanonicalGrid::xyLoc, CanonicalGrid::tDirection, CanonicalGrid::CanonicalGrid> astar;
 						t1.StartTimer();
-				bool solved = astar.GetPathTime(me, goal, start, path, secondsLimit, true, statesQuantityBoundforASPIDARS, false);
+				bool solved = astar.GetPathTime(cg, cgoal, cstart, cpath, secondsLimit, true, statesQuantityBoundforASPIDARS, false);
 				unsigned long nodesExpanded = astar.GetNodesExpanded();
 				unsigned long necessaryNodesExpanded = 0;
 				if(solved){
 					t1.EndTimer();
 					necessaryNodesExpanded = astar.GetNecessaryExpansions();
-					cout << boost::format("\t\t\tA*+IDA*_Reverse+MinH A* using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) found path length %1.0f; %llu expanded; %llu necessary; %1.4fs elapsed\n") % statesQuantityBoundforASPIDARS % stateSize % percentage % me->GetPathLength(path) %
+					cout << boost::format("\t\t\tA*+IDA*_Reverse+MinH A* using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) found path length %1.0f; %llu expanded; %llu necessary; %1.4fs elapsed\n") % statesQuantityBoundforASPIDARS % stateSize % percentage % cg->GetPathLength(cpath) %
 					   nodesExpanded % necessaryNodesExpanded % t1.GetElapsedTime();
 				}
 				else{
-					IDAStar<xyLoc, tDirection, false> idastar;
-					solved = idastar.ASpIDArev(me, start, goal, path, astar.getStatesList(), secondsLimit-t1.GetElapsedTime(),isConsistent, true);
+					IDAStar<CanonicalGrid::xyLoc, CanonicalGrid::tDirection, false> idastar;
+					solved = idastar.ASpIDArev(cg, cstart, cgoal, cpath, astar.getStatesList(), secondsLimit-t1.GetElapsedTime(),isConsistent, true);
 					nodesExpanded += idastar.GetNodesExpanded();
 					necessaryNodesExpanded += idastar.GetNecessaryExpansions();
 					t1.EndTimer();
@@ -1299,20 +1307,20 @@ void AnalyzeProblem(Map *m, int whichProblem, Experiment e, double weight)
 			cout << "\t\t_BAI_\n";
 			for(double percentage : percentages){
 				unsigned long statesQuantityBoundforASPIDARS = std::max(statesQuantityBound*percentage,2.0);;
-				TemplateAStar<xyLoc, tDirection, MapEnvironment> astar;
+				TemplateAStar<CanonicalGrid::xyLoc, CanonicalGrid::tDirection, CanonicalGrid::CanonicalGrid> astar;
 						t1.StartTimer();
-				bool solved = astar.GetPathTime(me, goal, start, path, secondsLimit, true, statesQuantityBoundforASPIDARS);
+				bool solved = astar.GetPathTime(cg, cgoal, cstart, cpath, secondsLimit, true, statesQuantityBoundforASPIDARS);
 				unsigned long nodesExpanded = astar.GetNodesExpanded();
 				unsigned long necessaryNodesExpanded = 0;
 				if(solved){
 					t1.EndTimer();
 					necessaryNodesExpanded = astar.GetNecessaryExpansions();
-					cout << boost::format("\t\t\tBAI A* using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) found path length %1.0f; %llu expanded; %llu necessary; %1.4fs elapsed\n") % statesQuantityBoundforASPIDARS % stateSize % percentage % me->GetPathLength(path) %
+					cout << boost::format("\t\t\tBAI A* using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) found path length %1.0f; %llu expanded; %llu necessary; %1.4fs elapsed\n") % statesQuantityBoundforASPIDARS % stateSize % percentage % cg->GetPathLength(cpath) %
 					   nodesExpanded % necessaryNodesExpanded % t1.GetElapsedTime();
 				}
 				else{
-					IDAStar<xyLoc, tDirection, false> idastar;
-					solved = idastar.BAI(me, start, goal, path, astar.getStatesList(), secondsLimit-t1.GetElapsedTime(), false);
+					IDAStar<CanonicalGrid::xyLoc, CanonicalGrid::tDirection, false> idastar;
+					solved = idastar.BAI(cg, cstart, cgoal, cpath, astar.getStatesList(), secondsLimit-t1.GetElapsedTime(), false);
 					nodesExpanded += idastar.GetNodesExpanded();
 					necessaryNodesExpanded += idastar.GetNecessaryExpansions();
 					t1.EndTimer();
@@ -1331,20 +1339,20 @@ void AnalyzeProblem(Map *m, int whichProblem, Experiment e, double weight)
 			cout << "\t\t_Max_BAI_\n";
 			for(double percentage : percentages){
 				unsigned long statesQuantityBoundforASPIDARS = std::max(statesQuantityBound*percentage,2.0);;
-				TemplateAStar<xyLoc, tDirection, MapEnvironment> astar;
+				TemplateAStar<CanonicalGrid::xyLoc, CanonicalGrid::tDirection, CanonicalGrid::CanonicalGrid> astar;
 						t1.StartTimer();
-				bool solved = astar.GetPathTime(me, goal, start, path, secondsLimit, true, statesQuantityBoundforASPIDARS);
+				bool solved = astar.GetPathTime(cg, cgoal, cstart, cpath, secondsLimit, true, statesQuantityBoundforASPIDARS);
 				unsigned long nodesExpanded = astar.GetNodesExpanded();
 				unsigned long necessaryNodesExpanded = 0;
 				if(solved){
 					t1.EndTimer();
 					necessaryNodesExpanded = astar.GetNecessaryExpansions();
-					cout << boost::format("\t\t\tMax_BAI A* using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) found path length %1.0f; %llu expanded; %llu necessary; %1.4fs elapsed\n") % statesQuantityBoundforASPIDARS % stateSize % percentage % me->GetPathLength(path) %
+					cout << boost::format("\t\t\tMax_BAI A* using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) found path length %1.0f; %llu expanded; %llu necessary; %1.4fs elapsed\n") % statesQuantityBoundforASPIDARS % stateSize % percentage % cg->GetPathLength(cpath) %
 					   nodesExpanded % necessaryNodesExpanded % t1.GetElapsedTime();
 				}
 				else{
-					IDAStar<xyLoc, tDirection, false> idastar;
-					solved = idastar.BAI(me, start, goal, path, astar.getStatesList(), secondsLimit-t1.GetElapsedTime(), true);
+					IDAStar<CanonicalGrid::xyLoc, CanonicalGrid::tDirection, false> idastar;
+					solved = idastar.BAI(cg, cstart, cgoal, cpath, astar.getStatesList(), secondsLimit-t1.GetElapsedTime(), true);
 					nodesExpanded += idastar.GetNodesExpanded();
 					necessaryNodesExpanded += idastar.GetNecessaryExpansions();
 					t1.EndTimer();
@@ -1359,6 +1367,7 @@ void AnalyzeProblem(Map *m, int whichProblem, Experiment e, double weight)
 				}
 			}
 		}
+    /*
 		// MBBDS
 		if (MBBDSRun && (threePhase || twoPhase)){
 			bool doThree = threePhase;
@@ -1374,20 +1383,20 @@ void AnalyzeProblem(Map *m, int whichProblem, Experiment e, double weight)
 						solved = false;
 						unsigned long nodesExpanded = 0;
 						double lastBound = 0;
-						MM<xyLoc, tDirection, MapEnvironment> mm;
+						MM<CanonicalGrid::xyLoc, CanonicalGrid::tDirection, CanonicalGrid::CanonicalGrid> mm;
 						if(doThree){
-															solved = mm.GetPath(me, start, goal, me, me, path, secondsLimit, statesQuantityBoundforMBBDS);
+															solved = mm.GetPath(cg, cstart, cgoal, cg, cg, cpath, secondsLimit, statesQuantityBoundforMBBDS);
 							nodesExpanded += mm.GetNodesExpanded();
 							lastBound = mm.getLastBound();
 						}
 						if(solved){
 							timer.EndTimer();
-							cout << boost::format("\t\t\tMBBDS(k=1,ThreePhase=%d) MM using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) found path length %1.0f; %llu expanded; %llu necessary; %d iterations; %1.4fs elapsed;\n") % int(doThree) % statesQuantityBoundforMBBDS % stateSize % percentage % me->GetPathLength(path) %
+							cout << boost::format("\t\t\tMBBDS(k=1,ThreePhase=%d) MM using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) found path length %1.0f; %llu expanded; %llu necessary; %d iterations; %1.4fs elapsed;\n") % int(doThree) % statesQuantityBoundforMBBDS % stateSize % percentage % cg->GetPathLength(cpath) %
 							   nodesExpanded % mm.GetNecessaryExpansions() % 0 % timer.GetElapsedTime();
 						}
 						else{
-							MBBDS<xyLoc, tDirection, MbbdsBloomFilter<xyLoc, GridHasher>, false> mbbds(statesQuantityBoundforMBBDS, isUpdateByWorkload, isConsistent) ;
-															solved = mbbds.GetMidState(me, start, goal, midState, secondsLimit - timer.GetElapsedTime(), int(lastBound));
+							MBBDS<CanonicalGrid::xyLoc, CanonicalGrid::tDirection, MbbdsBloomFilter<CanonicalGrid::xyLoc, GridHasher>, false> mbbds(statesQuantityBoundforMBBDS, isUpdateByWorkload, isConsistent) ;
+															solved = mbbds.GetMidState(cg, cstart, cgoal, midState, secondsLimit - timer.GetElapsedTime(), int(lastBound));
 							nodesExpanded += mbbds.GetNodesExpanded();
 							lastBound = mbbds.getLastBound();
 							if(solved){
@@ -1395,8 +1404,8 @@ void AnalyzeProblem(Map *m, int whichProblem, Experiment e, double weight)
 								cout << boost::format("\t\t\tMBBDS(k=1,ThreePhase=%d) MBBDS using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) found path length %1.0f; %llu expanded; %llu necessary; %d iterations; %1.4fs elapsed;\n") % int(doThree) % statesQuantityBoundforMBBDS % stateSize % percentage % mbbds.getPathLength() % nodesExpanded % mbbds.GetNecessaryExpansions() % mbbds.getIterationNum() % timer.GetElapsedTime();
 							}
 							else{
-								IDMM<xyLoc, tDirection, false> idmm(idmmF2fFlag, isConsistent, isUpdateByWorkload);
-																		solved = idmm.GetMidState(me, start, goal, midState, secondsLimit-timer.GetElapsedTime(), int(lastBound));
+								IDMM<CanonicalGrid::xyLoc, CanonicalGrid::tDirection, false> idmm(idmmF2fFlag, isConsistent, isUpdateByWorkload);
+																		solved = idmm.GetMidState(cg, cstart, cgoal, midState, secondsLimit-timer.GetElapsedTime(), int(lastBound));
 								nodesExpanded += idmm.GetNodesExpanded();
 								timer.EndTimer();
 								if(solved){
@@ -1413,22 +1422,41 @@ void AnalyzeProblem(Map *m, int whichProblem, Experiment e, double weight)
 				doThree = false;
 			}
 		}
+    */
 		//IDMM
 		if(IDMMRun){
-			cout << "\t\t_IDMM_\n";
-			IDMM<xyLoc, tDirection, false> idmm(idmmF2fFlag, isConsistent, isUpdateByWorkload);
-			xyLoc midState;
+			cout << "\t\t_IDMM-0.5_\n";
+			IDMM<CanonicalGrid::xyLoc, CanonicalGrid::tDirection, false> idmm(idmmF2fFlag, isConsistent, false);
+			CanonicalGrid::xyLoc midState;
 			t8.StartTimer();
-			bool solved = idmm.GetMidState(me, start, goal, midState, secondsLimit);
+			bool solved = idmm.GetMidState(cg, cstart, cgoal, midState, secondsLimit);
 			t8.EndTimer();
 			if(solved){
-				cout << boost::format("\t\t\tIDMM found path length %1.0f; %llu expanded; %llu generated; %llu necessary; %1.4fs elapsed; ") % idmm.getPathLength() %
+				cout << boost::format("\t\t\tIDMM-0.5 found path length %1.0f; %llu expanded; %llu generated; %llu necessary; %1.4fs elapsed; ") % idmm.getPathLength() %
 				   idmm.GetNodesExpanded() % idmm.GetNodesTouched() % idmm.GetNecessaryExpansions() % t8.GetElapsedTime();
 				cout << "Mid state: " << midState << std::endl;
 				cout << boost::format("\t\t\tD-MM ; %llu expanded;\n") % idmm.getDMMExpansions();
 			}
 			else{
-				cout << boost::format("\t\t\tIDMM failed after %1.4fs\n") % t8.GetElapsedTime();
+				cout << boost::format("\t\t\tIDMM-0.5 failed after %1.4fs\n") % t8.GetElapsedTime();
+				cout << "\t\t\tD-MM failed because IDMM failed\n";
+			}   				
+		}
+    if(IDMMRun){
+			cout << "\t\t_IDTHS-BW_\n";
+			IDMM<CanonicalGrid::xyLoc, CanonicalGrid::tDirection, false> idmm(idmmF2fFlag, isConsistent, true);
+			CanonicalGrid::xyLoc midState;
+			t8.StartTimer();
+			bool solved = idmm.GetMidState(cg, cstart, cgoal, midState, secondsLimit);
+			t8.EndTimer();
+			if(solved){
+				cout << boost::format("\t\t\tIDTHS-BW found path length %1.0f; %llu expanded; %llu generated; %llu necessary; %1.4fs elapsed; ") % idmm.getPathLength() %
+				   idmm.GetNodesExpanded() % idmm.GetNodesTouched() % idmm.GetNecessaryExpansions() % t8.GetElapsedTime();
+				cout << "Mid state: " << midState << std::endl;
+				cout << boost::format("\t\t\tD-MM ; %llu expanded;\n") % idmm.getDMMExpansions();
+			}
+			else{
+				cout << boost::format("\t\t\tIDTHS-BW failed after %1.4fs\n") % t8.GetElapsedTime();
 				cout << "\t\t\tD-MM failed because IDMM failed\n";
 			}   				
 		}
@@ -1548,6 +1576,8 @@ void AnalyzeMap(const char *map, const char *scenario, double weight)
 	Map *m = new Map(map);
 	me = new MapEnvironment(m);
 	me->SetDiagonalCost(1.5);
+  cg = new CanonicalGrid::CanonicalGrid(m);
+  cg->SetDiagonalCost(1.5);
   //myfile.open(filename);
   //myfile << "started" << std::endl;
 	for (int x = 0; x < s.GetNumExperiments(); x++)
