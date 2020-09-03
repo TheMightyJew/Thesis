@@ -321,25 +321,25 @@ bool IDTHSwTrans<state, action, verbose, table>::DoIterationBackward(SearchEnvir
   */
 
   std::vector<uint64_t> ignoreList;
-  for (uint64_t i = 0; i< transTable.GetNumOpenElements();i++){
-    state possibleMidState = transTable.LookupOpen(i).data;
+  for (uint64_t i = transTable.GetNumOpenElements()-1; i != static_cast<uint64_t>(-1);i--){
+    state &possibleMidState = transTable.LookupOpen(i).data;
     double possibleMidStateG = transTable.LookupOpen(i).g;
-    double otherError = transTable.LookupOpen(i).error;
-    double otherH = transTable.LookupOpen(i).h;
+   // double otherError = transTable.LookupOpen(i).error;
+    //double otherH = transTable.LookupOpen(i).h;
+    backwardBound = fBound - possibleMidStateG - smallestEdge;
     if (currState == possibleMidState && !fgreater(g + possibleMidStateG,fBound)) {
       pathLength = g + possibleMidStateG;
       midState = i;
       return true;
     }
     double computedF = g + possibleMidStateG + env->HCost(currState,possibleMidState);
-    if(fgreater(computedF,fBound)){
+    if(fgreater(computedF,fBound) || g > backwardBound){
       ignoreList.push_back(transTable.GetOpenKey(i));
       transTable.closeNodeAtIndex(i);
-      i--;
       UpdateNextBound(fBound, computedF,backwardLoc);
       continue;
     }
-    backwardBound = fBound - possibleMidStateG - smallestEdge;
+    /*
     double originalH = env->HCost(currState, originStart);
     //fPossibleBound = std::max(g + originalH + otherError, fPossibleBound);
     fPossibleBound = std::max(g + originalH, fPossibleBound);
@@ -362,7 +362,8 @@ bool IDTHSwTrans<state, action, verbose, table>::DoIterationBackward(SearchEnvir
         i--;
         continue;
       }
-    }      
+    }
+*/    
   }
   if(transTable.GetNumOpenElements() ==0){
     for (uint64_t i : ignoreList){
