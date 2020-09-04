@@ -17,82 +17,14 @@
 template<typename state>
 class transpostionNode {
 public:
-	transpostionNode(const state &theData, double gCost, double hCost, double error, uint64_t hashValue, bool open):data(theData), error(error), g(gCost), h(hCost), hash(hashValue), isOpen(open) {}
+	transpostionNode(const state &theData, double gCost, double hCost, double error):data(theData), error(error), g(gCost), h(hCost){}
 	state data;
 	double g;
 	double h;
   double error;
-  uint64_t hash;
-  bool isOpen;
 };
 
-template<typename state, class dataStructure = transpostionNode<state> >
-class TranspositionTable {
-public:
-  TranspositionTable() {}
-	TranspositionTable(bool hash) : useHash(hash){}
-	~TranspositionTable() {}
-	uint64_t AddNode(const state &val, uint64_t hash, double g, double h, double error);
-	bool Lookup(uint64_t hashKey, uint64_t &objKey) const;
-	inline dataStructure &Lookup(uint64_t objKey) { return elements[objKey]; }
-  inline dataStructure &LookupOpen(uint64_t objKey) { return elements[currentOpenSet[objKey]]; }
-  inline uint64_t &GetOpenKey(uint64_t objKey) { return currentOpenSet[objKey]; }
-	inline const dataStructure &Lookat(uint64_t objKey) const { return elements[objKey]; }
-  inline void Reset(){ elements.clear(); table.clear(); currentOpenSet.clear();}
-  inline void close(){ elements.clear(); table.clear(); currentOpenSet.clear();}
-  inline void reOpenNode(uint64_t key){ elements[key].isOpen = true; currentOpenSet.push_back(key);}
-  typedef __gnu_cxx::hash_map<uint64_t, uint64_t, AHash64> IndexTable;
-	IndexTable table;
-  uint64_t size() {return elements.size();}
-  uint64_t GetNumOpenElements() {return currentOpenSet.size();}
-  void closeNodeAtIndex(uint64_t index);
-  void closeNodeAtElementIndex(uint64_t elementIndex);
-  
-private:
-  std::vector<dataStructure> elements;
-  std::vector<uint64_t> currentOpenSet;
-  bool useHash;
-};
-
-
-template<typename state, class dataStructure>
-uint64_t TranspositionTable<state, dataStructure>::AddNode(const state &val, uint64_t hash, double g, double h, double error)
-{
-	elements.push_back(dataStructure(val, g, h, error,hash,true));
-  if (useHash){
-    table[hash] = elements.size()-1; // hashing to element list location
-  }
-  currentOpenSet.push_back(elements.size()-1);
-	return elements.size()-1;
-}
-template<typename state, class dataStructure>
-void TranspositionTable<state, dataStructure>::closeNodeAtIndex(uint64_t index)
-{
-  elements[currentOpenSet[index]].isOpen = false;
-	currentOpenSet.erase(currentOpenSet.begin()+index);
-}
-
-template<typename state, class dataStructure>
-void TranspositionTable<state, dataStructure>::closeNodeAtElementIndex(uint64_t elementIndex)
-{
-  elements[elementIndex].isOpen = false;
-  currentOpenSet.erase(std::remove(currentOpenSet.begin(),currentOpenSet.end(), elementIndex), currentOpenSet.end());
-}
-
-template<typename state, class dataStructure>
-bool TranspositionTable<state, dataStructure>::Lookup(uint64_t hashKey, uint64_t &objKey) const
-{
-	typename IndexTable::const_iterator it;
-	it = table.find(hashKey);
-	if (it != table.end())
-	{
-		objKey = (*it).second;
-		return true;
-	}
-	return false;
-}
-
-template <class state, class action, bool verbose = true, class table = TranspositionTable<state>>
+template <class state, class action, bool verbose = true, class table = std::vector<transpostionNode<state>>>
 class IDTHSwTrans {
 public:
 	IDTHSwTrans(bool front2frontH=false, bool isConsistent = false, bool isUpdateByWorkload = false, double smallestEdge=1, bool useHash = true) { this->front2frontH = front2frontH; this->isConsistent = isConsistent; this->smallestEdge = smallestEdge; this->isUpdateByWorkload = isUpdateByWorkload; this->useHash = useHash;}
@@ -133,7 +65,8 @@ private:
   
   unsigned long availableStorage = 0;
 	
-
+  typedef __gnu_cxx::hash_map<uint64_t, double, AHash64> IndexTable;
+	IndexTable hashTable;
   table transTable;
 	bool readyOpenLists = false;
 	bool front2frontH;
@@ -147,8 +80,6 @@ private:
 
 template <class state, class action, bool verbose, class table>
 double IDTHSwTrans<state, action, verbose,table>::updateBoundByWorkload(double newbound, double prevBound, double oldForwardBound, uint64_t forwardLoad,uint64_t backwardLoad){
-	//printf("forwardLoad: %llu,backwardLoad: %llu,oldForwardBound%d\n",forwardLoad,backwardLoad,oldForwardBound);
-  //printf("update3: %1.0f|%1.0f|%1.0f|%llu|%llu\n", newbound, prevBound, oldForwardBound, forwardLoad, backwardLoad);
 	if (forwardLoad <= backwardLoad){
 		return oldForwardBound + newbound - prevBound;
 	}
@@ -161,7 +92,6 @@ template <class state, class action, bool verbose, class table>
 bool IDTHSwTrans<state, action, verbose, table>::GetPath(SearchEnvironment<state, action>* env,
 state fromState, state toState, /*std::vector<state> &thePath,*/ int secondsLimit, unsigned long availableStorage)
 {
-  //printf("start\n");
   //thePath.clear();
   this->availableStorage = availableStorage;
 	auto startTime = std::chrono::steady_clock::now();
@@ -169,7 +99,7 @@ state fromState, state toState, /*std::vector<state> &thePath,*/ int secondsLimi
 	originStart = fromState;
 	originGoal = toState;
 	double initialHeuristic = env->HCost(fromState, toState);
-	fBound = 	nextBound[forwardLoc] = nextBound[backwardLoc] = std::max(smallestEdge,initialHeuristic);
+	fBound = nextBound[forwardLoc] = nextBound[backwardLoc] = std::max(smallestEdge,initialHeuristic);
 	forwardBound = ceil(fBound / 2) - smallestEdge;
 	unsigned long nodesExpandedSoFar = 0;
 	unsigned long previousIterationExpansions = 0;
@@ -189,13 +119,12 @@ state fromState, state toState, /*std::vector<state> &thePath,*/ int secondsLimi
     if (useHash){
       hash = env->GetStateHash(originStart);
     }
-    //printf("bound=%1.0f, forwardBound%1.0f\n", fBound, forwardBound);
 		bool solved = DoIterationForward(env, originStart, originStart, hash, 0, midState);//, currPath, thePath);
 		if(verbose){
 			printf("Nodes expanded: %d(%d)\n", nodesExpanded-nodesExpandedSoFar, nodesExpanded);
 		}
 
-    if (!solved && transTable.GetNumOpenElements() > 0){
+    if (!solved && transTable.size() > 0){
       solved = DoIterationBackward(env, originGoal, originGoal, 0, midState);//, thePath);
     }
     if (solved) {
@@ -213,10 +142,9 @@ state fromState, state toState, /*std::vector<state> &thePath,*/ int secondsLimi
       return true;
 		}
 		else{
-      //printf("%1.0f|%1.0f|%1.0f|%1.0f|%llu|%llu\n", forwardBound, fBound, nextBound[forwardLoc], nextBound[backwardLoc], forwardExpandedInLastIter, backwardExpandedInLastIter);
-      transTable.Reset();
-			double nextFbound = std::max(nextBound[forwardLoc],nextBound[backwardLoc]);
-      nextBound[forwardLoc] = nextBound[backwardLoc] = nextFbound;
+      transTable.clear();
+      hashTable.clear();
+			double nextFbound = nextBound[forwardLoc] = nextBound[backwardLoc] = std::max(nextBound[forwardLoc],nextBound[backwardLoc]);
 			if (!isUpdateByWorkload){
 				forwardBound = ceil(nextFbound / 2) - smallestEdge;
 			} 
@@ -245,19 +173,22 @@ bool IDTHSwTrans<state, action, verbose, table>::DoIterationForward(SearchEnviro
 	}
 
 	if (g > forwardBound) {
-		//backwardBound = fBound - g - smallestEdge;
     double error = 0;
 		if (isConsistent){
 		  error = g - env->HCost(currState,originStart);
 		}
-    uint64_t frontierKey = transTable.AddNode(currState,hashValue, g, h, error);
+    transTable.push_back(transpostionNode<state>(currState, g, h, error));
+    if (useHash){
+      hashTable[hashValue] = g; // hashing to element list location
+    }
     if (transTable.size() > availableStorage){
       bool isSolutionFound = DoIterationBackward(env, originGoal, originGoal, 0, midState);//,backwardPath);
       if (isSolutionFound){
         return true;
       }
       else{
-        transTable.Reset();
+        transTable.clear();
+        hashTable.clear();
         return false;
       }
     }
@@ -272,7 +203,7 @@ bool IDTHSwTrans<state, action, verbose, table>::DoIterationForward(SearchEnviro
 		dMMLastIterExpansions++;
 	}
 	for (unsigned int x = 0; x < neighbors.size(); x++){
-		uint64_t childID;
+		double childG;
 		double edgeCost = env->GCost(currState, neighbors[x]);
 		if (neighbors[x] == parent){
       continue;
@@ -280,20 +211,19 @@ bool IDTHSwTrans<state, action, verbose, table>::DoIterationForward(SearchEnviro
     uint64_t hash;
     if (useHash){
       hash = env->GetStateHash(neighbors[x]);
+      typename IndexTable::const_iterator it;
+      it = hashTable.find(hash);
+      if (it != hashTable.end()){
+        childG = (*it).second;
+        if (childG <= g + edgeCost) {
+        continue;
+      }
+        else{
+          hashTable[hash] = g + edgeCost;
+        }
+      }
+
     }
-    if (useHash && transTable.Lookup(hash, childID)){
-      if (!transTable.Lookup(childID).isOpen){
-        continue;
-      }
-      if (transTable.Lookup(childID).g <= g + edgeCost) {
-        continue;
-      }
-      else{
-        transTable.Lookup(childID).g = g + edgeCost;
-        if (g + edgeCost <= forwardBound)
-        transTable.closeNodeAtElementIndex(childID);
-      }
-		}
 		if (DoIterationForward(env, currState, neighbors[x],hash, g + edgeCost, midState)){//, currPath, backwardPath)) {
 			return true;
 		}
@@ -308,69 +238,41 @@ bool IDTHSwTrans<state, action, verbose, table>::DoIterationBackward(SearchEnvir
 {	
 
   double fPossibleBound = 0;
-  //backwardPath.push_back(currState);
-  /*
-    if (front2frontH){
-    double h = env->HCost(currState, possibleMidState);
-    fPossibleBound = std::max(fPossibleBound, g + h + possibleMidStateG);
-    if (fgreater(fPossibleBound, fBound) || g > backwardBound){
-      UpdateNextBound(fBound, fPossibleBound,backwardLoc);
-      return false;
-    }
-  }
-  */
-
-  std::vector<uint64_t> ignoreList;
-  for (uint64_t i = transTable.GetNumOpenElements()-1; i != static_cast<uint64_t>(-1);i--){
-    state &possibleMidState = transTable.LookupOpen(i).data;
-    double possibleMidStateG = transTable.LookupOpen(i).g;
-   // double otherError = transTable.LookupOpen(i).error;
-    //double otherH = transTable.LookupOpen(i).h;
+  std::vector<transpostionNode<state>> ignoreList;
+  for (uint64_t i = transTable.size()-1; i != static_cast<uint64_t>(-1);i--){
+    state &possibleMidState = transTable[i].data;
+    double possibleMidStateG = transTable[i].g;
+    double otherError = transTable[i].error;
+    double otherH = transTable[i].h;
     backwardBound = fBound - possibleMidStateG - smallestEdge;
     if (currState == possibleMidState && !fgreater(g + possibleMidStateG,fBound)) {
       pathLength = g + possibleMidStateG;
       midState = i;
       return true;
     }
-    double computedF = g + possibleMidStateG + env->HCost(currState,possibleMidState);
+    double computedF = 0;
+	double error = 0;
+	double originalH = 0;
+	if(isConsistent){
+		error = g - env->HCost(currState,originGoal);
+		originalH = env->HCost(currState, originStart);
+	}
+	if(front2frontH){
+		computedF = g + possibleMidStateG + env->HCost(currState,possibleMidState);
+	}
+	computedF = std::max(computedF, possibleMidStateG + otherH + error); 
+	computedF = std::max(computedF, g + originalH + otherError);
     if(fgreater(computedF,fBound) || g > backwardBound){
-      ignoreList.push_back(transTable.GetOpenKey(i));
-      transTable.closeNodeAtIndex(i);
-      UpdateNextBound(fBound, computedF,backwardLoc);
+      ignoreList.push_back(transTable[i]);
+      transTable[i] = transTable.back();
+      transTable.pop_back();
+      UpdateNextBound(fBound, computedF, backwardLoc);
       continue;
     }
-    /*
-    double originalH = env->HCost(currState, originStart);
-    //fPossibleBound = std::max(g + originalH + otherError, fPossibleBound);
-    fPossibleBound = std::max(g + originalH, fPossibleBound);
-    if (fgreater(fPossibleBound, fBound) || g > backwardBound){
-      UpdateNextBound(fBound, fPossibleBound, backwardLoc);
-      ignoreList.push_back(transTable.GetOpenKey(i));
-      transTable.closeNodeAtIndex(i);
-      i--;
-      continue;
-    }
-    
-    if (isConsistent){
-      double error = g - env->HCost(currState,originGoal);
-      //fPossibleBound = std::max(possibleMidStateG + otherH + error, fPossibleBound); 
-      fPossibleBound = std::max(possibleMidStateG + otherH, fPossibleBound); 
-      if (fgreater(fPossibleBound, fBound) || g > backwardBound){
-        UpdateNextBound(fBound, fPossibleBound,backwardLoc);
-        ignoreList.push_back(transTable.GetOpenKey(i));
-        transTable.closeNodeAtIndex(i);
-        i--;
-        continue;
-      }
-    }
-*/    
   }
-  if(transTable.GetNumOpenElements() ==0){
-    for (uint64_t i : ignoreList){
-      transTable.reOpenNode(i);
-    }
+  if(transTable.size()==0){
+    transTable.insert( transTable.end(), ignoreList.begin(), ignoreList.end());
     ignoreList.clear();
-    //backwardPath.pop_back();
     return false;
   }
    
@@ -392,11 +294,8 @@ bool IDTHSwTrans<state, action, verbose, table>::DoIterationBackward(SearchEnvir
       return true;
     }
   }
-  for (uint64_t i : ignoreList){
-    transTable.reOpenNode(i);
-  }
+  transTable.insert( transTable.end(), ignoreList.begin(), ignoreList.end());
   ignoreList.clear();
-  //backwardPath.pop_back();
   return false;
 }
 

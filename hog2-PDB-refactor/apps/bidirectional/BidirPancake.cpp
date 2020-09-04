@@ -51,7 +51,7 @@ static bool Max_BAI=false;
 
 static bool MMRun=true;
 
-static bool IDMMRun=false;
+static bool IDMMRun=true;
 static bool idmmF2fFlag=true;
 
 static bool ASTARpIDMM=false;
@@ -97,7 +97,7 @@ void TestPancake(string file)
 	StevenTest(0, 100, true);
 	StevenTest(1, 100, true);
 	StevenTest(2, 100, true);
-	StevenTest(3, 100, true);
+	//StevenTest(3, 100, true);
 
 	myfile << "completed!" << endl;
 	myfile.close();
@@ -107,7 +107,7 @@ void TestPancake(string file)
 
 void StevenTest(int gap, int problems_num, bool randomPancake, vector<int> skipVector)
 {
-	const int pancakes_num = 8;
+	const int pancakes_num = 10;
 	srandom(2017218);
 	PancakePuzzleState<pancakes_num> start;
 	PancakePuzzleState<pancakes_num> original;
@@ -138,11 +138,11 @@ void StevenTest(int gap, int problems_num, bool randomPancake, vector<int> skipV
 		if(std::find(skipVector.begin(), skipVector.end(), count+1) != skipVector.end()) {
 			continue;
 		}
-		//cout << "new prob" << endl;
     
     /*if (count != 38 || gap!=2){
       continue;
     }*/
+	cout << "Running: Gap=" << gap << ", ProblemID=" << count+1 << endl;
     
 		myfile << boost::format("\tProblem %d of %d\n") % (count+1) % problems_num;
 		myfile << "\tStart state: " << original << endl;
@@ -587,7 +587,8 @@ void StevenTest(int gap, int problems_num, bool randomPancake, vector<int> skipV
 							   nodesExpanded % mm.GetNecessaryExpansions() % 0 % timer.GetElapsedTime();
 						}
 						else{
-							MBBDS<PancakePuzzleState<pancakes_num>, PancakePuzzleAction, MbbdsBloomFilter<PancakePuzzleState<pancakes_num>, PancakeHasher<pancakes_num>>, false> mbbds(statesQuantityBoundforMBBDS, isUpdateByWorkload, isConsistent, revAlgo) ;
+							/*MBBDS<PancakePuzzleState<pancakes_num>, PancakePuzzleAction, MbbdsBloomFilter<PancakePuzzleState<pancakes_num>, PancakeHasher<pancakes_num>>, false> mbbds(statesQuantityBoundforMBBDS, isUpdateByWorkload, isConsistent, revAlgo) ;*/
+							MBBDS<PancakePuzzleState<pancakes_num>, PancakePuzzleAction, MbbdsBloomFilter<PancakePuzzleState<pancakes_num>, PancakeHasher<pancakes_num>>, false> mbbds(statesQuantityBoundforMBBDS, isUpdateByWorkload, false, false) ;
 							goal.Reset();
 							start = original;
 							solved = mbbds.GetMidState(&pancake, start, goal, midState, secondsLimit - timer.GetElapsedTime(), int(lastBound));

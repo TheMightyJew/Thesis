@@ -1,0 +1,462 @@
+TestSTP:(Random: 1, Hard: 0)
+	Problem 1 of 10
+	Start state: (4x4)5 4 2 3 1 6 9 10 0 8 12 15 13 11 14 7 
+	Goal state: (4x4)0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 
+	Initial heuristic 22
+		_A*_
+			A* found path length 30; 2162 expanded; 2050 necessary; using 4170 states in memory; 0.0043s elapsed
+			I-A* ; 4861 expanded;
+		_MM_
+			MM found path length 30; 3765 expanded; 3765 necessary; using 7427 states in memory; 0.0072s elapsed
+			I-MM ; 17582 expanded;
+		_IDA*_
+			IDA* found path length 30; 7962 expanded; 24332 generated; 3779 necessary; 0.0025s elapsed
+			D-A* ; 6327 expanded;
+		_MM+IDMM_
+			MM+IDMM IDMM using memory for 3753 states(state size: 68 bits, Memory_Percentage=0.90) found path length 30; 2686 expanded; 2398 necessary; 0.0444s elapsed
+			MM+IDMM IDMM using memory for 3127 states(state size: 68 bits, Memory_Percentage=0.75) found path length 30; 2565 expanded; 2424 necessary; 0.0395s elapsed
+			MM+IDMM IDMM using memory for 2085 states(state size: 68 bits, Memory_Percentage=0.50) found path length 30; 3657 expanded; 3442 necessary; 0.0331s elapsed
+			MM+IDMM IDMM using memory for 1042 states(state size: 68 bits, Memory_Percentage=0.25) found path length 30; 3919 expanded; 3413 necessary; 0.0156s elapsed
+			MM+IDMM IDMM using memory for 417 states(state size: 68 bits, Memory_Percentage=0.10) found path length 30; 6050 expanded; 4767 necessary; 0.0122s elapsed
+		_A*+IDMM_
+			A*+IDMM IDMM using memory for 3753 states(state size: 68 bits, Memory_Percentage=0.90) found path length 30; 13114 expanded; 2921 necessary; 0.0357s elapsed
+			A*+IDMM IDMM using memory for 3127 states(state size: 68 bits, Memory_Percentage=0.75) found path length 30; 16043 expanded; 5326 necessary; 0.0333s elapsed
+			A*+IDMM IDMM using memory for 2085 states(state size: 68 bits, Memory_Percentage=0.50) found path length 30; 19780 expanded; 8142 necessary; 0.0282s elapsed
+			A*+IDMM IDMM using memory for 1042 states(state size: 68 bits, Memory_Percentage=0.25) found path length 30; 11665 expanded; 10239 necessary; 0.0136s elapsed
+			A*+IDMM IDMM using memory for 417 states(state size: 68 bits, Memory_Percentage=0.10) found path length 30; 9795 expanded; 8257 necessary; 0.0098s elapsed
+		_Astar+IDAstar_
+			A*+IDA* IDA* using memory for 3753 states(state size: 68 bits, Memory_Percentage=0.90) found path length 30; 2187 expanded; 706 generated; 2052 necessary; 0.0039s elapsed
+			A*+IDA* IDA* using memory for 3127 states(state size: 68 bits, Memory_Percentage=0.75) found path length 30; 2171 expanded; 1658 generated; 2064 necessary; 0.0036s elapsed
+			A*+IDA* IDA* using memory for 2085 states(state size: 68 bits, Memory_Percentage=0.50) found path length 30; 2162 expanded; 3309 generated; 2107 necessary; 0.0031s elapsed
+			A*+IDA* IDA* using memory for 1042 states(state size: 68 bits, Memory_Percentage=0.25) found path length 30; 2924 expanded; 7263 generated; 2229 necessary; 0.0027s elapsed
+			A*+IDA* IDA* using memory for 417 states(state size: 68 bits, Memory_Percentage=0.10) found path length 30; 3638 expanded; 10429 generated; 2838 necessary; 0.0033s elapsed
+		_Astar+IDAstar+Reverse_
+			A*+IDA*_Reverse IDA* using memory for 3753 states(state size: 68 bits, Memory_Percentage=0.90) found path length 30; 18535 expanded; 52241 generated; 17191 necessary; 0.0153s elapsed
+			A*+IDA*_Reverse IDA* using memory for 3127 states(state size: 68 bits, Memory_Percentage=0.75) found path length 30; 18218 expanded; 52241 generated; 16874 necessary; 0.0157s elapsed
+			A*+IDA*_Reverse IDA* using memory for 2085 states(state size: 68 bits, Memory_Percentage=0.50) found path length 30; 18163 expanded; 53648 generated; 16768 necessary; 0.0090s elapsed
+			A*+IDA*_Reverse IDA* using memory for 1042 states(state size: 68 bits, Memory_Percentage=0.25) found path length 30; 17812 expanded; 54086 generated; 16409 necessary; 0.0074s elapsed
+			A*+IDA*_Reverse IDA* using memory for 417 states(state size: 68 bits, Memory_Percentage=0.10) found path length 30; 17634 expanded; 54428 generated; 16222 necessary; 0.0076s elapsed
+		_MBBDS(ThreePhase=1)_
+			MBBDS(k=1,ThreePhase=1) MBBDS using memory for 3753 states(state size: 68 bits, Memory_Percentage=0.90) found path length 30; 27720 expanded; 15505 necessary; 7 iterations; 0.0104s elapsed;
+			MBBDS(k=1,ThreePhase=1) MBBDS using memory for 3127 states(state size: 68 bits, Memory_Percentage=0.75) found path length 30; 27395 expanded; 15505 necessary; 7 iterations; 0.0100s elapsed;
+			MBBDS(k=1,ThreePhase=1) MBBDS using memory for 2085 states(state size: 68 bits, Memory_Percentage=0.50) found path length 30; 29549 expanded; 18174 necessary; 11 iterations; 0.0113s elapsed;
+			MBBDS(k=1,ThreePhase=1) MBBDS using memory for 1042 states(state size: 68 bits, Memory_Percentage=0.25) found path length 30; 30910 expanded; 20083 necessary; 12 iterations; 0.0105s elapsed;
+			MBBDS(k=1,ThreePhase=1) MBBDS using memory for 417 states(state size: 68 bits, Memory_Percentage=0.10) found path length 30; 39009 expanded; 24892 necessary; 18 iterations; 0.0110s elapsed;
+		_IDMM_
+			IDMM found path length 30; 11171 expanded; 34771 generated; 4741 necessary; 0.0084s elapsed; Mid state: (4x4)5 4 2 3 0 1 6 10 8 9 15 7 12 13 11 14 
+			D-MM ; 5018 expanded;
+	Problem 2 of 10
+	Start state: (4x4)4 1 3 6 13 0 9 11 8 12 7 2 10 14 15 5 
+	Goal state: (4x4)0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 
+	Initial heuristic 26
+		_A*_
+			A* found path length 38; 63916 expanded; 63010 necessary; using 122731 states in memory; 0.1617s elapsed
+			I-A* ; 148653 expanded;
+		_MM_
+			MM found path length 38; 64090 expanded; 64090 necessary; using 125420 states in memory; 0.1373s elapsed
+			I-MM ; 287553 expanded;
+		_IDA*_
+			IDA* found path length 38; 189733 expanded; 581785 generated; 164459 necessary; 0.0553s elapsed
+			D-A* ; 149973 expanded;
+		_MM+IDMM_
+			MM+IDMM IDMM using memory for 110457 states(state size: 68 bits, Memory_Percentage=0.90) found path length 38; 62710 expanded; 62437 necessary; 5.9345s elapsed
+			MM+IDMM IDMM using memory for 92048 states(state size: 68 bits, Memory_Percentage=0.75) found path length 38; 53715 expanded; 52953 necessary; 7.3252s elapsed
+			MM+IDMM IDMM using memory for 61365 states(state size: 68 bits, Memory_Percentage=0.50) found path length 38; 47681 expanded; 46982 necessary; 9.9396s elapsed
+			MM+IDMM IDMM using memory for 30682 states(state size: 68 bits, Memory_Percentage=0.25) found path length 38; 77327 expanded; 71459 necessary; 7.1985s elapsed
+			MM+IDMM IDMM using memory for 12273 states(state size: 68 bits, Memory_Percentage=0.10) found path length 38; 90945 expanded; 86643 necessary; 3.3213s elapsed
+		_A*+IDMM_
+			A*+IDMM IDMM using memory for 110457 states(state size: 68 bits, Memory_Percentage=0.90) found path length 38; 97902 expanded; 66676 necessary; 0.9825s elapsed
+			A*+IDMM IDMM using memory for 92048 states(state size: 68 bits, Memory_Percentage=0.75) found path length 38; 102327 expanded; 74033 necessary; 0.7970s elapsed
+			A*+IDMM IDMM using memory for 61365 states(state size: 68 bits, Memory_Percentage=0.50) found path length 38; 140311 expanded; 89391 necessary; 0.5916s elapsed
+			A*+IDMM IDMM using memory for 30682 states(state size: 68 bits, Memory_Percentage=0.25) found path length 38; 195929 expanded; 122219 necessary; 0.5014s elapsed
+			A*+IDMM IDMM using memory for 12273 states(state size: 68 bits, Memory_Percentage=0.10) found path length 38; 182813 expanded; 162932 necessary; 0.2753s elapsed
+		_Astar+IDAstar_
+			A*+IDA* IDA* using memory for 110457 states(state size: 68 bits, Memory_Percentage=0.90) found path length 38; 63989 expanded; 20043 generated; 63323 necessary; 0.1375s elapsed
+			A*+IDA* IDA* using memory for 92048 states(state size: 68 bits, Memory_Percentage=0.75) found path length 38; 64874 expanded; 52607 generated; 64130 necessary; 0.1152s elapsed
+			A*+IDA* IDA* using memory for 61365 states(state size: 68 bits, Memory_Percentage=0.50) found path length 38; 66914 expanded; 108071 generated; 65959 necessary; 0.1023s elapsed
+			A*+IDA* IDA* using memory for 30682 states(state size: 68 bits, Memory_Percentage=0.25) found path length 38; 71291 expanded; 170107 generated; 70986 necessary; 0.0705s elapsed
+			A*+IDA* IDA* using memory for 12273 states(state size: 68 bits, Memory_Percentage=0.10) found path length 38; 100987 expanded; 290985 generated; 92461 necessary; 0.0721s elapsed
+		_Astar+IDAstar+Reverse_
+			A*+IDA*_Reverse IDA* using memory for 110457 states(state size: 68 bits, Memory_Percentage=0.90) found path length 38; 427016 expanded; 1155417 generated; 218542 necessary; 11.2478s elapsed
+			A*+IDA*_Reverse IDA* using memory for 92048 states(state size: 68 bits, Memory_Percentage=0.75) found path length 38; 442675 expanded; 1233160 generated; 218980 necessary; 5.0999s elapsed
+			A*+IDA*_Reverse IDA* using memory for 61365 states(state size: 68 bits, Memory_Percentage=0.50) found path length 38; 426936 expanded; 1233160 generated; 203241 necessary; 5.0656s elapsed
+			A*+IDA*_Reverse IDA* using memory for 30682 states(state size: 68 bits, Memory_Percentage=0.25) found path length 38; 431715 expanded; 1296975 generated; 195422 necessary; 2.1977s elapsed
+			A*+IDA*_Reverse IDA* using memory for 12273 states(state size: 68 bits, Memory_Percentage=0.10) found path length 38; 437321 expanded; 1343224 generated; 191733 necessary; 0.8943s elapsed
+		_MBBDS(ThreePhase=1)_
+			MBBDS(k=1,ThreePhase=1) MBBDS using memory for 110457 states(state size: 68 bits, Memory_Percentage=0.90) found path length 38; 493359 expanded; 268190 necessary; 6 iterations; 0.2088s elapsed;
+			MBBDS(k=1,ThreePhase=1) MBBDS using memory for 92048 states(state size: 68 bits, Memory_Percentage=0.75) found path length 38; 527518 expanded; 283896 necessary; 7 iterations; 0.2013s elapsed;
+			MBBDS(k=1,ThreePhase=1) MBBDS using memory for 61365 states(state size: 68 bits, Memory_Percentage=0.50) found path length 38; 511607 expanded; 283896 necessary; 7 iterations; 0.1702s elapsed;
+			MBBDS(k=1,ThreePhase=1) MBBDS using memory for 30682 states(state size: 68 bits, Memory_Percentage=0.25) found path length 38; 542457 expanded; 330327 necessary; 11 iterations; 0.1511s elapsed;
+			MBBDS(k=1,ThreePhase=1) MBBDS using memory for 12273 states(state size: 68 bits, Memory_Percentage=0.10) found path length 38; 646956 expanded; 444223 necessary; 13 iterations; 0.1589s elapsed;
+		_IDMM_
+			IDMM found path length 38; 172566 expanded; 517374 generated; 147815 necessary; 0.1166s elapsed; Mid state: (4x4)4 1 2 3 13 9 5 6 8 0 11 7 10 12 14 15 
+			D-MM ; 122427 expanded;
+	Problem 3 of 10
+	Start state: (4x4)10 4 5 6 9 11 3 7 2 1 0 13 14 8 15 12 
+	Goal state: (4x4)0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 
+	Initial heuristic 34
+		_A*_
+			A* found path length 46; 400797 expanded; 380857 necessary; using 754509 states in memory; 1.0559s elapsed
+			I-A* ; 879745 expanded;
+		_MM_
+			MM found path length 46; 360618 expanded; 360618 necessary; using 684472 states in memory; 0.8625s elapsed
+			I-MM ; 1862047 expanded;
+		_IDA*_
+			IDA* found path length 46; 1126294 expanded; 3425483 generated; 1027337 necessary; 0.3196s elapsed
+			D-A* ; 950337 expanded;
+		_MM+IDMM_
+			MM+IDMM IDMM using memory for 616024 states(state size: 68 bits, Memory_Percentage=0.90) found path length 46; 356525 expanded; 355114 necessary; 130.0439s elapsed
+			MM+IDMM IDMM using memory for 513354 states(state size: 68 bits, Memory_Percentage=0.75) found path length 46; 303563 expanded; 300877 necessary; 155.9727s elapsed
+			MM+IDMM IDMM using memory for 342236 states(state size: 68 bits, Memory_Percentage=0.50) found path length 46; 271799 expanded; 270056 necessary; 197.8561s elapsed
+			MM+IDMM IDMM using memory for 171118 states(state size: 68 bits, Memory_Percentage=0.25) found path length 46; 427825 expanded; 426401 necessary; 181.7112s elapsed
+			MM+IDMM IDMM using memory for 68447 states(state size: 68 bits, Memory_Percentage=0.10) found path length 46; 529753 expanded; 525946 necessary; 50.9605s elapsed
+		_A*+IDMM_
+			A*+IDMM IDMM using memory for 616024 states(state size: 68 bits, Memory_Percentage=0.90) found path length 46; 1600767 expanded; 432680 necessary; 8.1788s elapsed
+			A*+IDMM IDMM using memory for 513354 states(state size: 68 bits, Memory_Percentage=0.75) found path length 46; 1847995 expanded; 492380 necessary; 7.1669s elapsed
+			A*+IDMM IDMM using memory for 342236 states(state size: 68 bits, Memory_Percentage=0.50) found path length 46; 765711 expanded; 596666 necessary; 4.2206s elapsed
+			A*+IDMM IDMM using memory for 171118 states(state size: 68 bits, Memory_Percentage=0.25) found path length 46; 956846 expanded; 704853 necessary; 2.4179s elapsed
+			A*+IDMM IDMM using memory for 68447 states(state size: 68 bits, Memory_Percentage=0.10) found path length 46; 1178862 expanded; 1018375 necessary; 1.9265s elapsed
+		_Astar+IDAstar_
+			A*+IDA* IDA* using memory for 616024 states(state size: 68 bits, Memory_Percentage=0.90) found path length 46; 404569 expanded; 237154 generated; 386687 necessary; 1.1198s elapsed
+			A*+IDA* IDA* using memory for 513354 states(state size: 68 bits, Memory_Percentage=0.75) found path length 46; 410460 expanded; 423585 generated; 395133 necessary; 0.9453s elapsed
+			A*+IDA* IDA* using memory for 342236 states(state size: 68 bits, Memory_Percentage=0.50) found path length 46; 426508 expanded; 750928 generated; 411756 necessary; 0.7383s elapsed
+			A*+IDA* IDA* using memory for 171118 states(state size: 68 bits, Memory_Percentage=0.25) found path length 46; 492052 expanded; 1223998 generated; 431530 necessary; 0.5307s elapsed
+			A*+IDA* IDA* using memory for 68447 states(state size: 68 bits, Memory_Percentage=0.10) found path length 46; 620938 expanded; 1779393 generated; 573444 necessary; 0.4722s elapsed
+		_Astar+IDAstar+Reverse_
+			A*+IDA*_Reverse IDA* using memory for 616024 states(state size: 68 bits, Memory_Percentage=0.90) found path length 46; 2029839 expanded; 5289953 generated; 1213791 necessary; 208.8242s elapsed
+			A*+IDA*_Reverse IDA* using memory for 513354 states(state size: 68 bits, Memory_Percentage=0.75) found path length 46; 1976690 expanded; 5289953 generated; 1160642 necessary; 206.7016s elapsed
+			A*+IDA*_Reverse IDA* using memory for 342236 states(state size: 68 bits, Memory_Percentage=0.50) found path length 46; 1958697 expanded; 5505930 generated; 1099838 necessary; 84.1625s elapsed
+			A*+IDA*_Reverse IDA* using memory for 171118 states(state size: 68 bits, Memory_Percentage=0.25) found path length 46; 1930082 expanded; 5688523 generated; 1032888 necessary; 14.3961s elapsed
+			A*+IDA*_Reverse IDA* using memory for 68447 states(state size: 68 bits, Memory_Percentage=0.10) found path length 46; 1923326 expanded; 5833187 generated; 996120 necessary; 6.3320s elapsed
+		_MBBDS(ThreePhase=1)_
+			MBBDS(k=1,ThreePhase=1) MBBDS using memory for 616024 states(state size: 68 bits, Memory_Percentage=0.90) found path length 46; 4066322 expanded; 1933287 necessary; 7 iterations; 1.8933s elapsed;
+			MBBDS(k=1,ThreePhase=1) MBBDS using memory for 513354 states(state size: 68 bits, Memory_Percentage=0.75) found path length 46; 4011963 expanded; 1933287 necessary; 7 iterations; 1.6517s elapsed;
+			MBBDS(k=1,ThreePhase=1) MBBDS using memory for 342236 states(state size: 68 bits, Memory_Percentage=0.50) found path length 46; 3920471 expanded; 1933287 necessary; 7 iterations; 1.3638s elapsed;
+			MBBDS(k=1,ThreePhase=1) MBBDS using memory for 171118 states(state size: 68 bits, Memory_Percentage=0.25) found path length 46; 4085353 expanded; 2187249 necessary; 11 iterations; 1.1857s elapsed;
+			MBBDS(k=1,ThreePhase=1) MBBDS using memory for 68447 states(state size: 68 bits, Memory_Percentage=0.10) found path length 46; 4861582 expanded; 3017610 necessary; 13 iterations; 1.2058s elapsed;
+		_IDMM_
+			IDMM found path length 46; 1076814 expanded; 3235013 generated; 958855 necessary; 0.7478s elapsed; Mid state: (4x4)1 2 10 6 0 4 5 3 9 12 11 7 14 8 13 15 
+			D-MM ; 832021 expanded;
+	Problem 4 of 10
+	Start state: (4x4)2 9 4 1 12 13 7 5 8 6 0 3 14 11 10 15 
+	Goal state: (4x4)0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 
+	Initial heuristic 26
+		_A*_
+			A* found path length 40; 129552 expanded; 129130 necessary; using 246490 states in memory; 0.2605s elapsed
+			I-A* ; 303935 expanded;
+		_MM_
+			MM found path length 40; 107019 expanded; 107019 necessary; using 207619 states in memory; 0.2156s elapsed
+			I-MM ; 504416 expanded;
+		_IDA*_
+			IDA* found path length 40; 474107 expanded; 1441026 generated; 317206 necessary; 0.1381s elapsed
+			D-A* ; 375902 expanded;
+		_MM+IDMM_
+			MM+IDMM IDMM using memory for 186857 states(state size: 68 bits, Memory_Percentage=0.90) found path length 40; 111080 expanded; 106752 necessary; 30.6585s elapsed
+			MM+IDMM IDMM using memory for 155714 states(state size: 68 bits, Memory_Percentage=0.75) found path length 40; 100213 expanded; 92460 necessary; 30.8030s elapsed
+			MM+IDMM IDMM using memory for 103809 states(state size: 68 bits, Memory_Percentage=0.50) found path length 40; 213998 expanded; 90063 necessary; 54.9673s elapsed
+			MM+IDMM IDMM using memory for 51904 states(state size: 68 bits, Memory_Percentage=0.25) found path length 40; 302266 expanded; 139142 necessary; 31.8681s elapsed
+			MM+IDMM IDMM using memory for 20761 states(state size: 68 bits, Memory_Percentage=0.10) found path length 40; 371642 expanded; 177595 necessary; 17.9367s elapsed
+		_A*+IDMM_
+			A*+IDMM IDMM using memory for 186857 states(state size: 68 bits, Memory_Percentage=0.90) found path length 40; 334398 expanded; 146462 necessary; 1.8794s elapsed
+			A*+IDMM IDMM using memory for 155714 states(state size: 68 bits, Memory_Percentage=0.75) found path length 40; 362325 expanded; 155849 necessary; 1.6270s elapsed
+			A*+IDMM IDMM using memory for 103809 states(state size: 68 bits, Memory_Percentage=0.50) found path length 40; 454159 expanded; 168642 necessary; 1.2405s elapsed
+			A*+IDMM IDMM using memory for 51904 states(state size: 68 bits, Memory_Percentage=0.25) found path length 40; 524923 expanded; 223900 necessary; 1.0667s elapsed
+			A*+IDMM IDMM using memory for 20761 states(state size: 68 bits, Memory_Percentage=0.10) found path length 40; 703250 expanded; 285031 necessary; 0.7696s elapsed
+		_Astar+IDAstar_
+			A*+IDA* IDA* using memory for 186857 states(state size: 68 bits, Memory_Percentage=0.90) found path length 40; 479218 expanded; 1161754 generated; 131824 necessary; 0.5650s elapsed
+			A*+IDA* IDA* using memory for 155714 states(state size: 68 bits, Memory_Percentage=0.75) found path length 40; 536384 expanded; 1385211 generated; 133731 necessary; 0.5779s elapsed
+			A*+IDA* IDA* using memory for 103809 states(state size: 68 bits, Memory_Percentage=0.50) found path length 40; 591035 expanded; 1636218 generated; 137013 necessary; 0.5331s elapsed
+			A*+IDA* IDA* using memory for 51904 states(state size: 68 bits, Memory_Percentage=0.25) found path length 40; 646147 expanded; 1888673 generated; 155951 necessary; 0.4773s elapsed
+			A*+IDA* IDA* using memory for 20761 states(state size: 68 bits, Memory_Percentage=0.10) found path length 40; 772762 expanded; 2325880 generated; 189488 necessary; 0.5110s elapsed
+		_Astar+IDAstar+Reverse_
+			A*+IDA*_Reverse IDA* using memory for 186857 states(state size: 68 bits, Memory_Percentage=0.90) found path length 40; 303609 expanded; 646506 generated; 230508 necessary; 1.3454s elapsed
+			A*+IDA*_Reverse IDA* using memory for 155714 states(state size: 68 bits, Memory_Percentage=0.75) found path length 40; 287282 expanded; 646506 generated; 214181 necessary; 1.2878s elapsed
+			A*+IDA*_Reverse IDA* using memory for 103809 states(state size: 68 bits, Memory_Percentage=0.50) found path length 40; 261212 expanded; 646506 generated; 188111 necessary; 1.2110s elapsed
+			A*+IDA*_Reverse IDA* using memory for 51904 states(state size: 68 bits, Memory_Percentage=0.25) found path length 40; 238047 expanded; 656409 generated; 163209 necessary; 0.5135s elapsed
+			A*+IDA*_Reverse IDA* using memory for 20761 states(state size: 68 bits, Memory_Percentage=0.10) found path length 40; 225141 expanded; 665313 generated; 148850 necessary; 0.1182s elapsed
+		_MBBDS(ThreePhase=1)_
+			MBBDS(k=1,ThreePhase=1) MBBDS using memory for 186857 states(state size: 68 bits, Memory_Percentage=0.90) found path length 40; 991764 expanded; 508675 necessary; 7 iterations; 0.4471s elapsed;
+			MBBDS(k=1,ThreePhase=1) MBBDS using memory for 155714 states(state size: 68 bits, Memory_Percentage=0.75) found path length 40; 975756 expanded; 508675 necessary; 7 iterations; 0.3848s elapsed;
+			MBBDS(k=1,ThreePhase=1) MBBDS using memory for 103809 states(state size: 68 bits, Memory_Percentage=0.50) found path length 40; 948255 expanded; 508675 necessary; 7 iterations; 0.3168s elapsed;
+			MBBDS(k=1,ThreePhase=1) MBBDS using memory for 51904 states(state size: 68 bits, Memory_Percentage=0.25) found path length 40; 1250187 expanded; 836631 necessary; 13 iterations; 0.3407s elapsed;
+			MBBDS(k=1,ThreePhase=1) MBBDS using memory for 20761 states(state size: 68 bits, Memory_Percentage=0.10) found path length 40; 1234087 expanded; 836631 necessary; 13 iterations; 0.3032s elapsed;
+		_IDMM_
+			IDMM found path length 40; 372651 expanded; 1099277 generated; 256267 necessary; 0.2577s elapsed; Mid state: (4x4)4 1 0 5 9 2 7 3 8 13 6 15 12 14 11 10 
+			D-MM ; 244521 expanded;
+	Problem 5 of 10
+	Start state: (4x4)1 5 0 3 14 8 7 11 6 4 15 13 9 12 10 2 
+	Goal state: (4x4)0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 
+	Initial heuristic 28
+		_A*_
+			A* found path length 38; 8870 expanded; 8864 necessary; using 17360 states in memory; 0.0135s elapsed
+			I-A* ; 19171 expanded;
+		_MM_
+			MM found path length 38; 22916 expanded; 22916 necessary; using 44797 states in memory; 0.0367s elapsed
+			I-MM ; 117333 expanded;
+		_IDA*_
+			IDA* found path length 38; 44360 expanded; 136734 generated; 15614 necessary; 0.0132s elapsed
+			D-A* ; 37823 expanded;
+		_MM+IDMM_
+			MM+IDMM IDMM using memory for 15624 states(state size: 68 bits, Memory_Percentage=0.90) found path length 38; 13247 expanded; 12980 necessary; 0.8893s elapsed
+			MM+IDMM IDMM using memory for 13020 states(state size: 68 bits, Memory_Percentage=0.75) found path length 38; 13386 expanded; 13107 necessary; 0.9825s elapsed
+			MM+IDMM IDMM using memory for 8680 states(state size: 68 bits, Memory_Percentage=0.50) found path length 38; 17258 expanded; 16513 necessary; 0.5120s elapsed
+			MM+IDMM IDMM using memory for 4340 states(state size: 68 bits, Memory_Percentage=0.25) found path length 38; 16424 expanded; 16271 necessary; 0.2429s elapsed
+			MM+IDMM IDMM using memory for 1736 states(state size: 68 bits, Memory_Percentage=0.10) found path length 38; 24578 expanded; 19077 necessary; 0.2248s elapsed
+		_A*+IDMM_
+			A*+IDMM IDMM using memory for 15624 states(state size: 68 bits, Memory_Percentage=0.90) found path length 38; 55345 expanded; 10854 necessary; 0.1661s elapsed
+			A*+IDMM IDMM using memory for 13020 states(state size: 68 bits, Memory_Percentage=0.75) found path length 38; 62203 expanded; 13478 necessary; 0.1537s elapsed
+			A*+IDMM IDMM using memory for 8680 states(state size: 68 bits, Memory_Percentage=0.50) found path length 38; 77316 expanded; 19144 necessary; 0.1284s elapsed
+			A*+IDMM IDMM using memory for 4340 states(state size: 68 bits, Memory_Percentage=0.25) found path length 38; 34225 expanded; 23784 necessary; 0.0592s elapsed
+			A*+IDMM IDMM using memory for 1736 states(state size: 68 bits, Memory_Percentage=0.10) found path length 38; 30623 expanded; 27273 necessary; 0.0388s elapsed
+		_Astar+IDAstar_
+			A*+IDA* IDA* using memory for 15624 states(state size: 68 bits, Memory_Percentage=0.90) found path length 38; 8943 expanded; 3008 generated; 8938 necessary; 0.0148s elapsed
+			A*+IDA* IDA* using memory for 13020 states(state size: 68 bits, Memory_Percentage=0.75) found path length 38; 9180 expanded; 7934 generated; 9174 necessary; 0.0131s elapsed
+			A*+IDA* IDA* using memory for 8680 states(state size: 68 bits, Memory_Percentage=0.50) found path length 38; 9752 expanded; 16538 generated; 9746 necessary; 0.0108s elapsed
+			A*+IDA* IDA* using memory for 4340 states(state size: 68 bits, Memory_Percentage=0.25) found path length 38; 12405 expanded; 31447 generated; 10251 necessary; 0.0102s elapsed
+			A*+IDA* IDA* using memory for 1736 states(state size: 68 bits, Memory_Percentage=0.10) found path length 38; 13846 expanded; 39901 generated; 11670 necessary; 0.0092s elapsed
+		_Astar+IDAstar+Reverse_
+			A*+IDA*_Reverse IDA* using memory for 15624 states(state size: 68 bits, Memory_Percentage=0.90) found path length 38; 292361 expanded; 877085 generated; 183752 necessary; 0.4386s elapsed
+			A*+IDA*_Reverse IDA* using memory for 13020 states(state size: 68 bits, Memory_Percentage=0.75) found path length 38; 291049 expanded; 877085 generated; 182440 necessary; 0.4390s elapsed
+			A*+IDA*_Reverse IDA* using memory for 8680 states(state size: 68 bits, Memory_Percentage=0.50) found path length 38; 296441 expanded; 898566 generated; 184746 necessary; 0.1858s elapsed
+			A*+IDA*_Reverse IDA* using memory for 4340 states(state size: 68 bits, Memory_Percentage=0.25) found path length 38; 298281 expanded; 910996 generated; 185094 necessary; 0.1124s elapsed
+			A*+IDA*_Reverse IDA* using memory for 1736 states(state size: 68 bits, Memory_Percentage=0.10) found path length 38; 299937 expanded; 920248 generated; 185594 necessary; 0.0965s elapsed
+		_MBBDS(ThreePhase=1)_
+			MBBDS(k=1,ThreePhase=1) MBBDS using memory for 15624 states(state size: 68 bits, Memory_Percentage=0.90) found path length 38; 212362 expanded; 108548 necessary; 7 iterations; 0.0623s elapsed;
+			MBBDS(k=1,ThreePhase=1) MBBDS using memory for 13020 states(state size: 68 bits, Memory_Percentage=0.75) found path length 38; 211061 expanded; 108548 necessary; 7 iterations; 0.0596s elapsed;
+			MBBDS(k=1,ThreePhase=1) MBBDS using memory for 8680 states(state size: 68 bits, Memory_Percentage=0.50) found path length 38; 224451 expanded; 124147 necessary; 11 iterations; 0.0598s elapsed;
+			MBBDS(k=1,ThreePhase=1) MBBDS using memory for 4340 states(state size: 68 bits, Memory_Percentage=0.25) found path length 38; 222290 expanded; 124147 necessary; 11 iterations; 0.0554s elapsed;
+			MBBDS(k=1,ThreePhase=1) MBBDS using memory for 1736 states(state size: 68 bits, Memory_Percentage=0.10) found path length 38; 291677 expanded; 157841 necessary; 14 iterations; 0.0682s elapsed;
+		_IDMM_
+			IDMM found path length 38; 54523 expanded; 168822 generated; 19966 necessary; 0.0370s elapsed; Mid state: (4x4)1 8 5 3 0 14 2 7 9 4 6 11 12 10 13 15 
+			D-MM ; 28870 expanded;
+	Problem 6 of 10
+	Start state: (4x4)1 5 6 3 4 7 11 10 8 2 12 14 13 0 9 15 
+	Goal state: (4x4)0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 
+	Initial heuristic 20
+		_A*_
+			A* found path length 30; 8013 expanded; 8005 necessary; using 15694 states in memory; 0.0120s elapsed
+			I-A* ; 19310 expanded;
+		_MM_
+			MM found path length 30; 7399 expanded; 7399 necessary; using 14885 states in memory; 0.0107s elapsed
+			I-MM ; 30334 expanded;
+		_IDA*_
+			IDA* found path length 30; 53504 expanded; 163681 generated; 16205 necessary; 0.0155s elapsed
+			D-A* ; 39399 expanded;
+		_MM+IDMM_
+			MM+IDMM IDMM using memory for 13396 states(state size: 68 bits, Memory_Percentage=0.90) found path length 30; 7713 expanded; 7345 necessary; 0.1645s elapsed
+			MM+IDMM IDMM using memory for 11163 states(state size: 68 bits, Memory_Percentage=0.75) found path length 30; 7631 expanded; 6704 necessary; 0.1395s elapsed
+			MM+IDMM IDMM using memory for 7442 states(state size: 68 bits, Memory_Percentage=0.50) found path length 30; 7422 expanded; 6125 necessary; 0.2156s elapsed
+			MM+IDMM IDMM using memory for 3721 states(state size: 68 bits, Memory_Percentage=0.25) found path length 30; 12912 expanded; 9705 necessary; 0.1239s elapsed
+			MM+IDMM IDMM using memory for 1488 states(state size: 68 bits, Memory_Percentage=0.10) found path length 30; 18007 expanded; 12791 necessary; 0.1094s elapsed
+		_A*+IDMM_
+			A*+IDMM IDMM using memory for 13396 states(state size: 68 bits, Memory_Percentage=0.90) found path length 30; 44209 expanded; 11088 necessary; 0.1339s elapsed
+			A*+IDMM IDMM using memory for 11163 states(state size: 68 bits, Memory_Percentage=0.75) found path length 30; 48685 expanded; 13712 necessary; 0.1183s elapsed
+			A*+IDMM IDMM using memory for 7442 states(state size: 68 bits, Memory_Percentage=0.50) found path length 30; 57804 expanded; 18739 necessary; 0.0982s elapsed
+			A*+IDMM IDMM using memory for 3721 states(state size: 68 bits, Memory_Percentage=0.25) found path length 30; 65022 expanded; 23092 necessary; 0.0802s elapsed
+			A*+IDMM IDMM using memory for 1488 states(state size: 68 bits, Memory_Percentage=0.10) found path length 30; 52121 expanded; 29276 necessary; 0.0497s elapsed
+		_Astar+IDAstar_
+			A*+IDA* IDA* using memory for 13396 states(state size: 68 bits, Memory_Percentage=0.90) found path length 30; 8054 expanded; 3744 generated; 8044 necessary; 0.0131s elapsed
+			A*+IDA* IDA* using memory for 11163 states(state size: 68 bits, Memory_Percentage=0.75) found path length 30; 8128 expanded; 7496 generated; 8123 necessary; 0.0131s elapsed
+			A*+IDA* IDA* using memory for 7442 states(state size: 68 bits, Memory_Percentage=0.50) found path length 30; 8294 expanded; 13800 generated; 8287 necessary; 0.0094s elapsed
+			A*+IDA* IDA* using memory for 3721 states(state size: 68 bits, Memory_Percentage=0.25) found path length 30; 10136 expanded; 25289 generated; 9229 necessary; 0.0084s elapsed
+			A*+IDA* IDA* using memory for 1488 states(state size: 68 bits, Memory_Percentage=0.10) found path length 30; 25412 expanded; 75614 generated; 11136 necessary; 0.0157s elapsed
+		_Astar+IDAstar+Reverse_
+			A*+IDA*_Reverse IDA* using memory for 13396 states(state size: 68 bits, Memory_Percentage=0.90) found path length 30; 24028 expanded; 55025 generated; 18501 necessary; 0.0370s elapsed
+			A*+IDA*_Reverse IDA* using memory for 11163 states(state size: 68 bits, Memory_Percentage=0.75) found path length 30; 22930 expanded; 55025 generated; 17403 necessary; 0.0359s elapsed
+			A*+IDA*_Reverse IDA* using memory for 7442 states(state size: 68 bits, Memory_Percentage=0.50) found path length 30; 21603 expanded; 56704 generated; 15835 necessary; 0.0175s elapsed
+			A*+IDA*_Reverse IDA* using memory for 3721 states(state size: 68 bits, Memory_Percentage=0.25) found path length 30; 20130 expanded; 57797 generated; 14189 necessary; 0.0102s elapsed
+			A*+IDA*_Reverse IDA* using memory for 1488 states(state size: 68 bits, Memory_Percentage=0.10) found path length 30; 19186 expanded; 58282 generated; 13161 necessary; 0.0072s elapsed
+		_MBBDS(ThreePhase=1)_
+			MBBDS(k=1,ThreePhase=1) MBBDS using memory for 13396 states(state size: 68 bits, Memory_Percentage=0.90) found path length 30; 60949 expanded; 33065 necessary; 7 iterations; 0.0248s elapsed;
+			MBBDS(k=1,ThreePhase=1) MBBDS using memory for 11163 states(state size: 68 bits, Memory_Percentage=0.75) found path length 30; 59832 expanded; 33065 necessary; 7 iterations; 0.0224s elapsed;
+			MBBDS(k=1,ThreePhase=1) MBBDS using memory for 7442 states(state size: 68 bits, Memory_Percentage=0.50) found path length 30; 57970 expanded; 33065 necessary; 7 iterations; 0.0191s elapsed;
+			MBBDS(k=1,ThreePhase=1) MBBDS using memory for 3721 states(state size: 68 bits, Memory_Percentage=0.25) found path length 30; 73552 expanded; 50473 necessary; 13 iterations; 0.0202s elapsed;
+			MBBDS(k=1,ThreePhase=1) MBBDS using memory for 1488 states(state size: 68 bits, Memory_Percentage=0.10) found path length 30; 74098 expanded; 52131 necessary; 17 iterations; 0.0187s elapsed;
+		_IDMM_
+			IDMM found path length 30; 73454 expanded; 228707 generated; 21034 necessary; 0.0494s elapsed; Mid state: (4x4)4 1 6 3 8 5 7 11 12 2 10 0 13 9 14 15 
+			D-MM ; 22445 expanded;
+	Problem 7 of 10
+	Start state: (4x4)4 3 11 7 8 2 6 0 13 15 1 10 9 12 5 14 
+	Goal state: (4x4)0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 
+	Initial heuristic 26
+		_A*_
+			A* found path length 34; 7040 expanded; 3249 necessary; using 13957 states in memory; 0.0109s elapsed
+			I-A* ; 11017 expanded;
+		_MM_
+			MM found path length 34; 9566 expanded; 5249 necessary; using 18943 states in memory; 0.0143s elapsed
+			I-MM ; 38393 expanded;
+		_IDA*_
+			IDA* found path length 34; 21520 expanded; 65411 generated; 5131 necessary; 0.0067s elapsed
+			D-A* ; 18025 expanded;
+		_MM+IDMM_
+			MM+IDMM IDMM using memory for 12561 states(state size: 68 bits, Memory_Percentage=0.90) found path length 34; 6558 expanded; 5249 necessary; 0.1351s elapsed
+			MM+IDMM IDMM using memory for 10467 states(state size: 68 bits, Memory_Percentage=0.75) found path length 34; 5581 expanded; 5249 necessary; 0.1478s elapsed
+			MM+IDMM IDMM using memory for 6978 states(state size: 68 bits, Memory_Percentage=0.50) found path length 34; 4568 expanded; 3725 necessary; 0.1031s elapsed
+			MM+IDMM IDMM using memory for 3489 states(state size: 68 bits, Memory_Percentage=0.25) found path length 34; 4266 expanded; 3715 necessary; 0.0747s elapsed
+			MM+IDMM IDMM using memory for 1395 states(state size: 68 bits, Memory_Percentage=0.10) found path length 34; 6372 expanded; 5535 necessary; 0.0198s elapsed
+		_A*+IDMM_
+			A*+IDMM IDMM using memory for 12561 states(state size: 68 bits, Memory_Percentage=0.90) found path length 34; 16027 expanded; 3249 necessary; 0.0393s elapsed
+			A*+IDMM IDMM using memory for 10467 states(state size: 68 bits, Memory_Percentage=0.75) found path length 34; 14615 expanded; 3249 necessary; 0.0320s elapsed
+			A*+IDMM IDMM using memory for 6978 states(state size: 68 bits, Memory_Percentage=0.50) found path length 34; 13270 expanded; 3249 necessary; 0.0234s elapsed
+			A*+IDMM IDMM using memory for 3489 states(state size: 68 bits, Memory_Percentage=0.25) found path length 34; 10567 expanded; 8004 necessary; 0.0281s elapsed
+			A*+IDMM IDMM using memory for 1395 states(state size: 68 bits, Memory_Percentage=0.10) found path length 34; 13105 expanded; 10800 necessary; 0.0166s elapsed
+		_Astar+IDAstar_
+			A*+IDA* IDA* using memory for 12561 states(state size: 68 bits, Memory_Percentage=0.90) found path length 34; 6961 expanded; 1910 generated; 3249 necessary; 0.0127s elapsed
+			A*+IDA* IDA* using memory for 10467 states(state size: 68 bits, Memory_Percentage=0.75) found path length 34; 7306 expanded; 6240 generated; 3249 necessary; 0.0109s elapsed
+			A*+IDA* IDA* using memory for 6978 states(state size: 68 bits, Memory_Percentage=0.50) found path length 34; 6644 expanded; 9523 generated; 3249 necessary; 0.0083s elapsed
+			A*+IDA* IDA* using memory for 3489 states(state size: 68 bits, Memory_Percentage=0.25) found path length 34; 6290 expanded; 13830 generated; 3389 necessary; 0.0060s elapsed
+			A*+IDA* IDA* using memory for 1395 states(state size: 68 bits, Memory_Percentage=0.10) found path length 34; 5464 expanded; 14492 generated; 3589 necessary; 0.0041s elapsed
+		_Astar+IDAstar+Reverse_
+			A*+IDA*_Reverse IDA* using memory for 12561 states(state size: 68 bits, Memory_Percentage=0.90) found path length 34; 31158 expanded; 78107 generated; 20330 necessary; 0.0606s elapsed
+			A*+IDA*_Reverse IDA* using memory for 10467 states(state size: 68 bits, Memory_Percentage=0.75) found path length 34; 30132 expanded; 78107 generated; 19304 necessary; 0.0586s elapsed
+			A*+IDA*_Reverse IDA* using memory for 6978 states(state size: 68 bits, Memory_Percentage=0.50) found path length 34; 29491 expanded; 81622 generated; 18241 necessary; 0.0298s elapsed
+			A*+IDA*_Reverse IDA* using memory for 3489 states(state size: 68 bits, Memory_Percentage=0.25) found path length 34; 28481 expanded; 83961 generated; 16953 necessary; 0.0154s elapsed
+			A*+IDA*_Reverse IDA* using memory for 1395 states(state size: 68 bits, Memory_Percentage=0.10) found path length 34; 27885 expanded; 85279 generated; 16176 necessary; 0.0107s elapsed
+		_MBBDS(ThreePhase=1)_
+			MBBDS(k=1,ThreePhase=1) MBBDS using memory for 12561 states(state size: 68 bits, Memory_Percentage=0.90) found path length 34; 25708 expanded; 4903 necessary; 2 iterations; 0.0144s elapsed;
+			MBBDS(k=1,ThreePhase=1) MBBDS using memory for 10467 states(state size: 68 bits, Memory_Percentage=0.75) found path length 34; 24730 expanded; 4903 necessary; 2 iterations; 0.0132s elapsed;
+			MBBDS(k=1,ThreePhase=1) MBBDS using memory for 6978 states(state size: 68 bits, Memory_Percentage=0.50) found path length 34; 48211 expanded; 20442 necessary; 7 iterations; 0.0169s elapsed;
+			MBBDS(k=1,ThreePhase=1) MBBDS using memory for 3489 states(state size: 68 bits, Memory_Percentage=0.25) found path length 34; 46443 expanded; 20442 necessary; 7 iterations; 0.0133s elapsed;
+			MBBDS(k=1,ThreePhase=1) MBBDS using memory for 1395 states(state size: 68 bits, Memory_Percentage=0.10) found path length 34; 47922 expanded; 22942 necessary; 11 iterations; 0.0120s elapsed;
+		_IDMM_
+			IDMM found path length 34; 27193 expanded; 82279 generated; 6026 necessary; 0.0188s elapsed; Mid state: (4x4)4 2 3 11 8 1 7 10 9 6 5 15 12 13 0 14 
+			D-MM ; 12227 expanded;
+	Problem 8 of 10
+	Start state: (4x4)1 5 2 11 8 4 9 0 12 14 3 15 10 13 6 7 
+	Goal state: (4x4)0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 
+	Initial heuristic 22
+		_A*_
+			A* found path length 34; 10450 expanded; 8445 necessary; using 20827 states in memory; 0.0163s elapsed
+			I-A* ; 21597 expanded;
+		_MM_
+			MM found path length 34; 16055 expanded; 16055 necessary; using 31994 states in memory; 0.0246s elapsed
+			I-MM ; 75891 expanded;
+		_IDA*_
+			IDA* found path length 34; 24154 expanded; 74330 generated; 13492 necessary; 0.0078s elapsed
+			D-A* ; 19004 expanded;
+		_MM+IDMM_
+			MM+IDMM IDMM using memory for 18744 states(state size: 68 bits, Memory_Percentage=0.90) found path length 34; 10466 expanded; 9953 necessary; 0.6946s elapsed
+			MM+IDMM IDMM using memory for 15620 states(state size: 68 bits, Memory_Percentage=0.75) found path length 34; 10182 expanded; 9809 necessary; 0.7151s elapsed
+			MM+IDMM IDMM using memory for 10413 states(state size: 68 bits, Memory_Percentage=0.50) found path length 34; 10935 expanded; 9873 necessary; 1.0617s elapsed
+			MM+IDMM IDMM using memory for 5206 states(state size: 68 bits, Memory_Percentage=0.25) found path length 34; 13893 expanded; 12302 necessary; 0.2646s elapsed
+			MM+IDMM IDMM using memory for 2082 states(state size: 68 bits, Memory_Percentage=0.10) found path length 34; 18037 expanded; 16493 necessary; 0.1327s elapsed
+		_A*+IDMM_
+			A*+IDMM IDMM using memory for 18744 states(state size: 68 bits, Memory_Percentage=0.90) found path length 34; 54638 expanded; 8445 necessary; 0.0852s elapsed
+			A*+IDMM IDMM using memory for 15620 states(state size: 68 bits, Memory_Percentage=0.75) found path length 34; 16572 expanded; 10825 necessary; 0.1199s elapsed
+			A*+IDMM IDMM using memory for 10413 states(state size: 68 bits, Memory_Percentage=0.50) found path length 34; 21721 expanded; 18559 necessary; 0.0885s elapsed
+			A*+IDMM IDMM using memory for 5206 states(state size: 68 bits, Memory_Percentage=0.25) found path length 34; 34231 expanded; 25575 necessary; 0.0597s elapsed
+			A*+IDMM IDMM using memory for 2082 states(state size: 68 bits, Memory_Percentage=0.10) found path length 34; 34944 expanded; 26166 necessary; 0.0476s elapsed
+		_Astar+IDAstar_
+			A*+IDA* IDA* using memory for 18744 states(state size: 68 bits, Memory_Percentage=0.90) found path length 34; 9820 expanded; 1284 generated; 8445 necessary; 0.0183s elapsed
+			A*+IDA* IDA* using memory for 15620 states(state size: 68 bits, Memory_Percentage=0.75) found path length 34; 10046 expanded; 6801 generated; 8456 necessary; 0.0157s elapsed
+			A*+IDA* IDA* using memory for 10413 states(state size: 68 bits, Memory_Percentage=0.50) found path length 34; 9969 expanded; 14709 generated; 8569 necessary; 0.0124s elapsed
+			A*+IDA* IDA* using memory for 5206 states(state size: 68 bits, Memory_Percentage=0.25) found path length 34; 15144 expanded; 38620 generated; 8788 necessary; 0.0125s elapsed
+			A*+IDA* IDA* using memory for 2082 states(state size: 68 bits, Memory_Percentage=0.10) found path length 34; 16182 expanded; 46625 generated; 10582 necessary; 0.0109s elapsed
+		_Astar+IDAstar+Reverse_
+			A*+IDA*_Reverse IDA* using memory for 18744 states(state size: 68 bits, Memory_Percentage=0.90) found path length 34; 108386 expanded; 305423 generated; 68296 necessary; 0.1480s elapsed
+			A*+IDA*_Reverse IDA* using memory for 15620 states(state size: 68 bits, Memory_Percentage=0.75) found path length 34; 106785 expanded; 305423 generated; 66695 necessary; 0.1463s elapsed
+			A*+IDA*_Reverse IDA* using memory for 10413 states(state size: 68 bits, Memory_Percentage=0.50) found path length 34; 104183 expanded; 305423 generated; 64093 necessary; 0.1418s elapsed
+			A*+IDA*_Reverse IDA* using memory for 5206 states(state size: 68 bits, Memory_Percentage=0.25) found path length 34; 103627 expanded; 311612 generated; 62624 necessary; 0.0634s elapsed
+			A*+IDA*_Reverse IDA* using memory for 2082 states(state size: 68 bits, Memory_Percentage=0.10) found path length 34; 104649 expanded; 319582 generated; 62361 necessary; 0.0359s elapsed
+		_MBBDS(ThreePhase=1)_
+			MBBDS(k=1,ThreePhase=1) MBBDS using memory for 18744 states(state size: 68 bits, Memory_Percentage=0.90) found path length 34; 89440 expanded; 52252 necessary; 6 iterations; 0.0343s elapsed;
+			MBBDS(k=1,ThreePhase=1) MBBDS using memory for 15620 states(state size: 68 bits, Memory_Percentage=0.75) found path length 34; 87861 expanded; 52252 necessary; 6 iterations; 0.0313s elapsed;
+			MBBDS(k=1,ThreePhase=1) MBBDS using memory for 10413 states(state size: 68 bits, Memory_Percentage=0.50) found path length 34; 110750 expanded; 61613 necessary; 7 iterations; 0.0340s elapsed;
+			MBBDS(k=1,ThreePhase=1) MBBDS using memory for 5206 states(state size: 68 bits, Memory_Percentage=0.25) found path length 34; 118841 expanded; 72296 necessary; 11 iterations; 0.0321s elapsed;
+			MBBDS(k=1,ThreePhase=1) MBBDS using memory for 2082 states(state size: 68 bits, Memory_Percentage=0.10) found path length 34; 170551 expanded; 102259 necessary; 18 iterations; 0.0427s elapsed;
+		_IDMM_
+			IDMM found path length 34; 28357 expanded; 87554 generated; 15367 necessary; 0.0203s elapsed; Mid state: (4x4)1 2 3 0 4 5 9 11 8 14 7 6 12 10 13 15 
+			D-MM ; 16868 expanded;
+	Problem 9 of 10
+	Start state: (4x4)4 1 0 5 8 2 7 3 9 13 6 11 12 14 15 10 
+	Goal state: (4x4)0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 
+	Initial heuristic 16
+		_A*_
+			A* found path length 22; 227 expanded; 220 necessary; using 473 states in memory; 0.0003s elapsed
+			I-A* ; 508 expanded;
+		_MM_
+			MM found path length 22; 324 expanded; 324 necessary; using 673 states in memory; 0.0005s elapsed
+			I-MM ; 1393 expanded;
+		_IDA*_
+			IDA* found path length 22; 806 expanded; 2488 generated; 285 necessary; 0.0003s elapsed
+			D-A* ; 586 expanded;
+		_MM+IDMM_
+			MM+IDMM IDMM using memory for 425 states(state size: 68 bits, Memory_Percentage=0.90) found path length 22; 327 expanded; 226 necessary; 0.0013s elapsed
+			MM+IDMM IDMM using memory for 354 states(state size: 68 bits, Memory_Percentage=0.75) found path length 22; 311 expanded; 212 necessary; 0.0013s elapsed
+			MM+IDMM IDMM using memory for 236 states(state size: 68 bits, Memory_Percentage=0.50) found path length 22; 314 expanded; 221 necessary; 0.0010s elapsed
+			MM+IDMM IDMM using memory for 118 states(state size: 68 bits, Memory_Percentage=0.25) found path length 22; 577 expanded; 334 necessary; 0.0009s elapsed
+			MM+IDMM IDMM using memory for 47 states(state size: 68 bits, Memory_Percentage=0.10) found path length 22; 826 expanded; 410 necessary; 0.0008s elapsed
+		_A*+IDMM_
+			A*+IDMM IDMM using memory for 425 states(state size: 68 bits, Memory_Percentage=0.90) found path length 22; 1045 expanded; 264 necessary; 0.0032s elapsed
+			A*+IDMM IDMM using memory for 354 states(state size: 68 bits, Memory_Percentage=0.75) found path length 22; 1248 expanded; 432 necessary; 0.0029s elapsed
+			A*+IDMM IDMM using memory for 236 states(state size: 68 bits, Memory_Percentage=0.50) found path length 22; 819 expanded; 618 necessary; 0.0018s elapsed
+			A*+IDMM IDMM using memory for 118 states(state size: 68 bits, Memory_Percentage=0.25) found path length 22; 1039 expanded; 730 necessary; 0.0012s elapsed
+			A*+IDMM IDMM using memory for 47 states(state size: 68 bits, Memory_Percentage=0.10) found path length 22; 1165 expanded; 587 necessary; 0.0011s elapsed
+		_Astar+IDAstar_
+			A*+IDA* IDA* using memory for 425 states(state size: 68 bits, Memory_Percentage=0.90) found path length 22; 227 expanded; 71 generated; 220 necessary; 0.0004s elapsed
+			A*+IDA* IDA* using memory for 354 states(state size: 68 bits, Memory_Percentage=0.75) found path length 22; 228 expanded; 179 generated; 221 necessary; 0.0003s elapsed
+			A*+IDA* IDA* using memory for 236 states(state size: 68 bits, Memory_Percentage=0.50) found path length 22; 503 expanded; 1219 generated; 222 necessary; 0.0004s elapsed
+			A*+IDA* IDA* using memory for 118 states(state size: 68 bits, Memory_Percentage=0.25) found path length 22; 575 expanded; 1613 generated; 222 necessary; 0.0004s elapsed
+			A*+IDA* IDA* using memory for 47 states(state size: 68 bits, Memory_Percentage=0.10) found path length 22; 751 expanded; 2245 generated; 254 necessary; 0.0005s elapsed
+		_Astar+IDAstar+Reverse_
+			A*+IDA*_Reverse IDA* using memory for 425 states(state size: 68 bits, Memory_Percentage=0.90) found path length 22; 886 expanded; 2129 generated; 774 necessary; 0.0006s elapsed
+			A*+IDA*_Reverse IDA* using memory for 354 states(state size: 68 bits, Memory_Percentage=0.75) found path length 22; 853 expanded; 2129 generated; 741 necessary; 0.0005s elapsed
+			A*+IDA*_Reverse IDA* using memory for 236 states(state size: 68 bits, Memory_Percentage=0.50) found path length 22; 816 expanded; 2175 generated; 701 necessary; 0.0004s elapsed
+			A*+IDA*_Reverse IDA* using memory for 118 states(state size: 68 bits, Memory_Percentage=0.25) found path length 22; 766 expanded; 2203 generated; 647 necessary; 0.0003s elapsed
+			A*+IDA*_Reverse IDA* using memory for 47 states(state size: 68 bits, Memory_Percentage=0.10) found path length 22; 733 expanded; 2205 generated; 613 necessary; 0.0003s elapsed
+		_MBBDS(ThreePhase=1)_
+			MBBDS(k=1,ThreePhase=1) MBBDS using memory for 425 states(state size: 68 bits, Memory_Percentage=0.90) found path length 22; 1310 expanded; 786 necessary; 6 iterations; 0.0006s elapsed;
+			MBBDS(k=1,ThreePhase=1) MBBDS using memory for 354 states(state size: 68 bits, Memory_Percentage=0.75) found path length 22; 1856 expanded; 1030 necessary; 7 iterations; 0.0007s elapsed;
+			MBBDS(k=1,ThreePhase=1) MBBDS using memory for 236 states(state size: 68 bits, Memory_Percentage=0.50) found path length 22; 1796 expanded; 1030 necessary; 7 iterations; 0.0006s elapsed;
+			MBBDS(k=1,ThreePhase=1) MBBDS using memory for 118 states(state size: 68 bits, Memory_Percentage=0.25) found path length 22; 1897 expanded; 1183 necessary; 11 iterations; 0.0005s elapsed;
+			MBBDS(k=1,ThreePhase=1) MBBDS using memory for 47 states(state size: 68 bits, Memory_Percentage=0.10) found path length 22; 2453 expanded; 1591 necessary; 14 iterations; 0.0006s elapsed;
+		_IDMM_
+			IDMM found path length 22; 933 expanded; 2846 generated; 323 necessary; 0.0007s elapsed; Mid state: (4x4)4 1 5 3 8 2 0 7 9 6 10 11 12 13 14 15 
+			D-MM ; 403 expanded;
+	Problem 10 of 10
+	Start state: (4x4)9 1 3 7 8 12 5 2 0 4 10 6 14 13 15 11 
+	Goal state: (4x4)0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 
+	Initial heuristic 20
+		_A*_
+			A* found path length 34; 44561 expanded; 43647 necessary; using 85151 states in memory; 0.0818s elapsed
+			I-A* ; 108212 expanded;
+		_MM_
+			MM found path length 34; 38093 expanded; 38093 necessary; using 73987 states in memory; 0.0724s elapsed
+			I-MM ; 151079 expanded;
+		_IDA*_
+			IDA* found path length 34; 296368 expanded; 915493 generated; 131741 necessary; 0.0896s elapsed
+			D-A* ; 220441 expanded;
+		_MM+IDMM_
+			MM+IDMM IDMM using memory for 66588 states(state size: 68 bits, Memory_Percentage=0.90) found path length 34; 39575 expanded; 37788 necessary; 5.9326s elapsed
+			MM+IDMM IDMM using memory for 55490 states(state size: 68 bits, Memory_Percentage=0.75) found path length 34; 36808 expanded; 33313 necessary; 6.1314s elapsed
+			MM+IDMM IDMM using memory for 36993 states(state size: 68 bits, Memory_Percentage=0.50) found path length 34; 35755 expanded; 31688 necessary; 6.5659s elapsed
+			MM+IDMM IDMM using memory for 18496 states(state size: 68 bits, Memory_Percentage=0.25) found path length 34; 73925 expanded; 45866 necessary; 2.7846s elapsed
+			MM+IDMM IDMM using memory for 7398 states(state size: 68 bits, Memory_Percentage=0.10) found path length 34; 99002 expanded; 67081 necessary; 2.0078s elapsed
+		_A*+IDMM_
+			A*+IDMM IDMM using memory for 66588 states(state size: 68 bits, Memory_Percentage=0.90) found path length 34; 73403 expanded; 48528 necessary; 0.5192s elapsed
+			A*+IDMM IDMM using memory for 55490 states(state size: 68 bits, Memory_Percentage=0.75) found path length 34; 91346 expanded; 52600 necessary; 0.4512s elapsed
+			A*+IDMM IDMM using memory for 36993 states(state size: 68 bits, Memory_Percentage=0.50) found path length 34; 122027 expanded; 58659 necessary; 0.3495s elapsed
+			A*+IDMM IDMM using memory for 18496 states(state size: 68 bits, Memory_Percentage=0.25) found path length 34; 136925 expanded; 83566 necessary; 0.3040s elapsed
+			A*+IDMM IDMM using memory for 7398 states(state size: 68 bits, Memory_Percentage=0.10) found path length 34; 179152 expanded; 108636 necessary; 0.2052s elapsed
+		_Astar+IDAstar_
+			A*+IDA* IDA* using memory for 66588 states(state size: 68 bits, Memory_Percentage=0.90) found path length 34; 113571 expanded; 242530 generated; 44145 necessary; 0.1426s elapsed
+			A*+IDA* IDA* using memory for 55490 states(state size: 68 bits, Memory_Percentage=0.75) found path length 34; 114861 expanded; 264328 generated; 44739 necessary; 0.1290s elapsed
+			A*+IDA* IDA* using memory for 36993 states(state size: 68 bits, Memory_Percentage=0.50) found path length 34; 144526 expanded; 385201 generated; 45737 necessary; 0.1341s elapsed
+			A*+IDA* IDA* using memory for 18496 states(state size: 68 bits, Memory_Percentage=0.25) found path length 34; 130657 expanded; 372390 generated; 54463 necessary; 0.1025s elapsed
+			A*+IDA* IDA* using memory for 7398 states(state size: 68 bits, Memory_Percentage=0.10) found path length 34; 163021 expanded; 490328 generated; 68374 necessary; 0.1078s elapsed
+		_Astar+IDAstar+Reverse_
+			A*+IDA*_Reverse IDA* using memory for 66588 states(state size: 68 bits, Memory_Percentage=0.90) found path length 34; 97950 expanded; 197780 generated; 93679 necessary; 0.4561s elapsed
+			A*+IDA*_Reverse IDA* using memory for 55490 states(state size: 68 bits, Memory_Percentage=0.75) found path length 34; 92272 expanded; 197780 generated; 88001 necessary; 0.4393s elapsed
+			A*+IDA*_Reverse IDA* using memory for 36993 states(state size: 68 bits, Memory_Percentage=0.50) found path length 34; 86348 expanded; 207698 generated; 81642 necessary; 0.1907s elapsed
+			A*+IDA*_Reverse IDA* using memory for 18496 states(state size: 68 bits, Memory_Percentage=0.25) found path length 34; 79317 expanded; 214613 generated; 74348 necessary; 0.0852s elapsed
+			A*+IDA*_Reverse IDA* using memory for 7398 states(state size: 68 bits, Memory_Percentage=0.10) found path length 34; 75304 expanded; 219411 generated; 70088 necessary; 0.0440s elapsed
+		_MBBDS(ThreePhase=1)_
+			MBBDS(k=1,ThreePhase=1) MBBDS using memory for 66588 states(state size: 68 bits, Memory_Percentage=0.90) found path length 34; 325256 expanded; 187792 necessary; 7 iterations; 0.1388s elapsed;
+			MBBDS(k=1,ThreePhase=1) MBBDS using memory for 55490 states(state size: 68 bits, Memory_Percentage=0.75) found path length 34; 319470 expanded; 187792 necessary; 7 iterations; 0.1244s elapsed;
+			MBBDS(k=1,ThreePhase=1) MBBDS using memory for 36993 states(state size: 68 bits, Memory_Percentage=0.50) found path length 34; 309888 expanded; 187792 necessary; 7 iterations; 0.1051s elapsed;
+			MBBDS(k=1,ThreePhase=1) MBBDS using memory for 18496 states(state size: 68 bits, Memory_Percentage=0.25) found path length 34; 415322 expanded; 302407 necessary; 13 iterations; 0.1161s elapsed;
+			MBBDS(k=1,ThreePhase=1) MBBDS using memory for 7398 states(state size: 68 bits, Memory_Percentage=0.10) found path length 34; 446207 expanded; 339032 necessary; 19 iterations; 0.1130s elapsed;
+		_IDMM_
+			IDMM found path length 34; 223716 expanded; 664169 generated; 98665 necessary; 0.1540s elapsed; Mid state: (4x4)1 3 5 7 9 8 2 6 4 13 10 11 12 14 0 15 
+			D-MM ; 94760 expanded;
+completed!
