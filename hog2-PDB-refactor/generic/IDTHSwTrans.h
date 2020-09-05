@@ -22,6 +22,8 @@ public:
 	double g;
 	double h;
   double error;
+  
+
 };
 
 template <class state, class action, bool verbose = true, class table = std::vector<transpostionNode<state>>>

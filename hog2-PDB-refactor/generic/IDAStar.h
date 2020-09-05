@@ -20,6 +20,8 @@
 #include "AStarOpenClosed.h"
 #include <limits>
 #include <algorithm>
+#include "IDTHSwTrans.h"
+
 
 //#define DO_LOGGING
 
@@ -97,6 +99,7 @@ private:
 	unsigned long dAstarLastIterExpansions = 0;
 	unsigned long necessaryExpansions = 0;
 	std::vector<uint64_t> heuristicList;
+	std::vector<transpostionNode<state>> transTable;
 	AStarOpenClosed<state, AStarCompareWithF<state>, AStarOpenClosedDataWithF<state>> statesList;
 	std::vector<AStarOpenClosedDataWithF<state>> openList;
 	//std::vector<AStarOpenClosedDataWithF<state>> perimeterList;
@@ -319,14 +322,13 @@ bool IDAStar<state, action, verbose>::ASpIDArev(SearchEnvironment<state, action>
 		
 		
 		if(isComputeMaxH && isConsistent){
-			heuristicList.clear();
+			transTable.clear();
 			for (AStarOpenClosedDataWithF<state> astarState : statesList.getElements()){
 				if(astarState.g == perimeterG){
 					double calculatedF = heuristic->HCost(from, astarState.data) + astarState.g;
+					double error = astarState.g - env->HCost(astarState.data, goal);
 					if(bound >= calculatedF){
-						uint64_t childID;
-						statesList.Lookup(env->GetStateHash(astarState.data), childID);
-						heuristicList.push_back(childID);
+						transTable.push_back(transpostionNode<state>(astarState.data, astarState.g, astarState.h, error));
 					}
 					else{
 						UpdateNextBound(bound, calculatedF);
@@ -335,7 +337,7 @@ bool IDAStar<state, action, verbose>::ASpIDArev(SearchEnvironment<state, action>
 			}	
 		}
 		double res;
-		if(isComputeMaxH && isConsistent && heuristicList.size() == 0)
+		if(isComputeMaxH && isConsistent && transTable.size() == 0)
 			res = 1;
 		else
 			res = DoIteration(env, from, from, thePath, bound, 0, 0);
@@ -457,18 +459,16 @@ double IDAStar<state, action, verbose>::DoIteration(SearchEnvironment<state, act
 										   std::vector<state> &thePath, double bound, double g,
 										   double maxH, double currStateH)
 {
-	std::vector<uint64_t> ignoreList;
+	std::vector<transpostionNode<state>> ignoreList;
 	double h = std::max(heuristic->HCost(currState, goal), currStateH);
-	// path max
 	if (usePathMax && fless(h, maxH))
 		h = maxH;
 	if (fgreater(g+h, bound))
 	{
 		UpdateNextBound(bound, g+h);
-		//printf("Stopping at (%d, %d). g=%f h=%f\n", currState>>16, currState&0xFFFF, g, h);
 		return h;
 	}
-	else if(reverseG && perimeterG+g >= bound){
+	else if(!isComputeMaxH && reverseG && perimeterG+g >= bound){
 		uint64_t ID;
 		if (statesList.Lookup(env->GetStateHash(currState), ID) != kNotFound){
 			if (statesList.Lookup(ID).g + g <= bound){
@@ -484,45 +484,59 @@ double IDAStar<state, action, verbose>::DoIteration(SearchEnvironment<state, act
 		else if (fgreater(perimeterG+g,bound)){
 		  UpdateNextBound(bound, g+perimeterG);
 		  return h;
-		}
+		}			
 	}
 	else if (reverseG && isComputeMaxH){
 		double F2F_h = DBL_MAX;
-    if (isConsistent){
-      for (int i = 0; i < heuristicList.size(); i++){
-        uint64_t childID = heuristicList[i];
-        AStarOpenClosedDataWithF<state> perimeterState = statesList.Lookup(childID);
-        if(perimeterState.g == perimeterG){ //perimeter frontier should be fixed and this should be updated to <= instead 
-          double calculatedF = g + heuristic->HCost(currState, perimeterState.data) + perimeterState.g;
-          F2F_h = std::min(F2F_h, calculatedF);
-          if(fgreater(calculatedF, bound)){
-            UpdateNextBound(bound, calculatedF);
-            ignoreList.push_back(childID);
-            heuristicList.erase(heuristicList.begin()+i);
-            i--;
-          }
-        }
-      }
-      if(heuristicList.size() ==0){
-        for (uint64_t childID : ignoreList){
-          heuristicList.push_back(childID);
-        }
-        ignoreList.clear();
-        return F2F_h;
-      }
-    }
-    else{
-      for (AStarOpenClosedDataWithF<state> astarState : statesList.getElements()){
-        if(astarState.g == perimeterG){ //perimeter frontier should be fixed and this should be updated to <= instead of ==
-          F2F_h = std::min(F2F_h,heuristic->HCost(currState, astarState.data) + astarState.g);
-        }
-      }
-      if (fgreater(g+F2F_h, bound)){
-        UpdateNextBound(bound, g+F2F_h);
-        //printf("Stopping at (%d, %d). g=%f h=%f\n", currState>>16, currState&0xFFFF, g, h);
-        return F2F_h;
-      }
-    }
+		if (isConsistent){
+			for (uint64_t i = transTable.size()-1; i != static_cast<uint64_t>(-1);i--){
+				state &possibleMidState = transTable[i].data;
+				double possibleMidStateG = transTable[i].g;
+				double otherError = transTable[i].error;
+				double otherH = transTable[i].h;
+				if (currState == possibleMidState && !fgreater(g + possibleMidStateG, bound)) {
+					solLength = g + possibleMidStateG;
+					solved = true;
+					return 0;
+				}
+				double computedF = 0;
+				double error = 0;
+				if(isConsistent){
+					error = g - env->HCost(currState, start);
+				}
+				//if(front2frontH){
+				if(true){
+					computedF = g + possibleMidStateG + env->HCost(currState,possibleMidState);
+				}
+				computedF = std::max(computedF, possibleMidStateG + otherH + error); 
+				computedF = std::max(computedF, g + h + otherError);
+				if(fgreater(computedF, bound)){
+					F2F_h = std::min(F2F_h, computedF);
+				  ignoreList.push_back(transTable[i]);
+				  transTable[i] = transTable.back();
+				  transTable.pop_back();
+				  UpdateNextBound(bound, computedF);
+				  continue;
+				}			
+			  }
+		  if(transTable.size()==0){
+			transTable.insert( transTable.end(), ignoreList.begin(), ignoreList.end());
+			ignoreList.clear();
+			return F2F_h;
+		  }
+		}
+		else{
+		  for (AStarOpenClosedDataWithF<state> astarState : statesList.getElements()){
+			if(astarState.g == perimeterG){ //perimeter frontier should be fixed and this should be updated to <= instead of ==
+			  F2F_h = std::min(F2F_h,heuristic->HCost(currState, astarState.data) + astarState.g);
+			}
+		  }
+		  if (fgreater(g+F2F_h, bound)){
+			UpdateNextBound(bound, g+F2F_h);
+			//printf("Stopping at (%d, %d). g=%f h=%f\n", currState>>16, currState&0xFFFF, g, h);
+			return F2F_h;
+		  }
+		}
 
 	}
   
@@ -544,6 +558,7 @@ double IDAStar<state, action, verbose>::DoIteration(SearchEnvironment<state, act
   
 	else if (env->GoalTest(currState, goal)){
 		solved = true;
+		solLength = g;
 		return 0;
 	}
   		
@@ -586,11 +601,9 @@ double IDAStar<state, action, verbose>::DoIteration(SearchEnvironment<state, act
 			}
 		}
 	}
-	for (uint64_t childID : ignoreList){
-		heuristicList.push_back(childID);
-	}
+	transTable.insert( transTable.end(), ignoreList.begin(), ignoreList.end());
 	ignoreList.clear();
-	return h;
+	  return h;
 }
 
 template <class state, class action, bool verbose>
@@ -669,7 +682,7 @@ void IDAStar<state, action, verbose>::UpdateNextBound(double currBound, double f
 {
 	if (!fgreater(nextBound, currBound))
 	{
-		nextBound = currIterNextBound = fCost;
+		nextBound = currIterNextBound = std::max(currBound, fCost);
 		//printf("Updating next bound to %f\n", nextBound);
 	}
 	else if (fgreater(fCost, currBound) && fless(fCost, nextBound))

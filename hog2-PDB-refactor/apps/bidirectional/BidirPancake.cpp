@@ -42,8 +42,8 @@ static bool RevAstarRun=true;
 static bool IDAstarRun=false;
 
 static bool AstarPIDAstarRun=false;
-static bool AstarPIDAstarReverseRun=false;
-static bool AstarPIDAstarReverseMinHRun=false;
+static bool AstarPIDAstarReverseRun=true;
+static bool AstarPIDAstarReverseMinHRun=true;
 static bool IDTHSpTrans = true;
 
 static bool BAI=false;
@@ -57,7 +57,7 @@ static bool idmmF2fFlag=true;
 static bool ASTARpIDMM=false;
 static bool MMpIDMM=false;
 
-static bool MBBDSRun=true;
+static bool MBBDSRun=false;
 static bool revAlgo=true;
 
 static bool threePhase=true;
@@ -97,7 +97,7 @@ void TestPancake(string file)
 	StevenTest(0, 100, true);
 	StevenTest(1, 100, true);
 	StevenTest(2, 100, true);
-	//StevenTest(3, 100, true);
+	StevenTest(3, 100, true);
 
 	myfile << "completed!" << endl;
 	myfile.close();
@@ -139,7 +139,7 @@ void StevenTest(int gap, int problems_num, bool randomPancake, vector<int> skipV
 			continue;
 		}
     
-    /*if (count != 38 || gap!=2){
+    /*if (count+1 != 17 || gap!=0){
       continue;
     }*/
 	cout << "Running: Gap=" << gap << ", ProblemID=" << count+1 << endl;
