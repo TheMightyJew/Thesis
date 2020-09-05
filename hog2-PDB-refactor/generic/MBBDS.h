@@ -13,6 +13,7 @@
 #include <unordered_set>
 #include "SearchEnvironment.h"
 #include <math.h>
+#include "IDTHSwTrans.h"
 
 template <class state, class action, class BloomFilter, bool verbose = true>
 class MBBDS {
@@ -50,8 +51,9 @@ private:
 	double backwardBound, forwardBound , fBound;
 	unsigned long forwardExpandedInLastIter = 0;
 	unsigned long backwardExpandedInLastIter = 0;
+	unsigned long lastBLinsertions = 0;
 	double pathLength;
-	std::unordered_set<state> middleStates;
+	std::vector<state> middleStates;
 	unsigned long memoryBound;
 
 	bool DoIteration(SearchEnvironment<state, action>* env,
@@ -140,15 +142,13 @@ bool MBBDS<state, action, BloomFilter, verbose>::GetMidState(SearchEnvironment<s
 			}
 			outOfSpace = false;
 			if(revAlgo && listReady){
-				for (auto it = middleStates.begin(); it != middleStates.end(); ) {
-					state perimeterState = *it;
+				for (uint64_t i = middleStates.size()-1; i != static_cast<uint64_t>(-1);i--){
+					state perimeterState = middleStates[i];
 					double calculatedF = env->HCost(from, perimeterState) + (fBound-bound);
 					if(fgreater(calculatedF, fBound)){
 						UpdateNextBound(calculatedF);
-						it = middleStates.erase(it);
-					}
-					else {
-						++it;
+						middleStates[i] = middleStates.back();
+						middleStates.pop_back();
 					}
 				}
 			}
@@ -219,6 +219,7 @@ bool MBBDS<state, action, BloomFilter, verbose>::GetMidState(SearchEnvironment<s
 		}	
 		
 		last_saturation = 1;
+		lastBLinsertions = 0;
 		saturationIncreased = 0;
 		previousBloomfilter.clear();
 		firstRun = true;
@@ -265,35 +266,31 @@ bool MBBDS<state, action, BloomFilter, verbose>::DoIteration(SearchEnvironment<s
 	}
 
 	if (g == bound) {
-		if (isConsistent){
-		  minCurrentError = std::min(minCurrentError, g - env->HCost(currState, from)); 
-		}
 		if (checkState(currState)){
 			midState = currState;
 			return true;
 		}
 		else{
+			if (isConsistent){
+				minCurrentError = std::min(minCurrentError, g - env->HCost(currState, from)); 
+			}
 			return false;
 		}
 	}
 	
 	if(revAlgo && listReady){
-		for (auto it = middleStates.begin(); it != middleStates.end(); ) {
-			state perimeterState = *it;
+		for (uint64_t i = middleStates.size()-1; i != static_cast<uint64_t>(-1);i--){
+			state perimeterState = middleStates[i];
 			double calculatedF = g + env->HCost(currState, perimeterState) + (fBound-bound);
 			if(fgreater(calculatedF, fBound)){
 				UpdateNextBound(calculatedF);
 				ignoreList.push_back(perimeterState);
-				it = middleStates.erase(it);
-			}
-			else {
-				++it;
+				middleStates[i] = middleStates.back();
+				middleStates.pop_back();
 			}
 		}
 		if(middleStates.size() == 0){
-			for (state middleState : ignoreList){
-			  middleStates.insert(middleState);
-			}
+			middleStates.insert( middleStates.end(), ignoreList.begin(), ignoreList.end());
 			ignoreList.clear();
 			return false;
 		}
@@ -318,9 +315,7 @@ bool MBBDS<state, action, BloomFilter, verbose>::DoIteration(SearchEnvironment<s
 	}
 	
 	if(revAlgo && listReady){
-		for (state middleState : ignoreList){
-		  middleStates.insert(middleState);
-		}
+		middleStates.insert( middleStates.end(), ignoreList.begin(), ignoreList.end());
 		ignoreList.clear();
 	}
 	
@@ -331,18 +326,23 @@ template<class state, class action, class BloomFilter, bool verbose>
 bool MBBDS<state, action, BloomFilter, verbose>::checkState(state &midState)
 {
 	if (listReady) {
-		if (middleStates.find(midState) != middleStates.end()) {
+		if (std::find(middleStates.begin(), middleStates.end(), midState) != middleStates.end()) {
 			return true;
 		}
 	}
 	else if (firstRun || previousBloomfilter.contains(midState)) {
 		if (outOfSpace) {
 			currentBloomfilter.insert(midState);
+			lastBLinsertions += 1;
 		}
 		else {
 			if (middleStates.size() >= (int)(statesQuantityBound/2)) {
 				outOfSpace = true;
-				currentBloomfilter = BloomFilter(memoryBound/2, 1, previousBloomfilter.hashOffset + previousBloomfilter.getK());
+				if(lastBLinsertions>0)
+					currentBloomfilter = BloomFilter(memoryBound/2, round(0.693*(memoryBound/2)/(lastBLinsertions)), previousBloomfilter.hashOffset + previousBloomfilter.getK());
+				else
+					currentBloomfilter = BloomFilter(memoryBound/2, 5, previousBloomfilter.hashOffset + previousBloomfilter.getK());
+				lastBLinsertions = middleStates.size() + 1;
 				for (state possibleMidState : middleStates) {
 					currentBloomfilter.insert(possibleMidState);
 				}
@@ -350,7 +350,7 @@ bool MBBDS<state, action, BloomFilter, verbose>::checkState(state &midState)
 				middleStates.clear();
 			}
 			else {
-				middleStates.insert(midState);
+				middleStates.push_back(midState);
 			}
 		}
 	}
