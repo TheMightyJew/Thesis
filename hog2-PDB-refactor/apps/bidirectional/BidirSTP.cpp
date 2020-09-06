@@ -16,6 +16,7 @@
 #include <algorithm>
 #include "STPHasher.h"
 #include "TemplateAStar.h"
+#include "IDTHSwTrans.h"
 #include "AStarOpenClosed.h"
 #include "IDAStar.h"
 #include "MM.h"
@@ -45,6 +46,7 @@ static bool RevAstarRun=false;
 
 static bool IDAstarRun=false;
 
+static bool IDTHSpTrans = true;
 
 static bool AstarPIDAstarRun=false;
 
@@ -267,6 +269,60 @@ void StevenTest(int problems_num, bool randomSTP, vector<int> skipVector)
 				}
 			}
 		}*/
+      if(IDTHSpTrans){
+      {
+        myfile << "\t\t_IDTHSpTrans_\n";
+        for(double percentage : percentages){
+          unsigned long statesQuantityBoundforASPIDMM = std::max(statesQuantityBound*percentage,2.0);;
+          goal.Reset();
+          start = original;
+          timer.StartTimer();
+          unsigned long nodesExpanded = 0;
+          unsigned long necessaryNodesExpanded = 0;
+
+          IDTHSwTrans<MNPuzzleState<4, 4>, slideDir, false> idmm(idmmF2fFlag, isConsistent, isUpdateByWorkload, 1 , true);
+          MNPuzzleState<4, 4> midState;
+          bool solved = idmm.GetPath(&mnp, start, goal, /*astarPath, */secondsLimit, statesQuantityBoundforASPIDMM);
+          nodesExpanded += idmm.GetNodesExpanded();
+          necessaryNodesExpanded += idmm.GetNecessaryExpansions();
+          timer.EndTimer();
+          if(solved){
+            myfile << boost::format("\t\t\tIDTHSpTrans IDMM using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) found path length %1.0f; %llu expanded; %llu necessary; %1.4fs elapsed\n") % statesQuantityBoundforASPIDMM % stateSize % percentage % idmm.getPathLength() % nodesExpanded % necessaryNodesExpanded % timer.GetElapsedTime();
+          }
+          else{
+            myfile << boost::format("\t\t\tIDTHSpTrans IDMM using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) failed after %1.4fs\n") % statesQuantityBoundforASPIDMM % stateSize % percentage % timer.GetElapsedTime();
+            break;
+          }	
+          
+        }
+      }
+      {
+        myfile << "\t\t_IDTHSpTrans_NDD_\n";
+        for(double percentage : percentages){
+          unsigned long statesQuantityBoundforASPIDMM = std::max(statesQuantityBound*percentage,2.0);;
+          goal.Reset();
+          start = original;
+          timer.StartTimer();
+          unsigned long nodesExpanded = 0;
+          unsigned long necessaryNodesExpanded = 0;
+
+          IDTHSwTrans<MNPuzzleState<4, 4>, slideDir, false> idmm(idmmF2fFlag, isConsistent, isUpdateByWorkload, 1 , false);
+          MNPuzzleState<4, 4> midState;
+          bool solved = idmm.GetPath(&mnp, start, goal, /*astarPath, */secondsLimit, statesQuantityBoundforASPIDMM);
+          nodesExpanded += idmm.GetNodesExpanded();
+          necessaryNodesExpanded += idmm.GetNecessaryExpansions();
+          timer.EndTimer();
+          if(solved){
+            myfile << boost::format("\t\t\tIDTHSpTrans_NDD IDMM using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) found path length %1.0f; %llu expanded; %llu necessary; %1.4fs elapsed\n") % statesQuantityBoundforASPIDMM % stateSize % percentage % idmm.getPathLength() % nodesExpanded % necessaryNodesExpanded % timer.GetElapsedTime();
+          }
+          else{
+            myfile << boost::format("\t\t\tIDTHSpTrans_NDD IDMM using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) failed after %1.4fs\n") % statesQuantityBoundforASPIDMM % stateSize % percentage % timer.GetElapsedTime();
+            break;
+          }	
+          
+        }
+      }
+		}
 		if(ASTARpIDMM){
 			myfile << "\t\t_A*+IDMM_\n";
 			for(double percentage : percentages){
@@ -388,7 +444,7 @@ void StevenTest(int problems_num, bool randomSTP, vector<int> skipVector)
 				}
 				else{
 					IDAStar<MNPuzzleState<4, 4>, slideDir, false> idastar;
-					solved = idastar.ASpIDArev(&mnp, start, goal, idaPath, astar.getStatesList(), secondsLimit-timer.GetElapsedTime());
+					solved = idastar.ASpIDArev(&mnp, start, goal, idaPath, astar.getStatesList(),astar.getPrevF(), secondsLimit-timer.GetElapsedTime());
 					nodesExpanded += idastar.GetNodesExpanded();
 					necessaryNodesExpanded += idastar.GetNecessaryExpansions();
 					timer.EndTimer();

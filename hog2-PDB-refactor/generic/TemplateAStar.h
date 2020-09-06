@@ -166,6 +166,7 @@ public:
 	unsigned long getIAstarExpansions() { return iAstarExpansions; }
 	unsigned long getMemoryStatesUse() { return memoryStatesUse; }
 	openList &getStatesList() { return openClosedList; }
+  double getPrevF() {return prevF; }
 private:
 	uint64_t nodesTouched, nodesExpanded;
 	
@@ -192,6 +193,7 @@ private:
 	bool boundExists=false;
 	
 	double lastF = 0;
+  double prevF = 0;
 	bool useH = true;
 	uint64_t nodesExpandedInThisF = 0;
 };
@@ -392,6 +394,7 @@ bool TemplateAStar<state,action,environment,openList>::DoSingleSearchStep(std::v
 			fCounts.push_back(last_iteration_expanded);
 		}
 		nodesExpandedInThisF = nodesExpanded;
+    prevF = lastF;
 		lastF = phi(openClosedList.Lookup(nodeid).g, openClosedList.Lookup(nodeid).h);
 	}
 

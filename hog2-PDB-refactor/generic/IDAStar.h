@@ -36,7 +36,7 @@ public:
 							 std::vector<state> &thePath, int secondsLimit=600);
 	bool ASpIDA(SearchEnvironment<state, action> *env, state from, state to, std::vector<state> &thePath, AStarOpenClosed<state, AStarCompareWithF<state>, AStarOpenClosedDataWithF<state>> statesList, int secondsLimit=600, bool isDuplicateDetection = true);
 	bool BAI(SearchEnvironment<state, action> *env, state from, state to, std::vector<state> &thePath, AStarOpenClosed<state, AStarCompareWithF<state>, AStarOpenClosedDataWithF<state>> statesList, int secondsLimit=600, bool isConsistent = false);
-  bool ASpIDArev(SearchEnvironment<state, action> *env, state from, state to, std::vector<state> &thePath, AStarOpenClosed<state, AStarCompareWithF<state>, AStarOpenClosedDataWithF<state>> statesList, int secondsLimit=600, bool isConsistent = false, bool isComputeMaxH = false);
+  bool ASpIDArev(SearchEnvironment<state, action> *env, state from, state to, std::vector<state> &thePath, AStarOpenClosed<state, AStarCompareWithF<state>, AStarOpenClosedDataWithF<state>> statesList, double prevF, int secondsLimit=600, bool isConsistent = false, bool isComputeMaxH = false);
 	bool GetPath(SearchEnvironment<state, action> *env, state from, state to,
 				 std::vector<action> &thePath);
          
@@ -269,7 +269,7 @@ bool IDAStar<state, action, verbose>::BAI(SearchEnvironment<state, action> *env,
 
 template <class state, class action, bool verbose>
 bool IDAStar<state, action, verbose>::ASpIDArev(SearchEnvironment<state, action> *env, state from, state to,
-							 std::vector<state> &thePath, AStarOpenClosed<state, AStarCompareWithF<state>, AStarOpenClosedDataWithF<state>> statesList, int secondsLimit, bool isConsistent, bool isComputeMaxH)
+							 std::vector<state> &thePath, AStarOpenClosed<state, AStarCompareWithF<state>, AStarOpenClosedDataWithF<state>> statesList, double prevF, int secondsLimit,bool isConsistent, bool isComputeMaxH)
 {
 	reverseG = true;
 	heuristic = env;
@@ -288,8 +288,9 @@ bool IDAStar<state, action, verbose>::ASpIDArev(SearchEnvironment<state, action>
 		//maxF = std::max(maxF, astarState.f);
 		//maxG = std::max(maxG, astarState.g);
 	}
-  uint64_t key = statesList.Peek();
-	perimeterG = std::max(0.0, statesList.Lookup(key).f - 1); // this needs to be fixed for non-integer domains
+  //uint64_t key = statesList.Peek();
+	//perimeterG = std::max(0.0, statesList.Lookup(key).f - 1); // this needs to be fixed for non-integer domains
+  perimeterG = prevF;
   /*
 	for (AStarOpenClosedDataWithF<state> astarState : statesList.getElements()){
 		//changed
