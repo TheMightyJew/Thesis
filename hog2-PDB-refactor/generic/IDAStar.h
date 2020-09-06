@@ -36,7 +36,7 @@ public:
 							 std::vector<state> &thePath, int secondsLimit=600);
 	bool ASpIDA(SearchEnvironment<state, action> *env, state from, state to, std::vector<state> &thePath, AStarOpenClosed<state, AStarCompareWithF<state>, AStarOpenClosedDataWithF<state>> statesList, int secondsLimit=600, bool isDuplicateDetection = true);
 	bool BAI(SearchEnvironment<state, action> *env, state from, state to, std::vector<state> &thePath, AStarOpenClosed<state, AStarCompareWithF<state>, AStarOpenClosedDataWithF<state>> statesList, int secondsLimit=600, bool isConsistent = false);
-  bool ASpIDArev(SearchEnvironment<state, action> *env, state from, state to, std::vector<state> &thePath, AStarOpenClosed<state, AStarCompareWithF<state>, AStarOpenClosedDataWithF<state>> statesList, double prevF, int secondsLimit=600, bool isConsistent = false, bool isComputeMaxH = false);
+  bool ASpIDArev(SearchEnvironment<state, action> *env, state from, state to, std::vector<state> &thePath, AStarOpenClosed<state, AStarCompareWithF<state>, AStarOpenClosedDataWithF<state>> statesList, double prevF, int secondsLimit=600, bool isConsistent = false, bool isComputeMaxH = false, double heaviestEdge=1);
 	bool GetPath(SearchEnvironment<state, action> *env, state from, state to,
 				 std::vector<action> &thePath);
          
@@ -104,6 +104,7 @@ private:
 	std::vector<AStarOpenClosedDataWithF<state>> openList;
 	//std::vector<AStarOpenClosedDataWithF<state>> perimeterList;
 	double perimeterG;
+	double heaviestEdge=1;
 	bool isDuplicateDetection;
 	bool reverseG = false;
 	bool reverseF = false;
@@ -269,8 +270,9 @@ bool IDAStar<state, action, verbose>::BAI(SearchEnvironment<state, action> *env,
 
 template <class state, class action, bool verbose>
 bool IDAStar<state, action, verbose>::ASpIDArev(SearchEnvironment<state, action> *env, state from, state to,
-							 std::vector<state> &thePath, AStarOpenClosed<state, AStarCompareWithF<state>, AStarOpenClosedDataWithF<state>> statesList, double prevF, int secondsLimit,bool isConsistent, bool isComputeMaxH)
+							 std::vector<state> &thePath, AStarOpenClosed<state, AStarCompareWithF<state>, AStarOpenClosedDataWithF<state>> statesList, double prevF, int secondsLimit,bool isConsistent, bool isComputeMaxH, double heaviestEdge)
 {
+	this->heaviestEdge = heaviestEdge;
 	reverseG = true;
 	heuristic = env;
 	nextBound = 0;
@@ -325,7 +327,7 @@ bool IDAStar<state, action, verbose>::ASpIDArev(SearchEnvironment<state, action>
 		if(isComputeMaxH && isConsistent){
 			transTable.clear();
 			for (AStarOpenClosedDataWithF<state> astarState : statesList.getElements()){
-				if(astarState.g == perimeterG){
+				if(astarState.g <= perimeterG && astarState.g > perimeterG-heaviestEdge){
 					double calculatedF = heuristic->HCost(from, astarState.data) + astarState.g;
 					double error = astarState.g - env->HCost(astarState.data, goal);
 					if(bound >= calculatedF){
@@ -469,7 +471,7 @@ double IDAStar<state, action, verbose>::DoIteration(SearchEnvironment<state, act
 		UpdateNextBound(bound, g+h);
 		return h;
 	}
-	else if(!isComputeMaxH && reverseG && perimeterG+g >= bound){
+	else if(!isComputeMaxH && reverseG && perimeterG-heaviestEdge+g > bound){
 		uint64_t ID;
 		if (statesList.Lookup(env->GetStateHash(currState), ID) != kNotFound){
 			if (statesList.Lookup(ID).g + g <= bound){
@@ -482,8 +484,8 @@ double IDAStar<state, action, verbose>::DoIteration(SearchEnvironment<state, act
 				return h;
 			}
 		}
-		else if (fgreater(perimeterG+g,bound)){
-		  UpdateNextBound(bound, g+perimeterG);
+		else if (fgreater(perimeterG+g-heaviestEdge,bound)){
+		  UpdateNextBound(bound, g+perimeterG-heaviestEdge);
 		  return h;
 		}			
 	}
@@ -528,7 +530,7 @@ double IDAStar<state, action, verbose>::DoIteration(SearchEnvironment<state, act
 		}
 		else{
 		  for (AStarOpenClosedDataWithF<state> astarState : statesList.getElements()){
-			if(astarState.g == perimeterG){ //perimeter frontier should be fixed and this should be updated to <= instead of ==
+			if(astarState.g <= perimeterG-heaviestEdge){ //perimeter frontier should be fixed and this should be updated to <= instead of ==
 			  F2F_h = std::min(F2F_h,heuristic->HCost(currState, astarState.data) + astarState.g);
 			}
 		  }

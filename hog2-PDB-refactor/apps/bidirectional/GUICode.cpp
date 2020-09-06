@@ -1059,8 +1059,8 @@ void AnalyzeProblem(Map *m, int whichProblem, Experiment e, double weight)
    bool IDAstarRun=true;
 
    bool AstarPIDAstarRun=true;
-   bool AstarPIDAstarReverseRun=false;
-   bool AstarPIDAstarReverseMinHRun=false;
+   bool AstarPIDAstarReverseRun=true;
+   bool AstarPIDAstarReverseMinHRun=true;
    bool IDTHSpTrans = true;
 
    bool BAI=false;
@@ -1291,7 +1291,7 @@ void AnalyzeProblem(Map *m, int whichProblem, Experiment e, double weight)
 				}
 				else{
 					IDAStar<CanonicalGrid::xyLoc, CanonicalGrid::tDirection, false> idastar;
-					solved = idastar.ASpIDArev(cg, cstart, cgoal, cpath, astar.getStatesList(), astar.getPrevF(),secondsLimit-t1.GetElapsedTime(),isConsistent, true);
+					solved = idastar.ASpIDArev(cg, cstart, cgoal, cpath, astar.getStatesList(), astar.getPrevF(),secondsLimit-t1.GetElapsedTime(),isConsistent, true, 1.5);
 					nodesExpanded += idastar.GetNodesExpanded();
 					necessaryNodesExpanded += idastar.GetNecessaryExpansions();
 					t1.EndTimer();
