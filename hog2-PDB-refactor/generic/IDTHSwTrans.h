@@ -52,10 +52,8 @@ private:
 	bool DoIterationBackward(SearchEnvironment<state, action>* env, state parent, state currState, double g, uint64_t& midState);//, std::vector<state>& backwardPath);
 	double updateBoundByFraction(double boundToSplit,double p = 0.5, bool isInteger = true);
 	double updateBoundByWorkload(double newbound, double prevBound, double oldForwardBound,uint64_t forwardLoad,uint64_t backwardLoad);
-	double nextBound[2];
-	int const forwardLoc = 0;
-	int const backwardLoc = 1;
-	void UpdateNextBound(double currBound, double fCost, int loc);
+	double nextBound;
+	void UpdateNextBound(double fCost);
 	state originGoal;
 	state originStart;
 	unsigned long dMMLastIterExpansions = 0;
@@ -101,7 +99,7 @@ state fromState, state toState, /*std::vector<state> &thePath,*/ int secondsLimi
 	originStart = fromState;
 	originGoal = toState;
 	double initialHeuristic = env->HCost(fromState, toState);
-	fBound = nextBound[forwardLoc] = nextBound[backwardLoc] = std::max(smallestEdge,initialHeuristic);
+	fBound = nextBound = std::max(smallestEdge,initialHeuristic);
 	forwardBound = ceil(fBound / 2) - smallestEdge;
 	unsigned long nodesExpandedSoFar = 0;
 	unsigned long previousIterationExpansions = 0;
@@ -146,14 +144,14 @@ state fromState, state toState, /*std::vector<state> &thePath,*/ int secondsLimi
 		else{
       transTable.clear();
       hashTable.clear();
-			double nextFbound = nextBound[forwardLoc] = nextBound[backwardLoc] = std::max(nextBound[forwardLoc],nextBound[backwardLoc]);
+	  
 			if (!isUpdateByWorkload){
-				forwardBound = ceil(nextFbound / 2) - smallestEdge;
+				forwardBound = ceil(nextBound / 2) - smallestEdge;
 			} 
 			else{
-				forwardBound = updateBoundByWorkload(nextFbound, fBound, forwardBound, forwardExpandedInLastIter, backwardExpandedInLastIter);
+				forwardBound = updateBoundByWorkload(nextBound, fBound, forwardBound, forwardExpandedInLastIter, backwardExpandedInLastIter);
 			}
-			fBound = nextFbound;
+			fBound = nextBound;
 			forwardExpandedInLastIter = 0;
 			backwardExpandedInLastIter = 0;
 		}
@@ -170,7 +168,7 @@ bool IDTHSwTrans<state, action, verbose, table>::DoIterationForward(SearchEnviro
 {
 	double h = env->HCost(currState, originGoal);
 	if (fgreater(g + h, fBound)){
-		UpdateNextBound(fBound, g + h,forwardLoc);
+		UpdateNextBound(g + h);
 		return false;
 	}
 
@@ -268,7 +266,7 @@ bool IDTHSwTrans<state, action, verbose, table>::DoIterationBackward(SearchEnvir
       ignoreList.push_back(transTable[i]);
       transTable[i] = transTable.back();
       transTable.pop_back();
-      UpdateNextBound(fBound, computedF, backwardLoc);
+      UpdateNextBound(computedF);
       continue;
     }
   }
@@ -302,15 +300,15 @@ bool IDTHSwTrans<state, action, verbose, table>::DoIterationBackward(SearchEnvir
 }
 
 template <class state, class action, bool verbose, class table>
-void IDTHSwTrans<state, action, verbose, table>::UpdateNextBound(double currBound, double fCost, int loc)
+void IDTHSwTrans<state, action, verbose, table>::UpdateNextBound(double fCost)
 {
-	if (!fgreater(nextBound[loc], currBound))
+	if (!fgreater(nextBound, fBound))
 	{
-		nextBound[loc] = std::max(fCost,currBound);
+		nextBound = std::max(fCost,fBound);
 	}
-	else if (fgreater(fCost, currBound) && fless(fCost, nextBound[loc]))
+	else if (fgreater(fCost, fBound) && fless(fCost, nextBound))
 	{
-		nextBound[loc] = fCost;
+		nextBound = fCost;
 	}
 }
 

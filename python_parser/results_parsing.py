@@ -106,10 +106,13 @@ for filename in filenames:
                         a = 1
             algos2Check = ['MBBDS', 'A*+IDA*(', 'A*+IDA*_Reverse(', 'MM+IDMM', 'A*+IDMM', 'IDMM', 'BAI', 'IDTHSpTrans ',
                            'IDTHSpTrans_NDD']
-            if 'length' in line and not line.startswith('MM ') and not line.startswith('A* '):
+            # if 'length' in line and not line.startswith('MM ') and not line.startswith('A* '):
+            if 'length' in line and not line.startswith('A* '):
                 solLength = float(splittedLine[splittedLine.index('length') + 1].replace(';', ''))
-                realSolLength = max(AsolLength, MMsolLength)
-                if solLength not in [AsolLength, MMsolLength]:
+                # realSolLength = max(AsolLength, MMsolLength)
+                realSolLength = min(AsolLength, MMsolLength)
+                # if solLength not in [AsolLength, MMsolLength]:
+                if solLength != AsolLength:
                     isError = True
             else:
                 resDict['Memory'] = '-'

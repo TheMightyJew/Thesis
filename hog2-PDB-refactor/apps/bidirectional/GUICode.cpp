@@ -986,15 +986,15 @@ void AnalyzeProblem(Map *m, int whichProblem, Experiment e, double weight)
 		if (0)
 		{
 			nbs0e1.GetPath(me, start, goal, &z, &z, path);
-			printf("NBS0e1 found path length %1.0f; %llu expanded; %llu necessary\n", me->GetPathLength(path),
+			printf("NBS0e1 found path length %1.1f; %llu expanded; %llu necessary\n", me->GetPathLength(path),
 				   nbs0e1.GetNodesExpanded(), nbs0e1.GetNecessaryExpansions());
 
 			nbse0.GetPath(me, start, goal, me, me, path);
-			printf("NBSe0 found path length %1.0f; %llu expanded; %llu necessary\n", me->GetPathLength(path),
+			printf("NBSe0 found path length %1.1f; %llu expanded; %llu necessary\n", me->GetPathLength(path),
 				   nbse0.GetNodesExpanded(), nbse0.GetNecessaryExpansions());
 
 			nbse1.GetPath(me, start, goal, me, me, path);
-			printf("NBSe1 found path length %1.0f; %llu expanded; %llu necessary\n", me->GetPathLength(path),
+			printf("NBSe1 found path length %1.1f; %llu expanded; %llu necessary\n", me->GetPathLength(path),
 				   nbse1.GetNodesExpanded(), nbse1.GetNecessaryExpansions());
 
 //			EuclideanDistance d;
@@ -1019,7 +1019,7 @@ void AnalyzeProblem(Map *m, int whichProblem, Experiment e, double weight)
 			timer.StartTimer();
 			nbs.GetPath(me, start, goal, &w, &w, path);
 			timer.EndTimer();
-			printf("NBSW found path length %1.0f; %llu expanded; %llu necessary; %1.2fs elapsed; %f meeting\n", me->GetPathLength(path),
+			printf("NBSW found path length %1.1f; %llu expanded; %llu necessary; %1.2fs elapsed; %f meeting\n", me->GetPathLength(path),
 				   nbs.GetNodesExpanded(), nbs.GetNecessaryExpansions(), timer.GetElapsedTime(), nbs.GetMeetingPoint());
 		}
 
@@ -1031,7 +1031,7 @@ void AnalyzeProblem(Map *m, int whichProblem, Experiment e, double weight)
 			timer.StartTimer();
 			nbs.GetPath(me, start, goal, &o, &o, path);
 			timer.EndTimer();
-			printf("NBSO found path length %1.0f; %llu expanded; %llu necessary; %1.2fs elapsed; %f meeting\n", me->GetPathLength(path),
+			printf("NBSO found path length %1.1f; %llu expanded; %llu necessary; %1.2fs elapsed; %f meeting\n", me->GetPathLength(path),
 				   nbs.GetNodesExpanded(), nbs.GetNecessaryExpansions(), timer.GetElapsedTime(), nbs.GetMeetingPoint());
 		}
 		
@@ -1041,7 +1041,7 @@ void AnalyzeProblem(Map *m, int whichProblem, Experiment e, double weight)
 			timer.StartTimer();
 			nbs.GetPath(me, start, goal, &z, &z, path);
 			timer.EndTimer();
-			printf("NBS0 found path length %1.0f; %llu expanded; %llu necessary; %1.2fs elapsed; %f meeting\n", me->GetPathLength(path),
+			printf("NBS0 found path length %1.1f; %llu expanded; %llu necessary; %1.2fs elapsed; %f meeting\n", me->GetPathLength(path),
 				   nbs.GetNodesExpanded(), nbs.GetNecessaryExpansions(), timer.GetElapsedTime(), nbs.GetMeetingPoint());
 		}
 		return;
@@ -1063,7 +1063,7 @@ void AnalyzeProblem(Map *m, int whichProblem, Experiment e, double weight)
    bool AstarPIDAstarReverseMinHRun=true;
    bool IDTHSpTrans = true;
 
-   bool BAI=false;
+   bool BAI=true;
    bool Max_BAI=true;
 
    bool MMRun=true;
@@ -1104,7 +1104,7 @@ void AnalyzeProblem(Map *m, int whichProblem, Experiment e, double weight)
 			ASTARstatesQuantityBound = astar.getMemoryStatesUse();
 			t1.EndTimer();
 			if(solved){
-				cout << boost::format("\t\t\tA* found path length %1.0f; %llu expanded; %llu necessary; using %1.0llu states in memory; %1.4fs elapsed\n") % cg->GetPathLength(cpath) %
+				cout << boost::format("\t\t\tA* found path length %1.1f; %llu expanded; %llu necessary; using %1.0llu states in memory; %1.4fs elapsed\n") % cg->GetPathLength(cpath) %
 				   astar.GetNodesExpanded() % astar.GetNecessaryExpansions() % ASTARstatesQuantityBound % t1.GetElapsedTime();
 				cout << boost::format("\t\t\tI-A* ; %llu expanded;\n") % astar.getIAstarExpansions();	
         statesQuantityBound =  std::min(statesQuantityBound, ASTARstatesQuantityBound);
@@ -1123,7 +1123,7 @@ void AnalyzeProblem(Map *m, int whichProblem, Experiment e, double weight)
 			ASTARstatesQuantityBound = astar.getMemoryStatesUse();
 			t1.EndTimer();
 			if(solved){
-				cout << boost::format("\t\t\tRev-A* found path length %1.0f; %llu expanded; %llu necessary; using %1.0llu states in memory; %1.4fs elapsed\n") % cg->GetPathLength(cpath) %
+				cout << boost::format("\t\t\tRev-A* found path length %1.1f; %llu expanded; %llu necessary; using %1.0llu states in memory; %1.4fs elapsed\n") % cg->GetPathLength(cpath) %
 				   astar.GetNodesExpanded() % astar.GetNecessaryExpansions() % ASTARstatesQuantityBound % t1.GetElapsedTime();
            statesQuantityBound =  std::min(statesQuantityBound, ASTARstatesQuantityBound);
 			}
@@ -1142,7 +1142,7 @@ void AnalyzeProblem(Map *m, int whichProblem, Experiment e, double weight)
 			MMstatesQuantityBound = mm.getMemoryStatesUse();
 			t4.EndTimer();
 			if(solved){
-				cout << boost::format("\t\t\tMM found path length %1.0f; %llu expanded; %llu necessary; using %1.0llu states in memory; %1.4fs elapsed\n") % cg->GetPathLength(cpath) %
+				cout << boost::format("\t\t\tMM found path length %1.1f; %llu expanded; %llu necessary; using %1.0llu states in memory; %1.4fs elapsed\n") % cg->GetPathLength(cpath) %
 					   mm.GetNodesExpanded() % mm.GetNecessaryExpansions() % MMstatesQuantityBound % t4.GetElapsedTime();
 				cout << boost::format("\t\t\tI-MM ; %llu expanded;\n") % mm.getIMMExpansions();
         statesQuantityBound =  std::min(statesQuantityBound, MMstatesQuantityBound);				
@@ -1164,7 +1164,7 @@ void AnalyzeProblem(Map *m, int whichProblem, Experiment e, double weight)
 			bool solved = idastar.GetPath(cg, cstart, cgoal, cpath, secondsLimit);
 			t3.EndTimer();
 			if(solved){
-				cout << boost::format("\t\t\tIDA* found path length %1.0f; %llu expanded; %llu generated; %llu necessary; %1.4fs elapsed\n") % cg->GetPathLength(cpath) %
+				cout << boost::format("\t\t\tIDA* found path length %1.1f; %llu expanded; %llu generated; %llu necessary; %1.4fs elapsed\n") % cg->GetPathLength(cpath) %
 				   idastar.GetNodesExpanded() % idastar.GetNodesTouched() % idastar.GetNecessaryExpansions() % t3.GetElapsedTime();
 				cout << boost::format("\t\t\tD-A* ; %llu expanded;\n") % idastar.getDAstarExpansions();
 			}
@@ -1190,7 +1190,7 @@ void AnalyzeProblem(Map *m, int whichProblem, Experiment e, double weight)
 				if(solved){
 					t1.EndTimer();
 					necessaryNodesExpanded = astar.GetNecessaryExpansions();
-					cout << boost::format("\t\t\tA*+IDMM A* using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) found path length %1.0f; %llu expanded; %llu necessary; %1.4fs elapsed\n") % statesQuantityBoundforASPIDMM % stateSize % percentage % cg->GetPathLength(cpath) %
+					cout << boost::format("\t\t\tA*+IDMM A* using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) found path length %1.1f; %llu expanded; %llu necessary; %1.4fs elapsed\n") % statesQuantityBoundforASPIDMM % stateSize % percentage % cg->GetPathLength(cpath) %
 					   nodesExpanded % necessaryNodesExpanded  % t1.GetElapsedTime();
 				}
 				else{
@@ -1201,7 +1201,7 @@ void AnalyzeProblem(Map *m, int whichProblem, Experiment e, double weight)
 					necessaryNodesExpanded += idmm.GetNecessaryExpansions();
 					t1.EndTimer();
 					if(solved){
-					  cout << boost::format("\t\t\tA*+IDMM IDMM using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) found path length %1.0f; %llu expanded; %llu necessary; %1.4fs elapsed\n") % statesQuantityBoundforASPIDMM % stateSize % percentage % idmm.getPathLength() % nodesExpanded % necessaryNodesExpanded % t1.GetElapsedTime();
+					  cout << boost::format("\t\t\tA*+IDMM IDMM using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) found path length %1.1f; %llu expanded; %llu necessary; %1.4fs elapsed\n") % statesQuantityBoundforASPIDMM % stateSize % percentage % idmm.getPathLength() % nodesExpanded % necessaryNodesExpanded % t1.GetElapsedTime();
 					}
 					else{
 					  cout << boost::format("\t\t\tA*+IDMM IDMM using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) failed after %1.4fs\n") % statesQuantityBoundforASPIDMM % stateSize % percentage % t1.GetElapsedTime();
@@ -1222,7 +1222,7 @@ void AnalyzeProblem(Map *m, int whichProblem, Experiment e, double weight)
 				if(solved){
 					t1.EndTimer();
 					necessaryNodesExpanded = astar.GetNecessaryExpansions();
-					cout << boost::format("\t\t\tA*+IDA* A* using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) found path length %1.0f; %llu expanded; %llu necessary; %1.4fs elapsed\n") % statesQuantityBoundforASPIDAS % stateSize % percentage % cg->GetPathLength(cpath) %
+					cout << boost::format("\t\t\tA*+IDA* A* using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) found path length %1.1f; %llu expanded; %llu necessary; %1.4fs elapsed\n") % statesQuantityBoundforASPIDAS % stateSize % percentage % cg->GetPathLength(cpath) %
 					   nodesExpanded % necessaryNodesExpanded % t1.GetElapsedTime();
 				}
 				else{
@@ -1232,7 +1232,7 @@ void AnalyzeProblem(Map *m, int whichProblem, Experiment e, double weight)
 					necessaryNodesExpanded += idastar.GetNecessaryExpansions();
 					t1.EndTimer();
 					if(solved){
-						cout << boost::format("\t\t\tA*+IDA* IDA* using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) found path length %1.0f; %llu expanded; %llu generated; %llu necessary; %1.4fs elapsed\n") % statesQuantityBoundforASPIDAS % stateSize % percentage % idastar.getSolLength() %
+						cout << boost::format("\t\t\tA*+IDA* IDA* using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) found path length %1.1f; %llu expanded; %llu generated; %llu necessary; %1.4fs elapsed\n") % statesQuantityBoundforASPIDAS % stateSize % percentage % idastar.getSolLength() %
 						   nodesExpanded % idastar.GetNodesTouched() % necessaryNodesExpanded % t1.GetElapsedTime();
 					}
 					else{
@@ -1254,7 +1254,7 @@ void AnalyzeProblem(Map *m, int whichProblem, Experiment e, double weight)
 				if(solved){
 					t1.EndTimer();
 					necessaryNodesExpanded = astar.GetNecessaryExpansions();
-					cout << boost::format("\t\t\tA*+IDA*_Reverse A* using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) found path length %1.0f; %llu expanded; %llu necessary; %1.4fs elapsed\n") % statesQuantityBoundforASPIDARS % stateSize % percentage % cg->GetPathLength(cpath) %
+					cout << boost::format("\t\t\tA*+IDA*_Reverse A* using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) found path length %1.1f; %llu expanded; %llu necessary; %1.4fs elapsed\n") % statesQuantityBoundforASPIDARS % stateSize % percentage % cg->GetPathLength(cpath) %
 					   nodesExpanded % necessaryNodesExpanded % t1.GetElapsedTime();
 				}
 				else{
@@ -1264,7 +1264,7 @@ void AnalyzeProblem(Map *m, int whichProblem, Experiment e, double weight)
 					necessaryNodesExpanded += idastar.GetNecessaryExpansions();
 					t1.EndTimer();
 					if(solved){
-						cout << boost::format("\t\t\tA*+IDA*_Reverse IDA* using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) found path length %1.0f; %llu expanded; %llu generated; %llu necessary; %1.4fs elapsed\n") % statesQuantityBoundforASPIDARS % stateSize % percentage % idastar.getSolLength() %
+						cout << boost::format("\t\t\tA*+IDA*_Reverse IDA* using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) found path length %1.1f; %llu expanded; %llu generated; %llu necessary; %1.4fs elapsed\n") % statesQuantityBoundforASPIDARS % stateSize % percentage % idastar.getSolLength() %
 						   nodesExpanded % idastar.GetNodesTouched() % necessaryNodesExpanded % t1.GetElapsedTime();
 					}
 					else{
@@ -1286,7 +1286,7 @@ void AnalyzeProblem(Map *m, int whichProblem, Experiment e, double weight)
 				if(solved){
 					t1.EndTimer();
 					necessaryNodesExpanded = astar.GetNecessaryExpansions();
-					cout << boost::format("\t\t\tA*+IDA*_Reverse+MinH A* using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) found path length %1.0f; %llu expanded; %llu necessary; %1.4fs elapsed\n") % statesQuantityBoundforASPIDARS % stateSize % percentage % cg->GetPathLength(cpath) %
+					cout << boost::format("\t\t\tA*+IDA*_Reverse+MinH A* using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) found path length %1.1f; %llu expanded; %llu necessary; %1.4fs elapsed\n") % statesQuantityBoundforASPIDARS % stateSize % percentage % cg->GetPathLength(cpath) %
 					   nodesExpanded % necessaryNodesExpanded % t1.GetElapsedTime();
 				}
 				else{
@@ -1296,7 +1296,7 @@ void AnalyzeProblem(Map *m, int whichProblem, Experiment e, double weight)
 					necessaryNodesExpanded += idastar.GetNecessaryExpansions();
 					t1.EndTimer();
 					if(solved){
-						cout << boost::format("\t\t\tA*+IDA*_Reverse+MinH IDA* using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) found path length %1.0f; %llu expanded; %llu generated; %llu necessary; %1.4fs elapsed\n") % statesQuantityBoundforASPIDARS % stateSize % percentage % idastar.getSolLength() %
+						cout << boost::format("\t\t\tA*+IDA*_Reverse+MinH IDA* using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) found path length %1.1f; %llu expanded; %llu generated; %llu necessary; %1.4fs elapsed\n") % statesQuantityBoundforASPIDARS % stateSize % percentage % idastar.getSolLength() %
 						   nodesExpanded % idastar.GetNodesTouched() % necessaryNodesExpanded % t1.GetElapsedTime();
 					}
 					else{
@@ -1318,7 +1318,7 @@ void AnalyzeProblem(Map *m, int whichProblem, Experiment e, double weight)
 				if(solved){
 					t1.EndTimer();
 					necessaryNodesExpanded = astar.GetNecessaryExpansions();
-					cout << boost::format("\t\t\tBAI A* using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) found path length %1.0f; %llu expanded; %llu necessary; %1.4fs elapsed\n") % statesQuantityBoundforASPIDARS % stateSize % percentage % cg->GetPathLength(cpath) %
+					cout << boost::format("\t\t\tBAI A* using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) found path length %1.1f; %llu expanded; %llu necessary; %1.4fs elapsed\n") % statesQuantityBoundforASPIDARS % stateSize % percentage % cg->GetPathLength(cpath) %
 					   nodesExpanded % necessaryNodesExpanded % t1.GetElapsedTime();
 				}
 				else{
@@ -1328,7 +1328,7 @@ void AnalyzeProblem(Map *m, int whichProblem, Experiment e, double weight)
 					necessaryNodesExpanded += idastar.GetNecessaryExpansions();
 					t1.EndTimer();
 					if(solved){
-						cout << boost::format("\t\t\tBAI IDA* using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) found path length %1.0f; %llu expanded; %llu generated; %llu necessary; %1.4fs elapsed\n") % statesQuantityBoundforASPIDARS % stateSize % percentage % idastar.getSolLength() %
+						cout << boost::format("\t\t\tBAI IDA* using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) found path length %1.1f; %llu expanded; %llu generated; %llu necessary; %1.4fs elapsed\n") % statesQuantityBoundforASPIDARS % stateSize % percentage % idastar.getSolLength() %
 						   nodesExpanded % idastar.GetNodesTouched() % necessaryNodesExpanded % t1.GetElapsedTime();
 					}
 					else{
@@ -1350,7 +1350,7 @@ void AnalyzeProblem(Map *m, int whichProblem, Experiment e, double weight)
 				if(solved){
 					t1.EndTimer();
 					necessaryNodesExpanded = astar.GetNecessaryExpansions();
-					cout << boost::format("\t\t\tMax_BAI A* using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) found path length %1.0f; %llu expanded; %llu necessary; %1.4fs elapsed\n") % statesQuantityBoundforASPIDARS % stateSize % percentage % cg->GetPathLength(cpath) %
+					cout << boost::format("\t\t\tMax_BAI A* using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) found path length %1.1f; %llu expanded; %llu necessary; %1.4fs elapsed\n") % statesQuantityBoundforASPIDARS % stateSize % percentage % cg->GetPathLength(cpath) %
 					   nodesExpanded % necessaryNodesExpanded % t1.GetElapsedTime();
 				}
 				else{
@@ -1360,7 +1360,7 @@ void AnalyzeProblem(Map *m, int whichProblem, Experiment e, double weight)
 					necessaryNodesExpanded += idastar.GetNecessaryExpansions();
 					t1.EndTimer();
 					if(solved){
-						cout << boost::format("\t\t\tMax_BAI IDA* using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) found path length %1.0f; %llu expanded; %llu generated; %llu necessary; %1.4fs elapsed\n") % statesQuantityBoundforASPIDARS % stateSize % percentage % idastar.getSolLength() %
+						cout << boost::format("\t\t\tMax_BAI IDA* using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) found path length %1.1f; %llu expanded; %llu generated; %llu necessary; %1.4fs elapsed\n") % statesQuantityBoundforASPIDARS % stateSize % percentage % idastar.getSolLength() %
 						   nodesExpanded % idastar.GetNodesTouched() % necessaryNodesExpanded % t1.GetElapsedTime();
 					}
 					else{
@@ -1378,7 +1378,7 @@ void AnalyzeProblem(Map *m, int whichProblem, Experiment e, double weight)
 			bool solved = idastar.SFBDS(cg, cstart, cgoal, cpath, secondsLimit,1,false,false);
 			t1.EndTimer();
 			if(solved){
-				cout << boost::format("\t\t\tSFBDS1 found path length %1.0f; %llu expanded; %llu generated; %llu necessary; %1.4fs elapsed\n") % cg->GetPathLength(cpath) %
+				cout << boost::format("\t\t\tSFBDS1 found path length %1.1f; %llu expanded; %llu generated; %llu necessary; %1.4fs elapsed\n") % cg->GetPathLength(cpath) %
 				   idastar.GetNodesExpanded() % idastar.GetNodesTouched() % idastar.GetNecessaryExpansions() % t1.GetElapsedTime();
 			}
 			else{
@@ -1403,7 +1403,7 @@ void AnalyzeProblem(Map *m, int whichProblem, Experiment e, double weight)
           necessaryNodesExpanded += idmm.GetNecessaryExpansions();
           t1.EndTimer();
           if(solved){
-            cout << boost::format("\t\t\tIDTHSpTrans IDMM using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) found path length %1.0f; %llu expanded; %llu necessary; %1.4fs elapsed\n") % statesQuantityBoundforASPIDMM % stateSize % percentage % idmm.getPathLength() % nodesExpanded % necessaryNodesExpanded % t1.GetElapsedTime();
+            cout << boost::format("\t\t\tIDTHSpTrans IDMM using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) found path length %1.1f; %llu expanded; %llu necessary; %1.4fs elapsed\n") % statesQuantityBoundforASPIDMM % stateSize % percentage % idmm.getPathLength() % nodesExpanded % necessaryNodesExpanded % t1.GetElapsedTime();
           }
           else{
             cout << boost::format("\t\t\tIDTHSpTrans IDMM using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) failed after %1.4fs\n") % statesQuantityBoundforASPIDMM % stateSize % percentage % t1.GetElapsedTime();
@@ -1436,7 +1436,7 @@ void AnalyzeProblem(Map *m, int whichProblem, Experiment e, double weight)
 						}
 						if(solved){
 							timer.EndTimer();
-							cout << boost::format("\t\t\tMBBDS(k=1,ThreePhase=%d) MM using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) found path length %1.0f; %llu expanded; %llu necessary; %d iterations; %1.4fs elapsed;\n") % int(doThree) % statesQuantityBoundforMBBDS % stateSize % percentage % cg->GetPathLength(cpath) %
+							cout << boost::format("\t\t\tMBBDS(k=1,ThreePhase=%d) MM using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) found path length %1.1f; %llu expanded; %llu necessary; %d iterations; %1.4fs elapsed;\n") % int(doThree) % statesQuantityBoundforMBBDS % stateSize % percentage % cg->GetPathLength(cpath) %
 							   nodesExpanded % mm.GetNecessaryExpansions() % 0 % timer.GetElapsedTime();
 						}
 						else{
@@ -1446,7 +1446,7 @@ void AnalyzeProblem(Map *m, int whichProblem, Experiment e, double weight)
 							lastBound = mbbds.getLastBound();
 							if(solved){
 								timer.EndTimer();
-								cout << boost::format("\t\t\tMBBDS(k=1,ThreePhase=%d) MBBDS using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) found path length %1.0f; %llu expanded; %llu necessary; %d iterations; %1.4fs elapsed;\n") % int(doThree) % statesQuantityBoundforMBBDS % stateSize % percentage % mbbds.getPathLength() % nodesExpanded % mbbds.GetNecessaryExpansions() % mbbds.getIterationNum() % timer.GetElapsedTime();
+								cout << boost::format("\t\t\tMBBDS(k=1,ThreePhase=%d) MBBDS using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) found path length %1.1f; %llu expanded; %llu necessary; %d iterations; %1.4fs elapsed;\n") % int(doThree) % statesQuantityBoundforMBBDS % stateSize % percentage % mbbds.getPathLength() % nodesExpanded % mbbds.GetNecessaryExpansions() % mbbds.getIterationNum() % timer.GetElapsedTime();
 							}
 							else{
 								IDMM<CanonicalGrid::xyLoc, CanonicalGrid::tDirection, false> idmm(idmmF2fFlag, isConsistent, isUpdateByWorkload);
@@ -1454,7 +1454,7 @@ void AnalyzeProblem(Map *m, int whichProblem, Experiment e, double weight)
 								nodesExpanded += idmm.GetNodesExpanded();
 								timer.EndTimer();
 								if(solved){
-									cout << boost::format("\t\t\tMBBDS(k=1,ThreePhase=%d) IDMM using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) found path length %1.0f; %llu expanded; %llu necessary; %d iterations; %1.4fs elapsed;\n") % int(doThree) % statesQuantityBoundforMBBDS % stateSize % percentage % idmm.getPathLength() % nodesExpanded % mbbds.GetNecessaryExpansions() % mbbds.getIterationNum() % timer.GetElapsedTime();
+									cout << boost::format("\t\t\tMBBDS(k=1,ThreePhase=%d) IDMM using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) found path length %1.1f; %llu expanded; %llu necessary; %d iterations; %1.4fs elapsed;\n") % int(doThree) % statesQuantityBoundforMBBDS % stateSize % percentage % idmm.getPathLength() % nodesExpanded % mbbds.GetNecessaryExpansions() % mbbds.getIterationNum() % timer.GetElapsedTime();
 								}
 								else{
 									cout << boost::format("\t\t\tMBBDS(k=1,ThreePhase=%d) IDMM using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) failed after %1.4fs and %d iterations\n") % int(doThree) % statesQuantityBoundforMBBDS % stateSize % percentage % timer.GetElapsedTime() % mbbds.getIterationNum();
@@ -1477,7 +1477,7 @@ void AnalyzeProblem(Map *m, int whichProblem, Experiment e, double weight)
 			bool solved = idmm.GetMidState(cg, cstart, cgoal, midState, secondsLimit);
 			t8.EndTimer();
 			if(solved){
-				cout << boost::format("\t\t\tIDMM-0.5 found path length %1.0f; %llu expanded; %llu generated; %llu necessary; %1.4fs elapsed; ") % idmm.getPathLength() %
+				cout << boost::format("\t\t\tIDMM-0.5 found path length %1.1f; %llu expanded; %llu generated; %llu necessary; %1.4fs elapsed; ") % idmm.getPathLength() %
 				   idmm.GetNodesExpanded() % idmm.GetNodesTouched() % idmm.GetNecessaryExpansions() % t8.GetElapsedTime();
 				cout << "Mid state: " << midState << std::endl;
 				cout << boost::format("\t\t\tD-MM ; %llu expanded;\n") % idmm.getDMMExpansions();
@@ -1495,7 +1495,7 @@ void AnalyzeProblem(Map *m, int whichProblem, Experiment e, double weight)
 			bool solved = idmm.GetMidState(cg, cstart, cgoal, midState, secondsLimit);
 			t8.EndTimer();
 			if(solved){
-				cout << boost::format("\t\t\tIDTHS-BW found path length %1.0f; %llu expanded; %llu generated; %llu necessary; %1.4fs elapsed; ") % idmm.getPathLength() %
+				cout << boost::format("\t\t\tIDTHS-BW found path length %1.1f; %llu expanded; %llu generated; %llu necessary; %1.4fs elapsed; ") % idmm.getPathLength() %
 				   idmm.GetNodesExpanded() % idmm.GetNodesTouched() % idmm.GetNecessaryExpansions() % t8.GetElapsedTime();
 				cout << "Mid state: " << midState << std::endl;
 				cout << boost::format("\t\t\tD-MM ; %llu expanded;\n") % idmm.getDMMExpansions();
@@ -1628,12 +1628,12 @@ void AnalyzeMap(const char *map, const char *scenario, double weight)
   int counter = 0;
 	for (int x = 0; x < s.GetNumExperiments() && counter < 400; x++)
 	{
-//		if (x+1 != 813)
-//			continue;
 		if (s.GetNthExperiment(x).GetDistance() <= 0)
 			continue;
-		printf("Problem %d of %d\n", x+1, s.GetNumExperiments()); 
-		AnalyzeProblem(m, x, s.GetNthExperiment(x), weight);
+		if(true){
+			printf("Problem %d of %d\n", x+1, s.GetNumExperiments()); 
+			AnalyzeProblem(m, x, s.GetNthExperiment(x), weight);
+		}
     counter++;
 	}
   //myfile << "completed!" << std::endl;
@@ -1756,6 +1756,6 @@ void tmp()
 	t.EndTimer();
 	printf("%llu nodes expanded\n", nbs.GetNodesExpanded());
 	printf("%llu neccesary nodes expanded\n", nbs.GetNecessaryExpansions());
-	printf("Solution path length %1.0f\n", cube.GetPathLength(thePath));
+	printf("Solution path length %1.1f\n", cube.GetPathLength(thePath));
 	printf("%1.2f elapsed\n", t.GetElapsedTime());
 }
