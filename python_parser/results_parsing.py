@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 import sys
 import os
+
 analysis_dir = 'Analysis'
 res_dir = 'Grid'
 path = analysis_dir + '/' + res_dir + '/'
@@ -12,7 +13,7 @@ try:
     filename = os.path.basename(arg)
     filenames = [filename]
 except:
-    filenames = ['heaviestEdge.txt']
+    filenames = ['three_maps', 'one_map']
 for filename in filenames:
     filename = str(filename)
     fileName = filename.replace('.txt', '')
@@ -27,6 +28,8 @@ for filename in filenames:
         analysisCols = []
     if res_dir != 'Grid':
         cols += ['Start state', 'Goal state', 'Initial Heuristic']
+    else:
+        cols += ['Map Name']
     cols += ['Problem ID', 'Algorithm',
              'Memory', 'Status', 'States Expanded', 'Necessary Expansions', 'Iterations', 'Runtime(seconds)']
     errorCols += ['Problem ID', 'Algorithm', 'Memory', 'Status', 'solLength',
@@ -38,6 +41,7 @@ for filename in filenames:
     resDict = dict.fromkeys(cols)
     errorsDict = dict.fromkeys(errorCols)
     gapStr = 'GAP-0'
+    map_name = ''
     resDict['Problem ID'] = 0
     errorsDict['Problem ID'] = 0
     necessary = 0
@@ -45,12 +49,18 @@ for filename in filenames:
         isError = False
         line = line.replace('\t', '').replace('\n', '')
         splittedLine = line.replace(gapStr, ' ' + gapStr + ' ').split()
+        skipList = ['command line arguments', 'U2 F2 U D R2 U- D- F2', './bidirectional']
+        if 'command line arguments' in line or 'U2 F2 U D R2 U- D- F2' in line or './bidirectional' in line:
+            continue
         if 'Test' in line:
             if 'TestPancake' in line:
                 resDict['Number Of Pancakes'] = int(
                     splittedLine[splittedLine.index('TestPancake:(Pancakes:') + 1].replace(',', ''))
                 resDict['Gap'] = int(splittedLine[splittedLine.index('Gap:') + 1].replace(')', '').replace(',', ''))
                 gapStr = 'GAP-' + str(resDict['Gap'])
+        elif 'Loading' in line and res_dir == 'Grid':
+            a = line[:line.index('.map')].split('/')[-1]
+            map_name = line
         elif 'Problem' in line:
             problemID = int(splittedLine[splittedLine.index('Problem') + 1])
             MMsolLength = 0
@@ -112,7 +122,7 @@ for filename in filenames:
                 try:
                     resDict['States Expanded'] = int(splittedLine[splittedLine.index('expanded;') - 1])
                 except:
-                    print(line)
+                    print('error:', line)
                 if 'elapsed' in splittedLine:
                     resDict['Runtime(seconds)'] = float(
                         splittedLine[splittedLine.index('elapsed') - 1].replace('s', ''))
@@ -131,11 +141,18 @@ for filename in filenames:
                                   'Status': resDict['Status'],
                                   'solLength': solLength,
                                   'realSolLength': realSolLength}
-                else:
-                    errorsDict = {'Problem ID': resDict['Problem ID'], 'Algorithm': algoName, 'Memory': resDict['Memory'],
-                              'Status': resDict['Status'],
-                              'solLength': solLength,
-                              'realSolLength': realSolLength}
+                elif res_dir == 'STP':
+                    errorsDict = {'Problem ID': resDict['Problem ID'], 'Algorithm': algoName,
+                                  'Memory': resDict['Memory'],
+                                  'Status': resDict['Status'],
+                                  'solLength': solLength,
+                                  'realSolLength': realSolLength}
+                elif res_dir == 'Grid':
+                    errorsDict = {'Map Name': map_name, 'Problem ID': resDict['Problem ID'], 'Algorithm': algoName,
+                                  'Memory': resDict['Memory'],
+                                  'Status': resDict['Status'],
+                                  'solLength': solLength,
+                                  'realSolLength': realSolLength}
                 errorsDF = errorsDF.append(errorsDict, ignore_index=True)
 
     resultsDF = resultsDF[cols]
@@ -144,7 +161,7 @@ for filename in filenames:
     if len(errorsDF) > 0:
         if res_dir == 'PancakeSorting':
             errorsDF.sort_values(['Number Of Pancakes', 'Gap', 'Problem ID', 'Algorithm', 'Memory'], ascending=True,
-                             inplace=True)
+                                 inplace=True)
         else:
             errorsDF.sort_values(['Problem ID', 'Algorithm', 'Memory'], ascending=True,
                                  inplace=True)
