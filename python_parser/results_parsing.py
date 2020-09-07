@@ -1,16 +1,18 @@
 import pandas as pd
 import numpy as np
 import sys
+import os
 analysis_dir = 'Analysis'
-# res_dir = 'PancakeSorting'
-res_dir = 'PancakeSorting'
+res_dir = 'Grid'
 path = analysis_dir + '/' + res_dir + '/'
 filename = ''
 try:
-    filename = sys.argv[1]
+    arg = sys.argv[1]
+    path = os.path.dirname(arg) + '/'
+    filename = os.path.basename(arg)
     filenames = [filename]
 except:
-    filenames = ['mbbds_false']
+    filenames = ['heaviestEdge.txt']
 for filename in filenames:
     filename = str(filename)
     fileName = filename.replace('.txt', '')
@@ -23,7 +25,9 @@ for filename in filenames:
         cols = []
         errorCols = []
         analysisCols = []
-    cols += ['Problem ID', 'Start state', 'Goal state', 'Initial Heuristic', 'Algorithm',
+    if res_dir != 'Grid':
+        cols += ['Start state', 'Goal state', 'Initial Heuristic']
+    cols += ['Problem ID', 'Algorithm',
              'Memory', 'Status', 'States Expanded', 'Necessary Expansions', 'Iterations', 'Runtime(seconds)']
     errorCols += ['Problem ID', 'Algorithm', 'Memory', 'Status', 'solLength',
                   'realSolLength']
@@ -54,12 +58,13 @@ for filename in filenames:
             solLength = 0
             realSolLength = 0
             resDict['Problem ID'] = problemID
-            line = next(file).replace('\t', '').replace('\n', '')
-            resDict['Start state'] = line[line.index(':') + 1:-1]
-            line = next(file).replace('\t', '').replace('\n', '')
-            resDict['Goal state'] = line[line.index(':') + 1:-1]
-            line = next(file).replace('\t', '').replace('\n', '')
-            resDict['Initial Heuristic'] = float(line[line.index('heuristic') + len('heuristic') + 1:])
+            if res_dir != 'Grid':
+                line = next(file).replace('\t', '').replace('\n', '')
+                resDict['Start state'] = line[line.index(':') + 1:-1]
+                line = next(file).replace('\t', '').replace('\n', '')
+                resDict['Goal state'] = line[line.index(':') + 1:-1]
+                line = next(file).replace('\t', '').replace('\n', '')
+                resDict['Initial Heuristic'] = float(line[line.index('heuristic') + len('heuristic') + 1:])
         else:
             if line[0] == line[-1] == '_' or 'completed' in line:
                 continue
@@ -119,8 +124,15 @@ for filename in filenames:
                 algoName = resDict['Algorithm']
                 if '(' in algoName:
                     algoName = algoName[:algoName.index('(')]
-                errorsDict = {'Number Of Pancakes': resDict['Number Of Pancakes'], 'Gap': resDict['Gap'],
-                              'Problem ID': resDict['Problem ID'], 'Algorithm': algoName, 'Memory': resDict['Memory'],
+                if res_dir == 'PancakeSorting':
+                    errorsDict = {'Number Of Pancakes': resDict['Number Of Pancakes'], 'Gap': resDict['Gap'],
+                                  'Problem ID': resDict['Problem ID'], 'Algorithm': algoName,
+                                  'Memory': resDict['Memory'],
+                                  'Status': resDict['Status'],
+                                  'solLength': solLength,
+                                  'realSolLength': realSolLength}
+                else:
+                    errorsDict = {'Problem ID': resDict['Problem ID'], 'Algorithm': algoName, 'Memory': resDict['Memory'],
                               'Status': resDict['Status'],
                               'solLength': solLength,
                               'realSolLength': realSolLength}
@@ -128,10 +140,14 @@ for filename in filenames:
 
     resultsDF = resultsDF[cols]
     resultsDF.to_csv(path + fileName + '_results.csv')
+    errorsDF.drop_duplicates(inplace=True)
     if len(errorsDF) > 0:
-        errorsDF.drop_duplicates(inplace=True)
-        errorsDF.sort_values(['Number Of Pancakes', 'Gap', 'Problem ID', 'Algorithm', 'Memory'], ascending=True,
+        if res_dir == 'PancakeSorting':
+            errorsDF.sort_values(['Number Of Pancakes', 'Gap', 'Problem ID', 'Algorithm', 'Memory'], ascending=True,
                              inplace=True)
+        else:
+            errorsDF.sort_values(['Problem ID', 'Algorithm', 'Memory'], ascending=True,
+                                 inplace=True)
         errorsDF = errorsDF[errorCols]
     errorsDF.to_csv(path + fileName + '_errors.csv')
     analysisDF = pd.DataFrame()
