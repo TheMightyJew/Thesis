@@ -15,7 +15,7 @@
 #include "MM.h"
 #include "PancakeInstances.h"
 #include "MBBDS.h"
-#include "FullMBBDS.h"
+#include "BFBDS.h"
 #include "IDMM.h"
 #include "IDTHSwTrans.h"
 #include "MbbdsBloomFilter.h"
@@ -39,25 +39,27 @@ static int secondsLimit = 60*30;
 static bool AstarRun=true;
 static bool RevAstarRun=true;
 
-static bool IDAstarRun=false;
+static bool IDAstarRun=true;
 
-static bool AstarPIDAstarRun=false;
-static bool AstarPIDAstarReverseRun=false;
+static bool AstarPIDAstarRun=true;
+static bool AstarPIDAstarReverseRun=true;
 static bool AstarPIDAstarReverseMinHRun=true;
 static bool IDTHSpTrans = true;
 
-static bool BAI=false;
-static bool Max_BAI=false;
+static bool BAI=true;
+static bool Max_BAI=true;
 
 static bool MMRun=true;
 
 static bool IDMMRun=true;
 static bool idmmF2fFlag=true;
 
-static bool ASTARpIDMM=false;
+static bool ASTARpIDMM=true;
 static bool MMpIDMM=false;
 
-static bool MBBDSRun=false;
+static bool MBBDSRun=true;
+static bool BFBDSRUN=true;
+static bool fullMBBDS=true;
 static bool revAlgo=true;
 
 static bool threePhase=true;
@@ -94,21 +96,19 @@ void TestPancake(string file)
 	myfile.open (filename);
 	
 
-	StevenTest(0, 100, true);
-	//StevenTest(1, 100, true);
-	//StevenTest(2, 100, true);
-  //vector<int> skip = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100};
-	//StevenTest(3, 100, true, skip);
+	StevenTest(0, 5, true);
+	StevenTest(1, 5, true);
+	StevenTest(2, 5, true);
 
 	myfile << "completed!" << endl;
 	myfile.close();
 	cout << "completed!" << endl;
-	exit(0);
+	//exit(0);
 }
 
 void StevenTest(int gap, int problems_num, bool randomPancake, vector<int> skipVector)
 {
-	const int pancakes_num = 12;
+	const int pancakes_num = 8;
 	srandom(2017218);
 	PancakePuzzleState<pancakes_num> start;
 	PancakePuzzleState<pancakes_num> original;
@@ -239,32 +239,32 @@ void StevenTest(int gap, int problems_num, bool randomPancake, vector<int> skipV
 			}					   
 		}
     
+		//double percentages[6] = {1, 0.9, 0.75, 0.5, 0.25, 0.1};
+		double percentages[3] = {0.5, 0.1, 0.01};
+		long stateSize = sizeof(original);
+		
 		//FullMBBDS
-		/*if (false){
+		if (BFBDSRUN){
 			bool threePhase = false;
-			myfile << "\t\t_MBBDS_\n";
-			double percentages[6] = {1, 0.9, 0.75, 0.5, 0.25, 0.1};
+			myfile << "\t\t_BFBDS_\n";
 			long stateSize = sizeof(original);
 			bool solved;
 			unsigned long nodesExpanded;
 			for(double percentage : percentages){
 				timer.StartTimer();
 				unsigned long statesQuantityBoundforMBBDS = std::max(statesQuantityBound*percentage,2.0);;
-				FullMBBDS<PancakePuzzleState<pancakes_num>, PancakePuzzleAction, PancakePuzzle<pancakes_num>, MbbdsBloomFilter<PancakePuzzleState<pancakes_num>, PancakeHasher<pancakes_num>>, pancakes_num, false> fullMbbds(statesQuantityBoundforMBBDS) ;
+				BFBDS<PancakePuzzleState<pancakes_num>, PancakePuzzleAction, PancakePuzzle<pancakes_num>, MbbdsBloomFilter<PancakePuzzleState<pancakes_num>, PancakeHasher<pancakes_num>>, false> bfbds(statesQuantityBoundforMBBDS) ;
 				bool threePhase = true;
-				solved = fullMbbds.solve(&pancake, start, goal, midState, fullMbbdsPath, secondsLimit, threePhase);
+				solved = bfbds.solve(&pancake, start, goal, midState, fullMbbdsPath, secondsLimit, threePhase);
 				if(solved){
-					myfile << boost::format("\t\t\tHARD-%d GAP-%d MBBDS(k=1, ThreePhase=%d) IDMM using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) found path length %1.0f; %llu expanded; %1.4fs elapsed;\n") % count % gap % int(fullMbbds.isThreePhase()) % statesQuantityBoundforMBBDS % stateSize % percentage % fullMbbds.getPathLength() % fullMbbds.GetNodesExpanded() % timer.GetElapsedTime();
+					myfile << boost::format("\t\t\tBFBDS(k=1, ThreePhase=%d) using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) found path length %1.0f; %llu expanded; %llu necessary; %d iterations; %1.4fs elapsed;\n") % int(bfbds.isThreePhase()) % statesQuantityBoundforMBBDS % stateSize % percentage % bfbds.getPathLength() % bfbds.getNodesExpanded() % bfbds.getNecessaryExpansions() % bfbds.getIterationsNum() % timer.GetElapsedTime();
 				}
 				else{
-					myfile << boost::format("\t\t\tHARD-%d GAP-%d MBBDS(k=1, ThreePhase=%d) using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) failed after %1.4fs\n") % count % gap % int(fullMbbds.isThreePhase()) % statesQuantityBoundforMBBDS % stateSize % percentage % timer.GetElapsedTime();
+					myfile << boost::format("\t\t\tHARD-%d GAP-%d BFBDS(k=1, ThreePhase=%d) using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) failed after %1.4fs\n") % count % gap % int(bfbds.isThreePhase()) % statesQuantityBoundforMBBDS % stateSize % percentage % timer.GetElapsedTime();
 					break;
 				} 
 			}
-		}*/
-		//double percentages[6] = {1, 0.9, 0.75, 0.5, 0.25, 0.1};
-		double percentages[3] = {0.5, 0.1, 0.01};
-		long stateSize = sizeof(original);
+		}
 		
 		/*if(MMpIDMM){
 			myfile << "\t\t_MM+IDMM_\n";

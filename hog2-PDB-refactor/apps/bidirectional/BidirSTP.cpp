@@ -21,7 +21,7 @@
 #include "IDAStar.h"
 #include "MM.h"
 #include "MBBDS.h"
-#include "FullMBBDS.h"
+#include "BFBDS.h"
 #include "IDMM.h"
 #include "MbbdsBloomFilter.h"
 #include <fstream>
@@ -41,41 +41,41 @@ static unsigned long statesQuantityBound;
 static unsigned long statesQuantityBoundDefault = 1000000;
 static int secondsLimit = 60*30;
 
-static bool AstarRun=false;
-static bool RevAstarRun=false;
+static bool AstarRun=true;
+static bool RevAstarRun=true;
 
-static bool IDAstarRun=false;
+static bool IDAstarRun=true;
 
 static bool IDTHSpTrans = true;
 
-static bool AstarPIDAstarRun=false;
+static bool AstarPIDAstarRun=true;
 
 static bool isSFBDS=true;
 
 
-static bool AstarPIDAstarReverseRun=false;
-static bool AstarPIDAstarReverseMinHRun=false;
+static bool AstarPIDAstarReverseRun=true;
+static bool AstarPIDAstarReverseMinHRun=true;
 
-static bool BAI=false;
-static bool Max_BAI=false;
+static bool BAI=true;
+static bool Max_BAI=true;
 
-static bool MMRun=false;
+static bool MMRun=true;
 
 static bool IDMMRun=true;
 static bool idmmF2fFlag=true;
 
-static bool ASTARpIDMM=false;
+static bool ASTARpIDMM=true;
 
 static bool MMpIDMM=false;
 
-static bool MBBDSRun=false;
+static bool MBBDSRun=true;
 static bool threePhase=true;
 static bool twoPhase=false;
 
 static bool isConsistent=true;
 static bool isUpdateByWorkload=true;
 
-static bool isDuplicateDetection=false;
+static bool isDuplicateDetection=true;
 
 static string datetime()
 {
@@ -102,12 +102,12 @@ void TestSTP(string file)
 	cout << "running..." << endl;
 	myfile.open (filename);
 	
-	StevenTest(100, false);
+	StevenTest(1, true);
 
 	myfile << "completed!" << endl;
 	myfile.close();
 	cout << "completed!" << endl;
-	exit(0);
+	//exit(0);
 }
 
 void StevenTest(int problems_num, bool randomSTP, vector<int> skipVector)

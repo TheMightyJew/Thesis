@@ -4,7 +4,7 @@ import sys
 import os
 
 analysis_dir = 'Analysis'
-res_dir = 'Grid'
+res_dir = 'PancakeSorting'
 path = analysis_dir + '/' + res_dir + '/'
 filename = ''
 try:
@@ -95,7 +95,7 @@ for filename in filenames:
                 AsolLength = float(splittedLine[splittedLine.index('length') + 1].replace(';', ''))
             if 'memory' in line:
                 if 'MBBDS' in resDict['Algorithm'] or '+' in resDict['Algorithm'] or 'BAI' in resDict[
-                    'Algorithm'] or 'IDTHSpTrans' in resDict['Algorithm']:
+                    'Algorithm'] or 'IDTHSpTrans' in resDict['Algorithm'] or 'BFBDS' in resDict['Algorithm']:
                     memoryStr = 'Memory_Percentage='
                     resDict['Memory'] = int(splittedLine[splittedLine.index('memory') + 2])
                     resDict['Algorithm'] += '(' + line[line.index(memoryStr) + len(memoryStr):][:4] + ')'

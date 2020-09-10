@@ -1074,7 +1074,7 @@ void AnalyzeProblem(Map *m, int whichProblem, Experiment e, double weight)
    bool ASTARpIDMM=true;
    bool MMpIDMM=false;
 
-   bool MBBDSRun=false;
+   bool MBBDSRun=true;
    bool threePhase=true;
    bool twoPhase=false;
 
@@ -1630,10 +1630,11 @@ void AnalyzeMap(const char *map, const char *scenario, double weight)
 	{
 		if (s.GetNthExperiment(x).GetDistance() <= 0)
 			continue;
-		if(true){
-			printf("Problem %d of %d\n", x+1, s.GetNumExperiments()); 
-			AnalyzeProblem(m, x, s.GetNthExperiment(x), weight);
-		}
+
+		printf("Problem %d of %d\n", x+1, s.GetNumExperiments()); 
+		AnalyzeProblem(m, x, s.GetNthExperiment(x), weight);
+		if(x>=10)
+			break;
     counter++;
 	}
   //myfile << "completed!" << std::endl;
