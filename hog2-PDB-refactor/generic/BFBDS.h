@@ -14,12 +14,12 @@
 #include "SearchEnvironment.h"
 #include <math.h>
 #include "MM.h"
-#include "IDMM.h"
+#include "IDBiHS.h"
 
 template <class state, class action, class environment, class BloomFilter, bool verbose = false>
 class BFBDS {
 public:
-	BFBDS(unsigned long statesQuantityBound, bool isUpdateByWorkload=true, bool isConsistent=false, bool revAlgo=false, bool F2Fheuristics=true) {
+	BFBDS(unsigned long statesQuantityBound, bool isUpdateByWorkload=true, bool isConsistent=true, bool revAlgo=false, bool F2Fheuristics=true) {
 		this->statesQuantityBound = statesQuantityBound;
 		this->isUpdateByWorkload = isUpdateByWorkload;
 		this->isConsistent = isConsistent;
@@ -27,15 +27,16 @@ public:
 		this->F2Fheuristics = F2Fheuristics;
 	}
 	virtual ~BFBDS() {}
-	bool solve(environment *env, state fromState, state toState, state &midState, std::vector<state> &thePath, int secondsLimit=600, bool threePhase=true);
+	bool GetMidState(environment *env, state fromState, state toState, state &midState, std::vector<state> &thePath, int secondsLimit=600, bool threePhase=true);
 	double getPathLength()	{ return pathLength; }
 	uint64_t getNodesExpanded() { return nodesExpanded; }
 	uint64_t getNecessaryExpansions() { return necessaryExpansions; }
-	uint64_t getIterationsNum() { return iteration_num; }
+	int getIterationsNum() { return iteration_num; }
 	void ResetNodeCount() { nodesExpanded = nodesTouched = 0; }
 	bool isThreePhase() { return threePhase; }
 private:
-	uint64_t nodesExpanded, nodesTouched, statesQuantityBound, necessaryExpansions, iteration_num;
+	uint64_t nodesExpanded, nodesTouched, statesQuantityBound, necessaryExpansions;
+	int iteration_num;
 	double pathLength;
 	unsigned long memoryBound;
 	bool threePhase;
@@ -69,7 +70,7 @@ private:
 };
 
 template <class state, class action, class environment, class BloomFilter, bool verbose>
-bool BFBDS<state, action, environment, BloomFilter, verbose>::solve(environment *env,
+bool BFBDS<state, action, environment, BloomFilter, verbose>::GetMidState(environment *env,
 	state fromState, state toState, state &midState, std::vector<state> &thePath, int secondsLimit, bool threePhase)
 {
 	bool solved = false;
@@ -82,6 +83,7 @@ bool BFBDS<state, action, environment, BloomFilter, verbose>::solve(environment 
 		MM<state, action, environment> mm;
 		solved = mm.GetPath(env, fromState, toState, env, env, thePath, secondsLimit, statesQuantityBound);
 		currentNodesExapanded += mm.GetNodesExpanded();
+		necessaryExpansions = mm.GetNecessaryExpansions();
 		lastBound = mm.getLastBound();
 	}
 	if(solved){
@@ -98,12 +100,13 @@ bool BFBDS<state, action, environment, BloomFilter, verbose>::solve(environment 
 			return true;
 		}
 		else{
-			IDMM<state, action, false> idmm(F2Fheuristics, isConsistent, isUpdateByWorkload);
-			solved = idmm.GetMidState(env, fromState, toState, midState, secondsLimit, lastBound);
-			currentNodesExapanded += idmm.GetNodesExpanded();
+			IDBiHS<state, action, false> idbihs(F2Fheuristics, isConsistent, isUpdateByWorkload);
+			solved = idbihs.GetMidState(env, fromState, toState, midState, secondsLimit, lastBound);
+			currentNodesExapanded += idbihs.GetNodesExpanded();
 			if(solved){
-				pathLength = idmm.getPathLength();
+				pathLength = idbihs.getPathLength();
 				nodesExpanded = currentNodesExapanded;
+				necessaryExpansions = idbihs.GetNecessaryExpansions();
 				return true;
 			}
 			else{

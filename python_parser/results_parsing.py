@@ -160,8 +160,8 @@ for filename in filenames:
 
     resultsDF = resultsDF[cols]
     resultsDF.to_csv(path + fileName + '_results.csv')
-    errorsDF.drop_duplicates(inplace=True)
     if len(errorsDF) > 0:
+        errorsDF.drop_duplicates(inplace=True)
         if res_dir == 'PancakeSorting':
             errorsDF.sort_values(['Number Of Pancakes', 'Gap', 'Problem ID', 'Algorithm', 'Memory'], ascending=True,
                                  inplace=True)

@@ -16,7 +16,7 @@
 #include "PancakeInstances.h"
 #include "MBBDS.h"
 #include "BFBDS.h"
-#include "IDMM.h"
+#include "IDBiHS.h"
 #include "IDTHSwTrans.h"
 #include "MbbdsBloomFilter.h"
 #include "PancakeHasher.h"
@@ -51,16 +51,16 @@ static bool Max_BAI=true;
 
 static bool MMRun=true;
 
-static bool IDMMRun=true;
-static bool idmmF2fFlag=true;
+static bool IDBiHSRun=true;
+static bool F2Fheuristics=true;
 
-static bool ASTARpIDMM=true;
-static bool MMpIDMM=false;
+static bool ASTARpIDBiHS=true;
+static bool MMpIDBiHS=false;
 
 static bool MBBDSRun=true;
 static bool BFBDSRUN=true;
 static bool fullMBBDS=true;
-static bool revAlgo=true;
+static bool revAlgo=false;
 
 static bool threePhase=true;
 static bool twoPhase=false;
@@ -68,6 +68,8 @@ static bool twoPhase=false;
 static bool detectDuplicate=true;
 static bool isConsistent=true;
 static bool isUpdateByWorkload=true;
+
+static bool printAbstractAlgos = false;
 
 
 string datetime()
@@ -166,8 +168,9 @@ void StevenTest(int gap, int problems_num, bool randomPancake, vector<int> skipV
 			if(solved){
 				myfile << boost::format("\t\t\tA* found path length %1.0f; %llu expanded; %llu necessary; using %1.0llu states in memory; %1.4fs elapsed\n") % pancake.GetPathLength(astarPath) %
 				   astar.GetNodesExpanded() % astar.GetNecessaryExpansions() % ASTARstatesQuantityBound % t1.GetElapsedTime();
-				myfile << boost::format("\t\t\tI-A* ; %llu expanded;\n") % astar.getIAstarExpansions();	
-        statesQuantityBound =  std::min(statesQuantityBound, ASTARstatesQuantityBound);
+				if(printAbstractAlgos)
+					myfile << boost::format("\t\t\tI-A* ; %llu expanded;\n") % astar.getIAstarExpansions();	
+				statesQuantityBound =  std::min(statesQuantityBound, ASTARstatesQuantityBound);
 			}
 			else{
 				myfile << boost::format("\t\t\tA* failed after %1.4fs\n") % t1.GetElapsedTime();
@@ -207,12 +210,14 @@ void StevenTest(int gap, int problems_num, bool randomPancake, vector<int> skipV
 			if(solved){
 				myfile << boost::format("\t\t\tMM found path length %1.0f; %llu expanded; %llu necessary; using %1.0llu states in memory; %1.4fs elapsed\n") % pancake.GetPathLength(mmPath) %
 					   mm.GetNodesExpanded() % mm.GetNecessaryExpansions() % MMstatesQuantityBound % t4.GetElapsedTime();
-				myfile << boost::format("\t\t\tI-MM ; %llu expanded;\n") % mm.getIMMExpansions();
+				if(printAbstractAlgos)
+					myfile << boost::format("\t\t\tI-MM ; %llu expanded;\n") % mm.getIMMExpansions();
         statesQuantityBound =  std::min(statesQuantityBound, MMstatesQuantityBound);				
 			}
 			else{
 				myfile << boost::format("\t\t\tMM failed after %1.4fs\n") % t4.GetElapsedTime();
-				myfile << "\t\t\tI-MM failed because MM failed\n";
+				if(printAbstractAlgos)
+					myfile << "\t\t\tI-MM failed because MM failed\n";
 			}
 		}
 		if(statesQuantityBound == ULONG_MAX){
@@ -231,11 +236,13 @@ void StevenTest(int gap, int problems_num, bool randomPancake, vector<int> skipV
 			if(solved){
 				myfile << boost::format("\t\t\tIDA* found path length %1.0f; %llu expanded; %llu generated; %llu necessary; %1.4fs elapsed\n") % pancake.GetPathLength(idaPath) %
 				   idastar.GetNodesExpanded() % idastar.GetNodesTouched() % idastar.GetNecessaryExpansions() % t3.GetElapsedTime();
-				myfile << boost::format("\t\t\tD-A* ; %llu expanded;\n") % idastar.getDAstarExpansions();
+				if(printAbstractAlgos)
+					myfile << boost::format("\t\t\tD-A* ; %llu expanded;\n") % idastar.getDAstarExpansions();
 			}
 			else{
 				myfile << boost::format("\t\t\tIDA* failed after %1.4fs\n") % t3.GetElapsedTime();
-				myfile << "\t\t\tD-A* failed because IDA* failed\n";
+				if(printAbstractAlgos)
+					myfile << "\t\t\tD-A* failed because IDA* failed\n";
 			}					   
 		}
     
@@ -253,9 +260,9 @@ void StevenTest(int gap, int problems_num, bool randomPancake, vector<int> skipV
 			for(double percentage : percentages){
 				timer.StartTimer();
 				unsigned long statesQuantityBoundforMBBDS = std::max(statesQuantityBound*percentage,2.0);;
-				BFBDS<PancakePuzzleState<pancakes_num>, PancakePuzzleAction, PancakePuzzle<pancakes_num>, MbbdsBloomFilter<PancakePuzzleState<pancakes_num>, PancakeHasher<pancakes_num>>, false> bfbds(statesQuantityBoundforMBBDS) ;
+				BFBDS<PancakePuzzleState<pancakes_num>, PancakePuzzleAction, PancakePuzzle<pancakes_num>, MbbdsBloomFilter<PancakePuzzleState<pancakes_num>, PancakeHasher<pancakes_num>>, false> bfbds(statesQuantityBoundforMBBDS, isUpdateByWorkload, isConsistent, revAlgo, F2Fheuristics) ;
 				bool threePhase = true;
-				solved = bfbds.solve(&pancake, start, goal, midState, fullMbbdsPath, secondsLimit, threePhase);
+				solved = bfbds.GetMidState(&pancake, start, goal, midState, fullMbbdsPath, secondsLimit, threePhase);
 				if(solved){
 					myfile << boost::format("\t\t\tBFBDS(k=1, ThreePhase=%d) using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) found path length %1.0f; %llu expanded; %llu necessary; %d iterations; %1.4fs elapsed;\n") % int(bfbds.isThreePhase()) % statesQuantityBoundforMBBDS % stateSize % percentage % bfbds.getPathLength() % bfbds.getNodesExpanded() % bfbds.getNecessaryExpansions() % bfbds.getIterationsNum() % timer.GetElapsedTime();
 				}
@@ -266,69 +273,69 @@ void StevenTest(int gap, int problems_num, bool randomPancake, vector<int> skipV
 			}
 		}
 		
-		/*if(MMpIDMM){
-			myfile << "\t\t_MM+IDMM_\n";
+		/*if(MMpIDBiHS){
+			myfile << "\t\t_MM+IDBiHS_\n";
 			for(double percentage : percentages){
-				unsigned long statesQuantityBoundforMMpIDMM = std::max(statesQuantityBound*percentage,2.0);;
+				unsigned long statesQuantityBoundforMMpIDBiHS = std::max(statesQuantityBound*percentage,2.0);;
 				MM<PancakePuzzleState<pancakes_num>, PancakePuzzleAction, PancakePuzzle<pancakes_num>> mm;
 				goal.Reset();
 				start = original;
 				t1.StartTimer();
-				bool solved = mm.GetPath(&pancake, start, goal, &pancake, &pancake2, mmPath, secondsLimit, statesQuantityBoundforMMpIDMM);
+				bool solved = mm.GetPath(&pancake, start, goal, &pancake, &pancake2, mmPath, secondsLimit, statesQuantityBoundforMMpIDBiHS);
 				unsigned long nodesExpanded = mm.GetNodesExpanded();
 				unsigned long necessaryNodesExpanded = 0;
 				if(solved){
 					t1.EndTimer();
 					necessaryNodesExpanded = mm.GetNecessaryExpansions();
-					myfile << boost::format("\t\t\tMM+IDMM MM using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) found path length %1.0f; %llu expanded; %llu necessary; %1.4fs elapsed\n") % statesQuantityBoundforMMpIDMM % stateSize % percentage % pancake.GetPathLength(mmPath) %
+					myfile << boost::format("\t\t\tMM+IDBiHS MM using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) found path length %1.0f; %llu expanded; %llu necessary; %1.4fs elapsed\n") % statesQuantityBoundforMMpIDBiHS % stateSize % percentage % pancake.GetPathLength(mmPath) %
 					   nodesExpanded % necessaryNodesExpanded  % t4.GetElapsedTime();
 				}
 				else{
-					IDMM<PancakePuzzleState<pancakes_num>, PancakePuzzleAction, false> idmm(idmmF2fFlag, isConsistent, isUpdateByWorkload);
+					IDBiHS<PancakePuzzleState<pancakes_num>, PancakePuzzleAction, false> idbihs(F2Fheuristics, isConsistent, isUpdateByWorkload);
 					PancakePuzzleState<pancakes_num> midState;
-					bool solved = idmm.GetMidStateFromLists(&pancake, start, goal, midState, secondsLimit-t1.GetElapsedTime(), mm.getLastBound(), mm.GetForwardItems(), mm.GetBackwardItems());
-					nodesExpanded += idmm.GetNodesExpanded();
-					necessaryNodesExpanded += idmm.GetNecessaryExpansions();
+					bool solved = idbihs.GetMidStateFromLists(&pancake, start, goal, midState, secondsLimit-t1.GetElapsedTime(), mm.getLastBound(), mm.GetForwardItems(), mm.GetBackwardItems());
+					nodesExpanded += idbihs.GetNodesExpanded();
+					necessaryNodesExpanded += idbihs.GetNecessaryExpansions();
 					t1.EndTimer();
 					if(solved){
-						myfile << boost::format("\t\t\tMM+IDMM IDMM using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) found path length %1.0f; %llu expanded; %llu necessary; %1.4fs elapsed\n") % statesQuantityBoundforMMpIDMM % stateSize % percentage % idmm.getPathLength() % nodesExpanded % necessaryNodesExpanded % t1.GetElapsedTime();
+						myfile << boost::format("\t\t\tMM+IDBiHS IDBiHS using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) found path length %1.0f; %llu expanded; %llu necessary; %1.4fs elapsed\n") % statesQuantityBoundforMMpIDBiHS % stateSize % percentage % idbihs.getPathLength() % nodesExpanded % necessaryNodesExpanded % t1.GetElapsedTime();
 					}
 					else{
-						myfile << boost::format("\t\t\tMM+IDMM IDMM using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) failed after %1.4fs\n") % statesQuantityBoundforMMpIDMM % stateSize % percentage % t1.GetElapsedTime();
+						myfile << boost::format("\t\t\tMM+IDBiHS IDBiHS using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) failed after %1.4fs\n") % statesQuantityBoundforMMpIDBiHS % stateSize % percentage % t1.GetElapsedTime();
 						break;
 					}	
 				}
 			}
 		}*/
-		if(ASTARpIDMM){
-			myfile << "\t\t_A*+IDMM_\n";
+		if(ASTARpIDBiHS){
+			myfile << "\t\t_A*+IDBiHS_\n";
 			for(double percentage : percentages){
-				unsigned long statesQuantityBoundforASPIDMM = std::max(statesQuantityBound*percentage,2.0);;
+				unsigned long statesQuantityBoundforASPIDBiHS = std::max(statesQuantityBound*percentage,2.0);;
 				TemplateAStar<PancakePuzzleState<pancakes_num>, PancakePuzzleAction, PancakePuzzle<pancakes_num>> astar;
 				goal.Reset();
 				start = original;
 				t1.StartTimer();
-				bool solved = astar.GetPathTime(&pancake, start, goal, astarPath, secondsLimit, true, statesQuantityBoundforASPIDMM);
+				bool solved = astar.GetPathTime(&pancake, start, goal, astarPath, secondsLimit, true, statesQuantityBoundforASPIDBiHS);
 				unsigned long nodesExpanded = astar.GetNodesExpanded();
 				unsigned long necessaryNodesExpanded = 0;
 				if(solved){
 					t1.EndTimer();
 					necessaryNodesExpanded = astar.GetNecessaryExpansions();
-					myfile << boost::format("\t\t\tA*+IDMM A* using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) found path length %1.0f; %llu expanded; %llu necessary; %1.4fs elapsed\n") % statesQuantityBoundforASPIDMM % stateSize % percentage % pancake.GetPathLength(mmPath) %
+					myfile << boost::format("\t\t\tA*+IDBiHS A* using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) found path length %1.0f; %llu expanded; %llu necessary; %1.4fs elapsed\n") % statesQuantityBoundforASPIDBiHS % stateSize % percentage % pancake.GetPathLength(mmPath) %
 					   nodesExpanded % necessaryNodesExpanded  % t1.GetElapsedTime();
 				}
 				else{
-					IDMM<PancakePuzzleState<pancakes_num>, PancakePuzzleAction, false> idmm(idmmF2fFlag, isConsistent, isUpdateByWorkload);
+					IDBiHS<PancakePuzzleState<pancakes_num>, PancakePuzzleAction, false> idbihs(F2Fheuristics, isConsistent, isUpdateByWorkload);
 					PancakePuzzleState<pancakes_num> midState;
-					bool solved = idmm.GetMidStateFromForwardList(&pancake, start, goal, midState, secondsLimit-t1.GetElapsedTime(), astar.getStatesList(), detectDuplicate);
-					nodesExpanded += idmm.GetNodesExpanded();
-					necessaryNodesExpanded += idmm.GetNecessaryExpansions();
+					bool solved = idbihs.GetMidStateFromForwardList(&pancake, start, goal, midState, secondsLimit-t1.GetElapsedTime(), astar.getStatesList(), detectDuplicate);
+					nodesExpanded += idbihs.GetNodesExpanded();
+					necessaryNodesExpanded += idbihs.GetNecessaryExpansions();
 					t1.EndTimer();
 					if(solved){
-					  myfile << boost::format("\t\t\tA*+IDMM IDMM using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) found path length %1.0f; %llu expanded; %llu necessary; %1.4fs elapsed\n") % statesQuantityBoundforASPIDMM % stateSize % percentage % idmm.getPathLength() % nodesExpanded % necessaryNodesExpanded % t1.GetElapsedTime();
+					  myfile << boost::format("\t\t\tA*+IDBiHS IDBiHS using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) found path length %1.0f; %llu expanded; %llu necessary; %1.4fs elapsed\n") % statesQuantityBoundforASPIDBiHS % stateSize % percentage % idbihs.getPathLength() % nodesExpanded % necessaryNodesExpanded % t1.GetElapsedTime();
 					}
 					else{
-					  myfile << boost::format("\t\t\tA*+IDMM IDMM using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) failed after %1.4fs\n") % statesQuantityBoundforASPIDMM % stateSize % percentage % t1.GetElapsedTime();
+					  myfile << boost::format("\t\t\tA*+IDBiHS IDBiHS using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) failed after %1.4fs\n") % statesQuantityBoundforASPIDBiHS % stateSize % percentage % t1.GetElapsedTime();
 					  break;
 					}	
 				}
@@ -338,24 +345,24 @@ void StevenTest(int gap, int problems_num, bool randomPancake, vector<int> skipV
       {
         myfile << "\t\t_IDTHSpTrans_\n";
         for(double percentage : percentages){
-          unsigned long statesQuantityBoundforASPIDMM = std::max(statesQuantityBound*percentage,2.0);;
+          unsigned long statesQuantityBoundforASPIDBiHS = std::max(statesQuantityBound*percentage,2.0);;
           goal.Reset();
           start = original;
           t1.StartTimer();
           unsigned long nodesExpanded = 0;
           unsigned long necessaryNodesExpanded = 0;
 
-          IDTHSwTrans<PancakePuzzleState<pancakes_num>, PancakePuzzleAction, false> idmm(idmmF2fFlag, isConsistent, isUpdateByWorkload, 1 , true);
+          IDTHSwTrans<PancakePuzzleState<pancakes_num>, PancakePuzzleAction, false> idbihs(F2Fheuristics, isConsistent, isUpdateByWorkload, 1 , true);
           PancakePuzzleState<pancakes_num> midState;
-          bool solved = idmm.GetPath(&pancake, start, goal, /*astarPath, */secondsLimit, statesQuantityBoundforASPIDMM);
-          nodesExpanded += idmm.GetNodesExpanded();
-          necessaryNodesExpanded += idmm.GetNecessaryExpansions();
+          bool solved = idbihs.GetPath(&pancake, start, goal, /*astarPath, */secondsLimit, statesQuantityBoundforASPIDBiHS);
+          nodesExpanded += idbihs.GetNodesExpanded();
+          necessaryNodesExpanded += idbihs.GetNecessaryExpansions();
           t1.EndTimer();
           if(solved){
-            myfile << boost::format("\t\t\tIDTHSpTrans IDMM using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) found path length %1.0f; %llu expanded; %llu necessary; %1.4fs elapsed\n") % statesQuantityBoundforASPIDMM % stateSize % percentage % idmm.getPathLength() % nodesExpanded % necessaryNodesExpanded % t1.GetElapsedTime();
+            myfile << boost::format("\t\t\tIDTHSpTrans IDBiHS using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) found path length %1.0f; %llu expanded; %llu necessary; %1.4fs elapsed\n") % statesQuantityBoundforASPIDBiHS % stateSize % percentage % idbihs.getPathLength() % nodesExpanded % necessaryNodesExpanded % t1.GetElapsedTime();
           }
           else{
-            myfile << boost::format("\t\t\tIDTHSpTrans IDMM using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) failed after %1.4fs\n") % statesQuantityBoundforASPIDMM % stateSize % percentage % t1.GetElapsedTime();
+            myfile << boost::format("\t\t\tIDTHSpTrans IDBiHS using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) failed after %1.4fs\n") % statesQuantityBoundforASPIDBiHS % stateSize % percentage % t1.GetElapsedTime();
             break;
           }	
           
@@ -364,24 +371,24 @@ void StevenTest(int gap, int problems_num, bool randomPancake, vector<int> skipV
             {
         myfile << "\t\t_IDTHSpTrans_NDD_\n";
         for(double percentage : percentages){
-          unsigned long statesQuantityBoundforASPIDMM = std::max(statesQuantityBound*percentage,2.0);;
+          unsigned long statesQuantityBoundforASPIDBiHS = std::max(statesQuantityBound*percentage,2.0);;
           goal.Reset();
           start = original;
           t1.StartTimer();
           unsigned long nodesExpanded = 0;
           unsigned long necessaryNodesExpanded = 0;
 
-          IDTHSwTrans<PancakePuzzleState<pancakes_num>, PancakePuzzleAction, false> idmm(idmmF2fFlag, isConsistent, isUpdateByWorkload, 1 , false);
+          IDTHSwTrans<PancakePuzzleState<pancakes_num>, PancakePuzzleAction, false> idbihs(F2Fheuristics, isConsistent, isUpdateByWorkload, 1 , false);
           PancakePuzzleState<pancakes_num> midState;
-          bool solved = idmm.GetPath(&pancake, start, goal, /*astarPath, */secondsLimit, statesQuantityBoundforASPIDMM);
-          nodesExpanded += idmm.GetNodesExpanded();
-          necessaryNodesExpanded += idmm.GetNecessaryExpansions();
+          bool solved = idbihs.GetPath(&pancake, start, goal, /*astarPath, */secondsLimit, statesQuantityBoundforASPIDBiHS);
+          nodesExpanded += idbihs.GetNodesExpanded();
+          necessaryNodesExpanded += idbihs.GetNecessaryExpansions();
           t1.EndTimer();
           if(solved){
-            myfile << boost::format("\t\t\tIDTHSpTrans_NDD IDMM using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) found path length %1.0f; %llu expanded; %llu necessary; %1.4fs elapsed\n") % statesQuantityBoundforASPIDMM % stateSize % percentage % idmm.getPathLength() % nodesExpanded % necessaryNodesExpanded % t1.GetElapsedTime();
+            myfile << boost::format("\t\t\tIDTHSpTrans_NDD IDBiHS using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) found path length %1.0f; %llu expanded; %llu necessary; %1.4fs elapsed\n") % statesQuantityBoundforASPIDBiHS % stateSize % percentage % idbihs.getPathLength() % nodesExpanded % necessaryNodesExpanded % t1.GetElapsedTime();
           }
           else{
-            myfile << boost::format("\t\t\tIDTHSpTrans_NDD IDMM using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) failed after %1.4fs\n") % statesQuantityBoundforASPIDMM % stateSize % percentage % t1.GetElapsedTime();
+            myfile << boost::format("\t\t\tIDTHSpTrans_NDD IDBiHS using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) failed after %1.4fs\n") % statesQuantityBoundforASPIDBiHS % stateSize % percentage % t1.GetElapsedTime();
             break;
           }	
           
@@ -588,8 +595,7 @@ void StevenTest(int gap, int problems_num, bool randomPancake, vector<int> skipV
 							   nodesExpanded % mm.GetNecessaryExpansions() % 0 % timer.GetElapsedTime();
 						}
 						else{
-							/*MBBDS<PancakePuzzleState<pancakes_num>, PancakePuzzleAction, MbbdsBloomFilter<PancakePuzzleState<pancakes_num>, PancakeHasher<pancakes_num>>, false> mbbds(statesQuantityBoundforMBBDS, isUpdateByWorkload, isConsistent, revAlgo) ;*/
-							MBBDS<PancakePuzzleState<pancakes_num>, PancakePuzzleAction, MbbdsBloomFilter<PancakePuzzleState<pancakes_num>, PancakeHasher<pancakes_num>>, false> mbbds(statesQuantityBoundforMBBDS, isUpdateByWorkload, false, false) ;
+							MBBDS<PancakePuzzleState<pancakes_num>, PancakePuzzleAction, MbbdsBloomFilter<PancakePuzzleState<pancakes_num>, PancakeHasher<pancakes_num>>, false> mbbds(statesQuantityBoundforMBBDS, isUpdateByWorkload, isConsistent, revAlgo) ;
 							goal.Reset();
 							start = original;
 							solved = mbbds.GetMidState(&pancake, start, goal, midState, secondsLimit - timer.GetElapsedTime(), int(lastBound));
@@ -600,17 +606,17 @@ void StevenTest(int gap, int problems_num, bool randomPancake, vector<int> skipV
 								myfile << boost::format("\t\t\tMBBDS(k=1,ThreePhase=%d) MBBDS using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) found path length %1.0f; %llu expanded; %llu necessary; %d iterations; %1.4fs elapsed;\n") % int(doThree) % statesQuantityBoundforMBBDS % stateSize % percentage % mbbds.getPathLength() % nodesExpanded % mbbds.GetNecessaryExpansions() % mbbds.getIterationNum() % timer.GetElapsedTime();
 							}
 							else{
-								IDMM<PancakePuzzleState<pancakes_num>, PancakePuzzleAction, false> idmm(idmmF2fFlag, isConsistent, isUpdateByWorkload);
+								IDBiHS<PancakePuzzleState<pancakes_num>, PancakePuzzleAction, false> idbihs(F2Fheuristics, isConsistent, isUpdateByWorkload);
 								goal.Reset();
 								start = original;
-								solved = idmm.GetMidState(&pancake, start, goal, midState, secondsLimit-timer.GetElapsedTime(), int(lastBound));
-								nodesExpanded += idmm.GetNodesExpanded();
+								solved = idbihs.GetMidState(&pancake, start, goal, midState, secondsLimit-timer.GetElapsedTime(), int(lastBound));
+								nodesExpanded += idbihs.GetNodesExpanded();
 								timer.EndTimer();
 								if(solved){
-									myfile << boost::format("\t\t\tMBBDS(k=1,ThreePhase=%d) IDMM using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) found path length %1.0f; %llu expanded; %llu necessary; %d iterations; %1.4fs elapsed;\n") % int(doThree) % statesQuantityBoundforMBBDS % stateSize % percentage % idmm.getPathLength() % nodesExpanded % mbbds.GetNecessaryExpansions() % mbbds.getIterationNum() % timer.GetElapsedTime();
+									myfile << boost::format("\t\t\tMBBDS(k=1,ThreePhase=%d) IDBiHS using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) found path length %1.0f; %llu expanded; %llu necessary; %d iterations; %1.4fs elapsed;\n") % int(doThree) % statesQuantityBoundforMBBDS % stateSize % percentage % idbihs.getPathLength() % nodesExpanded % mbbds.GetNecessaryExpansions() % mbbds.getIterationNum() % timer.GetElapsedTime();
 								}
 								else{
-									myfile << boost::format("\t\t\tMBBDS(k=1,ThreePhase=%d) IDMM using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) failed after %1.4fs and %d iterations\n") % int(doThree) % statesQuantityBoundforMBBDS % stateSize % percentage % timer.GetElapsedTime() % mbbds.getIterationNum();
+									myfile << boost::format("\t\t\tMBBDS(k=1,ThreePhase=%d) IDBiHS using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) failed after %1.4fs and %d iterations\n") % int(doThree) % statesQuantityBoundforMBBDS % stateSize % percentage % timer.GetElapsedTime() % mbbds.getIterationNum();
 									break;
 								} 
 							}
@@ -620,25 +626,27 @@ void StevenTest(int gap, int problems_num, bool randomPancake, vector<int> skipV
 				doThree = false;
 			}
 		}
-		//IDMM
-		if(IDMMRun){
-			myfile << "\t\t_IDMM_\n";
-			IDMM<PancakePuzzleState<pancakes_num>, PancakePuzzleAction, false> idmm(idmmF2fFlag, isConsistent, isUpdateByWorkload);
+		//IDBiHS
+		if(IDBiHSRun){
+			myfile << "\t\t_IDBiHS_\n";
+			IDBiHS<PancakePuzzleState<pancakes_num>, PancakePuzzleAction, false> idbihs(F2Fheuristics, isConsistent, isUpdateByWorkload);
 			goal.Reset();
 			start = original;
 			PancakePuzzleState<pancakes_num> midState;
 			t8.StartTimer();
-			bool solved = idmm.GetMidState(&pancake, start, goal, midState, secondsLimit);
+			bool solved = idbihs.GetMidState(&pancake, start, goal, midState, secondsLimit);
 			t8.EndTimer();
 			if(solved){
-				myfile << boost::format("\t\t\tIDMM found path length %1.0f; %llu expanded; %llu generated; %llu necessary; %1.4fs elapsed; ") % idmm.getPathLength() %
-				   idmm.GetNodesExpanded() % idmm.GetNodesTouched() % idmm.GetNecessaryExpansions() % t8.GetElapsedTime();
+				myfile << boost::format("\t\t\tIDBiHS found path length %1.0f; %llu expanded; %llu generated; %llu necessary; %1.4fs elapsed; ") % idbihs.getPathLength() %
+				   idbihs.GetNodesExpanded() % idbihs.GetNodesTouched() % idbihs.GetNecessaryExpansions() % t8.GetElapsedTime();
 				myfile << "Mid state: " << midState << endl;
-				myfile << boost::format("\t\t\tD-MM ; %llu expanded;\n") % idmm.getDMMExpansions();
+				if(printAbstractAlgos)
+					myfile << boost::format("\t\t\tD-MM ; %llu expanded;\n") % idbihs.getDMMExpansions();
 			}
 			else{
-				myfile << boost::format("\t\t\tIDMM failed after %1.4fs\n") % t8.GetElapsedTime();
-				myfile << "\t\t\tD-MM failed because IDMM failed\n";
+				myfile << boost::format("\t\t\tIDBiHS failed after %1.4fs\n") % t8.GetElapsedTime();
+				if(printAbstractAlgos)
+					myfile << "\t\t\tD-MM failed because IDBiHS failed\n";
 			}   				
 		}
 	}

@@ -32,7 +32,7 @@
 #include "IDAStar.h"
 #include "MM.h"
 #include "MBBDS.h"
-#include "IDMM.h"
+#include "IDBiHS.h"
 #include "MbbdsBloomFilter.h"
 #include <fstream>
 #include <iostream>
@@ -1068,11 +1068,11 @@ void AnalyzeProblem(Map *m, int whichProblem, Experiment e, double weight)
 
    bool MMRun=true;
 
-   bool IDMMRun=true;
-   bool idmmF2fFlag=true;
+   bool IDBiHSRun=true;
+   bool idbihsF2fFlag=true;
 
-   bool ASTARpIDMM=true;
-   bool MMpIDMM=false;
+   bool ASTARpIDBiHS=true;
+   bool MMpIDBiHS=false;
 
    bool MBBDSRun=true;
    bool threePhase=true;
@@ -1178,33 +1178,33 @@ void AnalyzeProblem(Map *m, int whichProblem, Experiment e, double weight)
 		long stateSize = sizeof(cstart);
 		
 
-		if(ASTARpIDMM){
-			cout << "\t\t_A*+IDMM_\n";
+		if(ASTARpIDBiHS){
+			cout << "\t\t_A*+IDBiHS_\n";
 			for(double percentage : percentages){
-				unsigned long statesQuantityBoundforASPIDMM = std::max(statesQuantityBound*percentage,2.0);;
+				unsigned long statesQuantityBoundforASPIDBiHS = std::max(statesQuantityBound*percentage,2.0);;
 				TemplateAStar<CanonicalGrid::xyLoc, CanonicalGrid::tDirection, CanonicalGrid::CanonicalGrid> astar;
 						t1.StartTimer();
-				bool solved = astar.GetPathTime(cg, cstart, cgoal, cpath, secondsLimit, true, statesQuantityBoundforASPIDMM);
+				bool solved = astar.GetPathTime(cg, cstart, cgoal, cpath, secondsLimit, true, statesQuantityBoundforASPIDBiHS);
 				unsigned long nodesExpanded = astar.GetNodesExpanded();
 				unsigned long necessaryNodesExpanded = 0;
 				if(solved){
 					t1.EndTimer();
 					necessaryNodesExpanded = astar.GetNecessaryExpansions();
-					cout << boost::format("\t\t\tA*+IDMM A* using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) found path length %1.1f; %llu expanded; %llu necessary; %1.4fs elapsed\n") % statesQuantityBoundforASPIDMM % stateSize % percentage % cg->GetPathLength(cpath) %
+					cout << boost::format("\t\t\tA*+IDBiHS A* using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) found path length %1.1f; %llu expanded; %llu necessary; %1.4fs elapsed\n") % statesQuantityBoundforASPIDBiHS % stateSize % percentage % cg->GetPathLength(cpath) %
 					   nodesExpanded % necessaryNodesExpanded  % t1.GetElapsedTime();
 				}
 				else{
-					IDMM<CanonicalGrid::xyLoc, CanonicalGrid::tDirection, false> idmm(idmmF2fFlag, isConsistent, isUpdateByWorkload);
+					IDBiHS<CanonicalGrid::xyLoc, CanonicalGrid::tDirection, false> idbihs(idbihsF2fFlag, isConsistent, isUpdateByWorkload);
 					CanonicalGrid::xyLoc midState;
-					bool solved = idmm.GetMidStateFromForwardList(cg, cstart, cgoal, midState, secondsLimit-t1.GetElapsedTime(), astar.getStatesList());
-					nodesExpanded += idmm.GetNodesExpanded();
-					necessaryNodesExpanded += idmm.GetNecessaryExpansions();
+					bool solved = idbihs.GetMidStateFromForwardList(cg, cstart, cgoal, midState, secondsLimit-t1.GetElapsedTime(), astar.getStatesList());
+					nodesExpanded += idbihs.GetNodesExpanded();
+					necessaryNodesExpanded += idbihs.GetNecessaryExpansions();
 					t1.EndTimer();
 					if(solved){
-					  cout << boost::format("\t\t\tA*+IDMM IDMM using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) found path length %1.1f; %llu expanded; %llu necessary; %1.4fs elapsed\n") % statesQuantityBoundforASPIDMM % stateSize % percentage % idmm.getPathLength() % nodesExpanded % necessaryNodesExpanded % t1.GetElapsedTime();
+					  cout << boost::format("\t\t\tA*+IDBiHS IDBiHS using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) found path length %1.1f; %llu expanded; %llu necessary; %1.4fs elapsed\n") % statesQuantityBoundforASPIDBiHS % stateSize % percentage % idbihs.getPathLength() % nodesExpanded % necessaryNodesExpanded % t1.GetElapsedTime();
 					}
 					else{
-					  cout << boost::format("\t\t\tA*+IDMM IDMM using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) failed after %1.4fs\n") % statesQuantityBoundforASPIDMM % stateSize % percentage % t1.GetElapsedTime();
+					  cout << boost::format("\t\t\tA*+IDBiHS IDBiHS using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) failed after %1.4fs\n") % statesQuantityBoundforASPIDBiHS % stateSize % percentage % t1.GetElapsedTime();
 					  break;
 					}	
 				}
@@ -1391,22 +1391,22 @@ void AnalyzeProblem(Map *m, int whichProblem, Experiment e, double weight)
       
         cout << "\t\t_IDTHSpTrans_\n";
         for(double percentage : percentages){
-          unsigned long statesQuantityBoundforASPIDMM = std::max(statesQuantityBound*percentage,2.0);;
+          unsigned long statesQuantityBoundforASPIDBiHS = std::max(statesQuantityBound*percentage,2.0);;
           t1.StartTimer();
           unsigned long nodesExpanded = 0;
           unsigned long necessaryNodesExpanded = 0;
 
-          IDTHSwTrans<CanonicalGrid::xyLoc, CanonicalGrid::tDirection, false> idmm(idmmF2fFlag, isConsistent, isUpdateByWorkload, 1 , true);
+          IDTHSwTrans<CanonicalGrid::xyLoc, CanonicalGrid::tDirection, false> idbihs(idbihsF2fFlag, isConsistent, isUpdateByWorkload, 1 , true);
           CanonicalGrid::xyLoc midState;
-          bool solved = idmm.GetPath(cg, cstart, cgoal, /*astarPath, */secondsLimit, statesQuantityBoundforASPIDMM);
-          nodesExpanded += idmm.GetNodesExpanded();
-          necessaryNodesExpanded += idmm.GetNecessaryExpansions();
+          bool solved = idbihs.GetPath(cg, cstart, cgoal, /*astarPath, */secondsLimit, statesQuantityBoundforASPIDBiHS);
+          nodesExpanded += idbihs.GetNodesExpanded();
+          necessaryNodesExpanded += idbihs.GetNecessaryExpansions();
           t1.EndTimer();
           if(solved){
-            cout << boost::format("\t\t\tIDTHSpTrans IDMM using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) found path length %1.1f; %llu expanded; %llu necessary; %1.4fs elapsed\n") % statesQuantityBoundforASPIDMM % stateSize % percentage % idmm.getPathLength() % nodesExpanded % necessaryNodesExpanded % t1.GetElapsedTime();
+            cout << boost::format("\t\t\tIDTHSpTrans IDBiHS using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) found path length %1.1f; %llu expanded; %llu necessary; %1.4fs elapsed\n") % statesQuantityBoundforASPIDBiHS % stateSize % percentage % idbihs.getPathLength() % nodesExpanded % necessaryNodesExpanded % t1.GetElapsedTime();
           }
           else{
-            cout << boost::format("\t\t\tIDTHSpTrans IDMM using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) failed after %1.4fs\n") % statesQuantityBoundforASPIDMM % stateSize % percentage % t1.GetElapsedTime();
+            cout << boost::format("\t\t\tIDTHSpTrans IDBiHS using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) failed after %1.4fs\n") % statesQuantityBoundforASPIDBiHS % stateSize % percentage % t1.GetElapsedTime();
             break;
           }	
           
@@ -1449,15 +1449,15 @@ void AnalyzeProblem(Map *m, int whichProblem, Experiment e, double weight)
 								cout << boost::format("\t\t\tMBBDS(k=1,ThreePhase=%d) MBBDS using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) found path length %1.1f; %llu expanded; %llu necessary; %d iterations; %1.4fs elapsed;\n") % int(doThree) % statesQuantityBoundforMBBDS % stateSize % percentage % mbbds.getPathLength() % nodesExpanded % mbbds.GetNecessaryExpansions() % mbbds.getIterationNum() % timer.GetElapsedTime();
 							}
 							else{
-								IDMM<CanonicalGrid::xyLoc, CanonicalGrid::tDirection, false> idmm(idmmF2fFlag, isConsistent, isUpdateByWorkload);
-																		solved = idmm.GetMidState(cg, cstart, cgoal, midState, secondsLimit-timer.GetElapsedTime(), int(lastBound));
-								nodesExpanded += idmm.GetNodesExpanded();
+								IDBiHS<CanonicalGrid::xyLoc, CanonicalGrid::tDirection, false> idbihs(idbihsF2fFlag, isConsistent, isUpdateByWorkload);
+																		solved = idbihs.GetMidState(cg, cstart, cgoal, midState, secondsLimit-timer.GetElapsedTime(), int(lastBound));
+								nodesExpanded += idbihs.GetNodesExpanded();
 								timer.EndTimer();
 								if(solved){
-									cout << boost::format("\t\t\tMBBDS(k=1,ThreePhase=%d) IDMM using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) found path length %1.1f; %llu expanded; %llu necessary; %d iterations; %1.4fs elapsed;\n") % int(doThree) % statesQuantityBoundforMBBDS % stateSize % percentage % idmm.getPathLength() % nodesExpanded % mbbds.GetNecessaryExpansions() % mbbds.getIterationNum() % timer.GetElapsedTime();
+									cout << boost::format("\t\t\tMBBDS(k=1,ThreePhase=%d) IDBiHS using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) found path length %1.1f; %llu expanded; %llu necessary; %d iterations; %1.4fs elapsed;\n") % int(doThree) % statesQuantityBoundforMBBDS % stateSize % percentage % idbihs.getPathLength() % nodesExpanded % mbbds.GetNecessaryExpansions() % mbbds.getIterationNum() % timer.GetElapsedTime();
 								}
 								else{
-									cout << boost::format("\t\t\tMBBDS(k=1,ThreePhase=%d) IDMM using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) failed after %1.4fs and %d iterations\n") % int(doThree) % statesQuantityBoundforMBBDS % stateSize % percentage % timer.GetElapsedTime() % mbbds.getIterationNum();
+									cout << boost::format("\t\t\tMBBDS(k=1,ThreePhase=%d) IDBiHS using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) failed after %1.4fs and %d iterations\n") % int(doThree) % statesQuantityBoundforMBBDS % stateSize % percentage % timer.GetElapsedTime() % mbbds.getIterationNum();
 									break;
 								} 
 							}
@@ -1468,41 +1468,41 @@ void AnalyzeProblem(Map *m, int whichProblem, Experiment e, double weight)
 			}
 		}
     */
-		//IDMM
-		if(IDMMRun){
-			cout << "\t\t_IDMM-0.5_\n";
-			IDMM<CanonicalGrid::xyLoc, CanonicalGrid::tDirection, false> idmm(idmmF2fFlag, isConsistent, false);
+		//IDBiHS
+		if(IDBiHSRun){
+			cout << "\t\t_IDBiHS-0.5_\n";
+			IDBiHS<CanonicalGrid::xyLoc, CanonicalGrid::tDirection, false> idbihs(idbihsF2fFlag, isConsistent, false);
 			CanonicalGrid::xyLoc midState;
 			t8.StartTimer();
-			bool solved = idmm.GetMidState(cg, cstart, cgoal, midState, secondsLimit);
+			bool solved = idbihs.GetMidState(cg, cstart, cgoal, midState, secondsLimit);
 			t8.EndTimer();
 			if(solved){
-				cout << boost::format("\t\t\tIDMM-0.5 found path length %1.1f; %llu expanded; %llu generated; %llu necessary; %1.4fs elapsed; ") % idmm.getPathLength() %
-				   idmm.GetNodesExpanded() % idmm.GetNodesTouched() % idmm.GetNecessaryExpansions() % t8.GetElapsedTime();
+				cout << boost::format("\t\t\tIDBiHS-0.5 found path length %1.1f; %llu expanded; %llu generated; %llu necessary; %1.4fs elapsed; ") % idbihs.getPathLength() %
+				   idbihs.GetNodesExpanded() % idbihs.GetNodesTouched() % idbihs.GetNecessaryExpansions() % t8.GetElapsedTime();
 				cout << "Mid state: " << midState << std::endl;
-				cout << boost::format("\t\t\tD-MM ; %llu expanded;\n") % idmm.getDMMExpansions();
+				cout << boost::format("\t\t\tD-MM ; %llu expanded;\n") % idbihs.getDMMExpansions();
 			}
 			else{
-				cout << boost::format("\t\t\tIDMM-0.5 failed after %1.4fs\n") % t8.GetElapsedTime();
-				cout << "\t\t\tD-MM failed because IDMM failed\n";
+				cout << boost::format("\t\t\tIDBiHS-0.5 failed after %1.4fs\n") % t8.GetElapsedTime();
+				cout << "\t\t\tD-MM failed because IDBiHS failed\n";
 			}   				
 		}
-    if(IDMMRun){
+    if(IDBiHSRun){
 			cout << "\t\t_IDTHS-BW_\n";
-			IDMM<CanonicalGrid::xyLoc, CanonicalGrid::tDirection, false> idmm(idmmF2fFlag, isConsistent, true);
+			IDBiHS<CanonicalGrid::xyLoc, CanonicalGrid::tDirection, false> idbihs(idbihsF2fFlag, isConsistent, true);
 			CanonicalGrid::xyLoc midState;
 			t8.StartTimer();
-			bool solved = idmm.GetMidState(cg, cstart, cgoal, midState, secondsLimit);
+			bool solved = idbihs.GetMidState(cg, cstart, cgoal, midState, secondsLimit);
 			t8.EndTimer();
 			if(solved){
-				cout << boost::format("\t\t\tIDTHS-BW found path length %1.1f; %llu expanded; %llu generated; %llu necessary; %1.4fs elapsed; ") % idmm.getPathLength() %
-				   idmm.GetNodesExpanded() % idmm.GetNodesTouched() % idmm.GetNecessaryExpansions() % t8.GetElapsedTime();
+				cout << boost::format("\t\t\tIDTHS-BW found path length %1.1f; %llu expanded; %llu generated; %llu necessary; %1.4fs elapsed; ") % idbihs.getPathLength() %
+				   idbihs.GetNodesExpanded() % idbihs.GetNodesTouched() % idbihs.GetNecessaryExpansions() % t8.GetElapsedTime();
 				cout << "Mid state: " << midState << std::endl;
-				cout << boost::format("\t\t\tD-MM ; %llu expanded;\n") % idmm.getDMMExpansions();
+				cout << boost::format("\t\t\tD-MM ; %llu expanded;\n") % idbihs.getDMMExpansions();
 			}
 			else{
 				cout << boost::format("\t\t\tIDTHS-BW failed after %1.4fs\n") % t8.GetElapsedTime();
-				cout << "\t\t\tD-MM failed because IDMM failed\n";
+				cout << "\t\t\tD-MM failed because IDBiHS failed\n";
 			}   				
 		}
 
