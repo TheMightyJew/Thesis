@@ -41,6 +41,7 @@
 #include "ParallelIDAStar.h"
 #include "BidirSTP.h"
 #include "BidirPancake.h"
+#include "BidirTests.h"
 #include "BidirTOH.h"
 #include "BidirTS.h"
 #include "BidirRubik.h"
@@ -114,6 +115,7 @@ int main(int argc, char* argv[])
 	InstallCommandLineHandler(MyCLHandler, "-rubik", "-rubik <alg>", "A*/BS*/MM/NBS/MM0 test on rubik's cube");
 	InstallCommandLineHandler(MyCLHandler, "-pancake", "-pancake", "NBS test on pancake");
 	InstallCommandLineHandler(MyCLHandler, "-steven", "-steven", "Steven test everything");
+	InstallCommandLineHandler(MyCLHandler, "-aaai", "-aaai", "All tests for AAAI");
 	InstallCommandLineHandler(MyCLHandler, "-ts", "-ts", "NBS test on TopSpin");
 	InstallCommandLineHandler(MyCLHandler, "-toh", "-toh", "NBS test on TOH");
 	InstallCommandLineHandler(MyCLHandler, "-animate", "-animate", "Build animation");
@@ -335,6 +337,14 @@ int MyCLHandler(char *argument[], int maxNumArgs)
 			TestPancake(argument[1]);
 		else
 			TestPancake();
+		return 1;
+	}
+	else if (strcmp(argument[0], "-aaai") == 0)
+	{
+		if(maxNumArgs==2)
+			AAAI_Test(argument[1]);
+		else
+			AAAI_Test();
 		return 1;
 	}
 	else if (strcmp(argument[0], "-ts") == 0)

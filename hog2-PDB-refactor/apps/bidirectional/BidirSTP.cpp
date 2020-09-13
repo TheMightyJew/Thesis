@@ -11,10 +11,10 @@
 #include "STPInstances.h"
 #include "LexPermutationPDB.h"
 #include "MR1PermutationPDB.h"
+#include "STPHasher.h"
 
 #include <climits>
 #include <algorithm>
-#include "STPHasher.h"
 #include "TemplateAStar.h"
 #include "IDTHSwTrans.h"
 #include "AStarOpenClosed.h"
