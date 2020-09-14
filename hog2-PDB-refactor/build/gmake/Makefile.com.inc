@@ -1,7 +1,7 @@
 #-----------------------------------------------------------------------------
 # GNU Makefile: common part for all targets
 #
-# $Id: Makefile.com.inc,v 1.4 2006/11/01 23:34:14 nathanst Exp $
+# $Id: Makefile.com.inc,v 1.4 2006/11/01 23:34:14 *anonymized* Exp $
 # $Source: /usr/cvsroot/project_hog/build/gmake/Makefile.com.inc,v $
 #-----------------------------------------------------------------------------
 

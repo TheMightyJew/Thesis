@@ -5,7 +5,7 @@
 # http://aegis.sourceforge.net/auug97.pdf)
 #
 # $Source: /usr/cvsroot/project_hog/build/gmake/Makefile,v $
-# $Id: Makefile,v 1.5 2006/11/01 23:34:14 nathanst Exp $
+# $Id: Makefile,v 1.5 2006/11/01 23:34:14 *anonymized* Exp $
 #-----------------------------------------------------------------------------
 
 # All projects to build in this order.
@@ -20,31 +20,7 @@ PROJECTS = \
   gui \
   mapalgorithms \
   utils \
-  apps/arm \
-  apps/airplane \
-  apps/localsensingsearch \
-  apps/pathsample \
-  apps/puzzlesample \
-  apps/mapUtils \
-  apps/prediction \
-  apps/emotion \
-  apps/3dmaps \
-  apps/rubik \
   apps/bidirectional \
-  apps/voxel \
-  apps/delta \
-  apps/fling \
-  apps/stp \
-  apps/PDB \
-  apps/roads \
-  apps/canonicalGrids \
-  apps/delta \
-  demos/DFID \
-  demos/dijkstra \
-  demos/astar \
-  demos/idastar \
-  papers/IBEX \
-  papers/DWA \
 #  generic \
 
 

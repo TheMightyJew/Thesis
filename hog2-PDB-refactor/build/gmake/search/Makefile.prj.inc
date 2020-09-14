@@ -1,7 +1,7 @@
 #-----------------------------------------------------------------------------
 # GNU Makefile for static libraries: project dependent part
 #
-# $Id: Makefile.prj.inc,v 1.2 2006/11/01 19:16:13 nathanst Exp $
+# $Id: Makefile.prj.inc,v 1.2 2006/11/01 19:16:13 *anonymized* Exp $
 # $Source: /usr/cvsroot/project_hog/build/gmake/simulation/Makefile.prj.inc,v $
 #-----------------------------------------------------------------------------
 
