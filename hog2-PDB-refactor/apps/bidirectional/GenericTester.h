@@ -220,7 +220,7 @@ void GenericTester<state, action, environment, hasher>::genericTest(state origin
 				   nodesExpanded % necessaryNodesExpanded  % timer.GetElapsedTime();
 			}
 			else{
-				IDBiHS<state, action, false> idbihs(F2Fheuristics, isConsistent, isUpdateByWorkload);
+				IDBiHS<environment, state, action, false> idbihs(F2Fheuristics, isConsistent, isUpdateByWorkload);
 				state midState;
 				bool solved = idbihs.GetMidStateFromLists(&env, start, goal, midState, secondsLimit-timer.GetElapsedTime(), mm.getLastBound(), mm.GetForwardItems(), mm.GetBackwardItems());
 				nodesExpanded += idbihs.GetNodesExpanded();
@@ -239,35 +239,18 @@ void GenericTester<state, action, environment, hasher>::genericTest(state origin
 	if(ASTARpIDBiHS){
 		myfile << "\t\t_A*+IDBiHS_\n";
 		for(double percentage : percentages){
-			unsigned long statesQuantityBoundforASPIDBiHS = std::max(statesQuantityBound*percentage,2.0);;
-			TemplateAStar<state, action, environment> astar;
-			//goal.Reset();
-			start = original;
-			timer.StartTimer();
-			bool solved = astar.GetPathTime(&env, start, goal, astarPath, secondsLimit, true, statesQuantityBoundforASPIDBiHS);
-			unsigned long nodesExpanded = astar.GetNodesExpanded();
-			unsigned long necessaryNodesExpanded = 0;
+			unsigned long statesQuantityBoundforASPIDBiHS = std::max(statesQuantityBound*percentage, 2.0);;
+			IDBiHS<environment, state, action, false> idbihs(F2Fheuristics, isConsistent, isUpdateByWorkload);
+			state midState;
+			bool solved = idbihs.Astar_plus_IDBiHS(&env, start, goal, midState, statesQuantityBoundforASPIDBiHS, secondsLimit-timer.GetElapsedTime(), detectDuplicate);
+			timer.EndTimer();
 			if(solved){
-				timer.EndTimer();
-				necessaryNodesExpanded = astar.GetNecessaryExpansions();
-				myfile << boost::format("\t\t\tA*+IDBiHS A* using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) found path length %1.0f; %llu expanded; %llu necessary; %1.4fs elapsed\n") % statesQuantityBoundforASPIDBiHS % stateSize % percentage % env.GetPathLength(mmPath) %
-				   nodesExpanded % necessaryNodesExpanded  % timer.GetElapsedTime();
+			  myfile << boost::format("\t\t\tA*+IDBiHS using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) found path length %1.0f; %llu expanded; %llu necessary; %1.4fs elapsed\n") % statesQuantityBoundforASPIDBiHS % stateSize % percentage % idbihs.getPathLength() % idbihs.GetNodesExpanded() % idbihs.GetNecessaryExpansions() % timer.GetElapsedTime();
 			}
 			else{
-				IDBiHS<state, action, false> idbihs(F2Fheuristics, isConsistent, isUpdateByWorkload);
-				state midState;
-				bool solved = idbihs.GetMidStateFromForwardList(&env, start, goal, midState, secondsLimit-timer.GetElapsedTime(), astar.getStatesList(), detectDuplicate);
-				nodesExpanded += idbihs.GetNodesExpanded();
-				necessaryNodesExpanded += idbihs.GetNecessaryExpansions();
-				timer.EndTimer();
-				if(solved){
-				  myfile << boost::format("\t\t\tA*+IDBiHS IDBiHS using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) found path length %1.0f; %llu expanded; %llu necessary; %1.4fs elapsed\n") % statesQuantityBoundforASPIDBiHS % stateSize % percentage % idbihs.getPathLength() % nodesExpanded % necessaryNodesExpanded % timer.GetElapsedTime();
-				}
-				else{
-				  myfile << boost::format("\t\t\tA*+IDBiHS IDBiHS using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) failed after %1.4fs\n") % statesQuantityBoundforASPIDBiHS % stateSize % percentage % timer.GetElapsedTime();
-				  break;
-				}	
-			}
+			  myfile << boost::format("\t\t\tA*+IDBiHS using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) failed after %1.4fs\n") % statesQuantityBoundforASPIDBiHS % stateSize % percentage % timer.GetElapsedTime();
+			  break;
+			}	
 		}
 	}
 	if(IDTHSpTrans){
@@ -353,6 +336,23 @@ void GenericTester<state, action, environment, hasher>::genericTest(state origin
 			}
 		}
 	}
+	/*if (AstarPIDAstarRun){
+		myfile << "\t\t_Astar+IDAstar_\n";
+		for(double percentage : percentages){
+			start = original;
+			unsigned long statesQuantityBoundforASPIDAS = std::max(statesQuantityBound*percentage,2.0);;
+			IDAStar<state, action, false, environment> idastar;
+			bool solved = idastar.Astar_plus_IDAstar(&env, start, goal, idaPath, statesQuantityBoundforASPIDAS, secondsLimit-timer.GetElapsedTime(), detectDuplicate);
+			timer.EndTimer();
+			if(solved){
+				myfile << boost::format("\t\t\tA*+IDA* using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) found path length %1.0f; %llu expanded; %llu generated; %llu necessary; %1.4fs elapsed\n") % statesQuantityBoundforASPIDAS % stateSize % percentage % idastar.getSolLength() % idastar.GetNodesExpanded() % idastar.GetNodesTouched() % idastar.GetNecessaryExpansions() % timer.GetElapsedTime();
+			}
+			else{
+				myfile << boost::format("\t\t\tA*+IDA* using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) failed after %1.4fs\n") % statesQuantityBoundforASPIDAS % stateSize % percentage % timer.GetElapsedTime();
+				break;
+			}	
+		}
+	}*/
 	if (AstarPIDAstarReverseRun){
 		myfile << "\t\t_Astar+IDAstar+Reverse_\n";
 		for(double percentage : percentages){
@@ -486,7 +486,7 @@ void GenericTester<state, action, environment, hasher>::genericTest(state origin
 	//IDBiHS
 	if(IDBiHSRun){
 		myfile << "\t\t_IDBiHS_\n";
-		IDBiHS<state, action, false> idbihs(F2Fheuristics, isConsistent, isUpdateByWorkload);
+		IDBiHS<environment, state, action, false> idbihs(F2Fheuristics, isConsistent, isUpdateByWorkload);
 		//goal.Reset();
 		start = original;
 		state midState;

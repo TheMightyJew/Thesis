@@ -252,7 +252,7 @@ void StevenTest(int problems_num, bool randomSTP, vector<int> skipVector)
 					   nodesExpanded % necessaryNodesExpanded  % timer.GetElapsedTime();
 				}
 				else{
-					IDBiHS<MNPuzzleState<4, 4>, slideDir, false> idbihs(idbihsF2fFlag,isConsistent);
+					IDBiHS<MNPuzzle<4, 4>, MNPuzzleState<4, 4>, slideDir, false> idbihs(idbihsF2fFlag,isConsistent);
 					MNPuzzleState<4, 4> midState;
 					//bool solved = idbihs.GetMidStateFromLists(&mnp, start, goal, midState, secondsLimit-timer.GetElapsedTime(), mm.getLastBound(), mm.GetForwardItems(), mm.GetBackwardItems());
 					bool solved = false;
@@ -341,7 +341,7 @@ void StevenTest(int problems_num, bool randomSTP, vector<int> skipVector)
 					   nodesExpanded % necessaryNodesExpanded  % timer.GetElapsedTime();
 				}
 				else{
-					IDBiHS<MNPuzzleState<4, 4>, slideDir, false> idbihs(idbihsF2fFlag, isConsistent, isUpdateByWorkload);
+					IDBiHS<MNPuzzle<4, 4>, MNPuzzleState<4, 4>, slideDir, false> idbihs(idbihsF2fFlag, isConsistent, isUpdateByWorkload);
 					MNPuzzleState<4, 4> midState;
 					bool solved = idbihs.GetMidStateFromForwardList(&mnp, start, goal, midState, secondsLimit-timer.GetElapsedTime(), astar.getStatesList(),true);
 					nodesExpanded += idbihs.GetNodesExpanded();
@@ -375,7 +375,7 @@ void StevenTest(int problems_num, bool randomSTP, vector<int> skipVector)
 					   nodesExpanded % necessaryNodesExpanded  % timer.GetElapsedTime();
 				}
 				else{
-					IDBiHS<MNPuzzleState<4, 4>, slideDir, false> idbihs(idbihsF2fFlag, isConsistent, isUpdateByWorkload);
+					IDBiHS<MNPuzzle<4, 4>, MNPuzzleState<4, 4>, slideDir, false> idbihs(idbihsF2fFlag, isConsistent, isUpdateByWorkload);
 					MNPuzzleState<4, 4> midState;
 					bool solved = idbihs.GetMidStateFromForwardList(&mnp, start, goal, midState, secondsLimit-timer.GetElapsedTime(), astar.getStatesList(),false);
 					nodesExpanded += idbihs.GetNodesExpanded();
@@ -567,7 +567,7 @@ void StevenTest(int problems_num, bool randomSTP, vector<int> skipVector)
 								myfile << boost::format("\t\t\tMBBDS(k=1,ThreePhase=%d) MBBDS using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) found path length %1.0f; %llu expanded; %llu necessary; %d iterations; %1.4fs elapsed;\n") % int(doThree) % statesQuantityBoundforMBBDS % stateSize % percentage % mbbds.getPathLength() % nodesExpanded % mbbds.GetNecessaryExpansions() % mbbds.getIterationNum() % timer.GetElapsedTime();
 							}
 							else{
-								IDBiHS<MNPuzzleState<4, 4>, slideDir, false> idbihs(idbihsF2fFlag, isConsistent, isUpdateByWorkload);
+								IDBiHS<MNPuzzle<4, 4>, MNPuzzleState<4, 4>, slideDir, false> idbihs(idbihsF2fFlag, isConsistent, isUpdateByWorkload);
 								goal.Reset();
 								start = original;
 								solved = idbihs.GetMidState(&mnp, start, goal, midState, secondsLimit-timer.GetElapsedTime(), int(lastBound));
@@ -591,7 +591,7 @@ void StevenTest(int problems_num, bool randomSTP, vector<int> skipVector)
 		if(IDBiHSRun)
 		{
 			myfile << "\t\t_IDBiHS-0.5_\n";
-			IDBiHS<MNPuzzleState<4, 4>, slideDir, false> idbihs(idbihsF2fFlag, false, true);
+			IDBiHS<MNPuzzle<4, 4>, MNPuzzleState<4, 4>, slideDir, false> idbihs(idbihsF2fFlag, false, true);
 			goal.Reset();
 			start = original;
 			MNPuzzleState<4, 4> midState;
@@ -613,7 +613,7 @@ void StevenTest(int problems_num, bool randomSTP, vector<int> skipVector)
     if(IDBiHSRun)
 		{
 			myfile << "\t\t_IDBiHS-BW_\n";
-			IDBiHS<MNPuzzleState<4, 4>, slideDir, false> idbihs(idbihsF2fFlag, true, true);
+			IDBiHS<MNPuzzle<4, 4>, MNPuzzleState<4, 4>, slideDir, false> idbihs(idbihsF2fFlag, true, true);
 			goal.Reset();
 			start = original;
 			MNPuzzleState<4, 4> midState;

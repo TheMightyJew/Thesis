@@ -1194,7 +1194,7 @@ void AnalyzeProblem(Map *m, int whichProblem, Experiment e, double weight)
 					   nodesExpanded % necessaryNodesExpanded  % t1.GetElapsedTime();
 				}
 				else{
-					IDBiHS<CanonicalGrid::xyLoc, CanonicalGrid::tDirection, false> idbihs(idbihsF2fFlag, isConsistent, isUpdateByWorkload);
+					IDBiHS<CanonicalGrid::CanonicalGrid, CanonicalGrid::xyLoc, CanonicalGrid::tDirection, false> idbihs(idbihsF2fFlag, isConsistent, isUpdateByWorkload);
 					CanonicalGrid::xyLoc midState;
 					bool solved = idbihs.GetMidStateFromForwardList(cg, cstart, cgoal, midState, secondsLimit-t1.GetElapsedTime(), astar.getStatesList());
 					nodesExpanded += idbihs.GetNodesExpanded();
@@ -1449,7 +1449,7 @@ void AnalyzeProblem(Map *m, int whichProblem, Experiment e, double weight)
 								cout << boost::format("\t\t\tMBBDS(k=1,ThreePhase=%d) MBBDS using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) found path length %1.1f; %llu expanded; %llu necessary; %d iterations; %1.4fs elapsed;\n") % int(doThree) % statesQuantityBoundforMBBDS % stateSize % percentage % mbbds.getPathLength() % nodesExpanded % mbbds.GetNecessaryExpansions() % mbbds.getIterationNum() % timer.GetElapsedTime();
 							}
 							else{
-								IDBiHS<CanonicalGrid::xyLoc, CanonicalGrid::tDirection, false> idbihs(idbihsF2fFlag, isConsistent, isUpdateByWorkload);
+								IDBiHS<CanonicalGrid::CanonicalGrid, CanonicalGrid::xyLoc, CanonicalGrid::tDirection, false> idbihs(idbihsF2fFlag, isConsistent, isUpdateByWorkload);
 																		solved = idbihs.GetMidState(cg, cstart, cgoal, midState, secondsLimit-timer.GetElapsedTime(), int(lastBound));
 								nodesExpanded += idbihs.GetNodesExpanded();
 								timer.EndTimer();
@@ -1471,7 +1471,7 @@ void AnalyzeProblem(Map *m, int whichProblem, Experiment e, double weight)
 		//IDBiHS
 		if(IDBiHSRun){
 			cout << "\t\t_IDBiHS-0.5_\n";
-			IDBiHS<CanonicalGrid::xyLoc, CanonicalGrid::tDirection, false> idbihs(idbihsF2fFlag, isConsistent, false);
+			IDBiHS<CanonicalGrid::CanonicalGrid, CanonicalGrid::xyLoc, CanonicalGrid::tDirection, false> idbihs(idbihsF2fFlag, isConsistent, false);
 			CanonicalGrid::xyLoc midState;
 			t8.StartTimer();
 			bool solved = idbihs.GetMidState(cg, cstart, cgoal, midState, secondsLimit);
@@ -1489,7 +1489,7 @@ void AnalyzeProblem(Map *m, int whichProblem, Experiment e, double weight)
 		}
     if(IDBiHSRun){
 			cout << "\t\t_IDTHS-BW_\n";
-			IDBiHS<CanonicalGrid::xyLoc, CanonicalGrid::tDirection, false> idbihs(idbihsF2fFlag, isConsistent, true);
+			IDBiHS<CanonicalGrid::CanonicalGrid, CanonicalGrid::xyLoc, CanonicalGrid::tDirection, false> idbihs(idbihsF2fFlag, isConsistent, true);
 			CanonicalGrid::xyLoc midState;
 			t8.StartTimer();
 			bool solved = idbihs.GetMidState(cg, cstart, cgoal, midState, secondsLimit);

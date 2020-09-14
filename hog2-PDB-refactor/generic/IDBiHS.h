@@ -12,19 +12,22 @@
 #include <unordered_set>
 #include "SearchEnvironment.h"
 #include "AStarOpenClosed.h"
+#include "TemplateAStar.h"
 #include "MM.h"
 #include <math.h>
+#include <typeinfo>
 
 
-template <class state, class action, bool verbose = false>
+template <class environment, class state, class action, bool verbose = false>
 class IDBiHS {
 public:
 	IDBiHS(bool F2Fheuristics=false, bool isConsistent = false, bool isUpdateByWorkload = false, double smallestEdge=1) { this->F2Fheuristics = F2Fheuristics; this->isConsistent = isConsistent; this->smallestEdge = smallestEdge; this->isUpdateByWorkload = isUpdateByWorkload;}
 	virtual ~IDBiHS() {}
-	bool GetMidState(SearchEnvironment<state, action>* env, state fromState, state toState, state &midState, int secondsLimit=600, double startingFBound=0);
-	bool IDTHSpTrans(SearchEnvironment<state, action>* env, state fromState, state toState, state &midState, int secondsLimit=600,  unsigned long availableStorage = 0);
-	bool GetMidStateFromLists(SearchEnvironment<state, action>* env, state fromState, state toState, state &midState, int secondsLimit=600, double startingFBound=0, AStarOpenClosed<state, AStarCompareWithF<state>, AStarOpenClosedDataWithF<state>> forwardList = AStarOpenClosed<state, AStarCompareWithF<state>, AStarOpenClosedDataWithF<state>>(), AStarOpenClosed<state, AStarCompareWithF<state>, AStarOpenClosedDataWithF<state>> backwardList = AStarOpenClosed<state, AStarCompareWithF<state>, AStarOpenClosedDataWithF<state>>(), bool detectDuplicates = true);
-	bool GetMidStateFromForwardList(SearchEnvironment<state, action>* env, state fromState, state toState, state &midState, int secondsLimit=600, AStarOpenClosed<state, AStarCompareWithF<state>, AStarOpenClosedDataWithF<state>> forwardList = AStarOpenClosed<state, AStarCompareWithF<state>, AStarOpenClosedDataWithF<state>>(), bool detectDuplicates = true);
+	bool GetMidState(environment* env, state fromState, state toState, state &midState, int secondsLimit=600, double startingFBound=0);
+	bool Astar_plus_IDBiHS(environment* env, state fromState, state toState, state &midState, unsigned long statesQuantityBound, int secondsLimit=600, bool detectDuplicates=false);
+	bool IDTHSpTrans(environment* env, state fromState, state toState, state &midState, int secondsLimit=600,  unsigned long availableStorage = 0);
+	bool GetMidStateFromLists(environment* env, state fromState, state toState, state &midState, int secondsLimit=600, double startingFBound=0, AStarOpenClosed<state, AStarCompareWithF<state>, AStarOpenClosedDataWithF<state>> forwardList = AStarOpenClosed<state, AStarCompareWithF<state>, AStarOpenClosedDataWithF<state>>(), AStarOpenClosed<state, AStarCompareWithF<state>, AStarOpenClosedDataWithF<state>> backwardList = AStarOpenClosed<state, AStarCompareWithF<state>, AStarOpenClosedDataWithF<state>>(), bool detectDuplicates = true);
+	bool GetMidStateFromForwardList(environment* env, state fromState, state toState, state &midState, int secondsLimit=600, AStarOpenClosed<state, AStarCompareWithF<state>, AStarOpenClosedDataWithF<state>> forwardList = AStarOpenClosed<state, AStarCompareWithF<state>, AStarOpenClosedDataWithF<state>>(), bool detectDuplicates = true);
 	double getPathLength()	{ return pathLength; }
 	uint64_t GetNodesExpanded() { return nodesExpanded; }
 	uint64_t GetNecessaryExpansions() { return necessaryExpansions; }
@@ -33,8 +36,8 @@ public:
 	unsigned long getDMMExpansions() { return dMMExpansions; }
 
 private:
-	bool DoIterationForward(SearchEnvironment<state, action>* env, state parent, state currState, double g, state& midState);	
-	bool DoIterationBackward(SearchEnvironment<state, action>* env, state parent, state currState, double g, state& midState, state possibleMidState, double possibleMidStateG, double otherH = 0,double otherError = 0);
+	bool DoIterationForward(environment* env, state parent, state currState, double g, state& midState);	
+	bool DoIterationBackward(environment* env, state parent, state currState, double g, state& midState, state possibleMidState, double possibleMidStateG, double otherH = 0,double otherError = 0);
 	double updateBoundByFraction(double boundToSplit,double p = 0.5, bool isInteger = true);
 	double updateBoundByWorkload(double newbound, double prevBound, double oldForwardBound,uint64_t forwardLoad,uint64_t backwardLoad);
 	void UpdateNextBound(double fCost);
@@ -64,8 +67,30 @@ private:
 
 };
 
-template <class state, class action, bool verbose>
-bool IDBiHS<state, action, verbose>::GetMidStateFromForwardList(SearchEnvironment<state, action>* env,
+template <class environment, class state, class action, bool verbose>
+bool IDBiHS<environment, state, action, verbose>::Astar_plus_IDBiHS(environment* env, state start, state goal, state &midState, unsigned long statesQuantityBound, int secondsLimit, bool detectDuplicates){
+	TemplateAStar<state, action, environment> astar;
+	std::vector<state> astarPath;
+	Timer timer;
+	timer.StartTimer();
+	bool solved = astar.GetPathTime(env, start, goal, astarPath, secondsLimit, true, statesQuantityBound);
+	nodesExpanded = astar.GetNodesExpanded();
+	if(solved){
+		timer.EndTimer();
+		necessaryExpansions = astar.GetNecessaryExpansions();
+		pathLength = env->GetPathLength(astarPath);
+	}
+	else{
+		solved = GetMidStateFromForwardList(env, start, goal, midState, secondsLimit-timer.GetElapsedTime(), astar.getStatesList(), detectDuplicates);
+		timer.EndTimer();
+	}
+	nodesExpanded += astar.GetNodesExpanded();
+	return solved;
+}
+
+
+template <class environment, class state, class action, bool verbose>
+bool IDBiHS<environment, state, action, verbose>::GetMidStateFromForwardList(environment* env,
 	state fromState, state toState, state &midState, int secondsLimit, AStarOpenClosed<state, AStarCompareWithF<state>, AStarOpenClosedDataWithF<state>> forwardList, bool detectDuplicates)
 {	
 	AStarOpenClosed<state, AStarCompareWithF<state>, AStarOpenClosedDataWithF<state>> newBackwardList;
@@ -75,8 +100,8 @@ bool IDBiHS<state, action, verbose>::GetMidStateFromForwardList(SearchEnvironmen
 	return GetMidStateFromLists(env, fromState, toState, midState, secondsLimit, 0, forwardList, newBackwardList, detectDuplicates);
 }
 
-template <class state, class action, bool verbose>
-bool IDBiHS<state, action, verbose>::GetMidStateFromLists(SearchEnvironment<state, action>* env,
+template <class environment, class state, class action, bool verbose>
+bool IDBiHS<environment, state, action, verbose>::GetMidStateFromLists(environment* env,
 	state fromState, state toState, state &midState, int secondsLimit, double startingFBound, AStarOpenClosed<state, AStarCompareWithF<state>, AStarOpenClosedDataWithF<state>> forwardList, AStarOpenClosed<state, AStarCompareWithF<state>, AStarOpenClosedDataWithF<state>> backwardList, bool detectDuplicates)
 {
 	//printf("%d|%d\n", forwardList.getElements().size(), backwardList.getElements().size());
@@ -182,8 +207,8 @@ bool IDBiHS<state, action, verbose>::GetMidStateFromLists(SearchEnvironment<stat
 	return false;
 }
 
-template <class state, class action, bool verbose>
-double IDBiHS<state, action, verbose>::updateBoundByFraction(double boundToSplit,double p, bool isInteger){
+template <class environment, class state, class action, bool verbose>
+double IDBiHS<environment, state, action, verbose>::updateBoundByFraction(double boundToSplit,double p, bool isInteger){
   if (isInteger){
     return ceil(p*boundToSplit) - smallestEdge;
   }
@@ -192,8 +217,8 @@ double IDBiHS<state, action, verbose>::updateBoundByFraction(double boundToSplit
   }
 }
 
-template <class state, class action, bool verbose>
-double IDBiHS<state, action, verbose>::updateBoundByWorkload(double newbound, double prevBound, double oldForwardBound, uint64_t forwardLoad,uint64_t backwardLoad){
+template <class environment, class state, class action, bool verbose>
+double IDBiHS<environment, state, action, verbose>::updateBoundByWorkload(double newbound, double prevBound, double oldForwardBound, uint64_t forwardLoad,uint64_t backwardLoad){
 	//printf("forwardLoad: %llu,backwardLoad: %llu,oldForwardBound%d\n",forwardLoad,backwardLoad,oldForwardBound);
 	if (forwardLoad <= backwardLoad){
 		return oldForwardBound + newbound - prevBound;
@@ -203,8 +228,8 @@ double IDBiHS<state, action, verbose>::updateBoundByWorkload(double newbound, do
 	}
 }
 
-template <class state, class action, bool verbose>
-bool IDBiHS<state, action, verbose>::GetMidState(SearchEnvironment<state, action>* env,
+template <class environment, class state, class action, bool verbose>
+bool IDBiHS<environment, state, action, verbose>::GetMidState(environment* env,
 	state fromState, state toState, state &midState, int secondsLimit, double startingFBound)
 {
 	auto startTime = std::chrono::steady_clock::now();
@@ -259,8 +284,8 @@ bool IDBiHS<state, action, verbose>::GetMidState(SearchEnvironment<state, action
 }
 
 
-template <class state, class action, bool verbose>
-bool IDBiHS<state, action, verbose>::DoIterationForward(SearchEnvironment<state, action>* env,
+template <class environment, class state, class action, bool verbose>
+bool IDBiHS<environment, state, action, verbose>::DoIterationForward(environment* env,
 	state parent, state currState, double g, state& midState)
 {
 	double h = env->HCost(currState, originGoal);
@@ -326,8 +351,8 @@ bool IDBiHS<state, action, verbose>::DoIterationForward(SearchEnvironment<state,
 	return false;
 }
 
-template <class state, class action, bool verbose>
-bool IDBiHS<state, action, verbose>::DoIterationBackward(SearchEnvironment<state, action>* env,
+template <class environment, class state, class action, bool verbose>
+bool IDBiHS<environment, state, action, verbose>::DoIterationBackward(environment* env,
 	state parent, state currState, double g, state& midState, state possibleMidState, double possibleMidStateG, double otherH, double otherError)
 {	
   if (g > backwardBound || (smallestEdge == 0 && g == backwardBound)){
@@ -382,8 +407,8 @@ bool IDBiHS<state, action, verbose>::DoIterationBackward(SearchEnvironment<state
   
 }
 
-template <class state, class action, bool verbose>
-void IDBiHS<state, action, verbose>::UpdateNextBound(double fCost)
+template <class environment, class state, class action, bool verbose>
+void IDBiHS<environment, state, action, verbose>::UpdateNextBound(double fCost)
 {
 	if (!fgreater(nextBound, fBound))
 	{
@@ -396,8 +421,8 @@ void IDBiHS<state, action, verbose>::UpdateNextBound(double fCost)
 }
 
 
-template <class state, class action, bool verbose>
-bool IDBiHS<state, action, verbose>::IDTHSpTrans(SearchEnvironment<state, action>* env,
+template <class environment, class state, class action, bool verbose>
+bool IDBiHS<environment, state, action, verbose>::IDTHSpTrans(environment* env,
 	state fromState, state toState, state &midState, int secondsLimit, unsigned long availableStorage)
 {
 	auto startTime = std::chrono::steady_clock::now();

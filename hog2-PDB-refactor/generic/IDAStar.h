@@ -27,20 +27,20 @@
 
 typedef __gnu_cxx::hash_map<uint64_t, double> NodeHashTable;
 
-template <class state, class action, bool verbose = true>
+template <class state, class action, bool verbose=false, class environment=SearchEnvironment<state, action>>
 class IDAStar {
 public:
 	IDAStar() { useHashTable = usePathMax = false; storedHeuristic = false;}
 	virtual ~IDAStar() {}
-	bool GetPath(SearchEnvironment<state, action> *env, state from, state to,
-							 std::vector<state> &thePath, int secondsLimit=600);
-	bool ASpIDA(SearchEnvironment<state, action> *env, state from, state to, std::vector<state> &thePath, AStarOpenClosed<state, AStarCompareWithF<state>, AStarOpenClosedDataWithF<state>> statesList, int secondsLimit=600, bool isDuplicateDetection = true);
-	bool BAI(SearchEnvironment<state, action> *env, state from, state to, std::vector<state> &thePath, AStarOpenClosed<state, AStarCompareWithF<state>, AStarOpenClosedDataWithF<state>> statesList, int secondsLimit=600, bool isConsistent = false);
-  bool ASpIDArev(SearchEnvironment<state, action> *env, state from, state to, std::vector<state> &thePath, AStarOpenClosed<state, AStarCompareWithF<state>, AStarOpenClosedDataWithF<state>> statesList, double prevF, int secondsLimit=600, bool isConsistent = false, bool isComputeMaxH = false, double heaviestEdge=1);
-	bool GetPath(SearchEnvironment<state, action> *env, state from, state to,
+	bool GetPath(environment *env, state from, state to, std::vector<state> &thePath, int secondsLimit=600);
+	bool Astar_plus_IDAstar(environment *env, state from, state to, std::vector<state> &thePath, unsigned long statesQuantityBound, int secondsLimit=600, bool isDuplicateDetection = true);
+	bool ASpIDA(environment *env, state from, state to, std::vector<state> &thePath, AStarOpenClosed<state, AStarCompareWithF<state>, AStarOpenClosedDataWithF<state>> statesList, int secondsLimit=600, bool isDuplicateDetection = true);
+	bool BAI(environment *env, state from, state to, std::vector<state> &thePath, AStarOpenClosed<state, AStarCompareWithF<state>, AStarOpenClosedDataWithF<state>> statesList, int secondsLimit=600, bool isConsistent = false);
+  bool ASpIDArev(environment *env, state from, state to, std::vector<state> &thePath, AStarOpenClosed<state, AStarCompareWithF<state>, AStarOpenClosedDataWithF<state>> statesList, double prevF, int secondsLimit=600, bool isConsistent = false, bool isComputeMaxH = false, double heaviestEdge=1);
+	bool GetPath(environment *env, state from, state to,
 				 std::vector<action> &thePath);
          
-  bool SFBDS(SearchEnvironment<state, action> *env, state from, state to,
+  bool SFBDS(environment *env, state from, state to,
 							 std::vector<state> &thePath, int secondsLimit, int lookahead,bool isAlternating, bool storeLookup);
 
 	uint64_t GetNodesExpanded() { return nodesExpanded; }
@@ -54,18 +54,18 @@ public:
 private:
 	unsigned long long nodesExpanded, nodesTouched;
 	
-	double DoIteration(SearchEnvironment<state, action> *env,
+	double DoIteration(environment *env,
 					   state parent, state currState,
 					   std::vector<state> &thePath, double bound, double g,
 					   double maxH, double currStateH=0);
-	double DoIteration(SearchEnvironment<state, action> *env,
+	double DoIteration(environment *env,
 					   action forbiddenAction, state &currState,
 					   std::vector<action> &thePath, double bound, double g,
 					   double maxH, double parentH);
-  bool DoSFBDSIteration(SearchEnvironment<state, action> *env,
+  bool DoSFBDSIteration(environment *env,
              state parentStart, state currStart, state parentGoal, state currGoal,
              std::vector<state> &startPath, std::vector<state> &goalPath, double bound, double g_from, double g_to, int k,uint64_t b,double h, bool isAlternating,bool storeLookup, bool isForward);
-  double computeKlook(SearchEnvironment<state, action> *env,state parent, state curr, state opposite,double bound,double g_curr,double g_opposite,double prevf,int k,std::vector<state> &thePath,bool &isSolved, uint64_t b,bool storeLookup, std::vector<state> &stateStorage, std::vector<double> &hStorage);
+  double computeKlook(environment *env,state parent, state curr, state opposite,double bound,double g_curr,double g_opposite,double prevf,int k,std::vector<state> &thePath,bool &isSolved, uint64_t b,bool storeLookup, std::vector<state> &stateStorage, std::vector<double> &hStorage);
 	void PrintGHistogram()
 	{
 //		uint64_t early = 0, late = 0;
@@ -119,8 +119,31 @@ public:
 #endif
 };
 
-template <class state, class action, bool verbose>
-bool IDAStar<state, action, verbose>::ASpIDA(SearchEnvironment<state, action> *env, state from, state to,
+template <class state, class action, bool verbose, class environment>
+bool IDAStar<state, action, verbose, environment>::Astar_plus_IDAstar(environment *env, state from, state to, std::vector<state> &thePath, unsigned long statesQuantityBound, int secondsLimit, bool isDuplicateDetection){
+	TemplateAStar<state, action, environment> astar;
+	Timer timer;
+	timer.StartTimer();
+	std::vector<state> astarPath;
+	bool solved = astar.GetPathTime(env, start, goal, astarPath, secondsLimit, true, statesQuantityBound);
+	printf("new: %d\n", astar.getStatesList().size());
+	nodesExpanded = astar.GetNodesExpanded();
+	if(solved){
+		timer.EndTimer();
+		necessaryExpansions = astar.GetNecessaryExpansions();
+		thePath = astarPath;
+	}
+	else{
+		solved = ASpIDA(env, start, goal, thePath, astar.getStatesList(), secondsLimit-timer.GetElapsedTime(), isDuplicateDetection);
+		timer.EndTimer();
+	}
+	nodesExpanded += astar.GetNodesExpanded();
+	return solved;
+}
+
+
+template <class state, class action, bool verbose, class environment>
+bool IDAStar<state, action, verbose, environment>::ASpIDA(environment *env, state from, state to,
 							 std::vector<state> &thePath, AStarOpenClosed<state, AStarCompareWithF<state>, AStarOpenClosedDataWithF<state>> statesList, int secondsLimit, bool isDuplicateDetection)
 {
 	//reverseG = false;
@@ -200,8 +223,8 @@ bool IDAStar<state, action, verbose>::ASpIDA(SearchEnvironment<state, action> *e
 	return true;
 }
 
-template <class state, class action, bool verbose>
-bool IDAStar<state, action, verbose>::BAI(SearchEnvironment<state, action> *env, state from, state to,
+template <class state, class action, bool verbose, class environment>
+bool IDAStar<state, action, verbose, environment>::BAI(environment *env, state from, state to,
 							 std::vector<state> &thePath, AStarOpenClosed<state, AStarCompareWithF<state>, AStarOpenClosedDataWithF<state>> statesList, int secondsLimit, bool isConsistent)
 {
   this->isConsistent = isConsistent;
@@ -268,8 +291,8 @@ bool IDAStar<state, action, verbose>::BAI(SearchEnvironment<state, action> *env,
 	return true;
 }
 
-template <class state, class action, bool verbose>
-bool IDAStar<state, action, verbose>::ASpIDArev(SearchEnvironment<state, action> *env, state from, state to,
+template <class state, class action, bool verbose, class environment>
+bool IDAStar<state, action, verbose, environment>::ASpIDArev(environment *env, state from, state to,
 							 std::vector<state> &thePath, AStarOpenClosed<state, AStarCompareWithF<state>, AStarOpenClosedDataWithF<state>> statesList, double prevF, int secondsLimit,bool isConsistent, bool isComputeMaxH, double heaviestEdge)
 {
 	this->heaviestEdge = heaviestEdge;
@@ -368,8 +391,8 @@ bool IDAStar<state, action, verbose>::ASpIDArev(SearchEnvironment<state, action>
 	return true;
 }
 
-template <class state, class action, bool verbose>
-bool IDAStar<state, action, verbose>::GetPath(SearchEnvironment<state, action> *env,
+template <class state, class action, bool verbose, class environment>
+bool IDAStar<state, action, verbose, environment>::GetPath(environment *env,
 									 state from, state to,
 									 std::vector<state> &thePath, int secondsLimit)
 {
@@ -422,8 +445,8 @@ bool IDAStar<state, action, verbose>::GetPath(SearchEnvironment<state, action> *
 	return true;
 }
 
-template <class state, class action, bool verbose>
-bool IDAStar<state, action, verbose>::GetPath(SearchEnvironment<state, action> *env,
+template <class state, class action, bool verbose, class environment>
+bool IDAStar<state, action, verbose, environment>::GetPath(environment *env,
 									 state from, state to,
 									 std::vector<action> &thePath)
 {
@@ -456,8 +479,8 @@ bool IDAStar<state, action, verbose>::GetPath(SearchEnvironment<state, action> *
 	return true;
 }
 
-template <class state, class action, bool verbose>
-double IDAStar<state, action, verbose>::DoIteration(SearchEnvironment<state, action> *env,
+template <class state, class action, bool verbose, class environment>
+double IDAStar<state, action, verbose, environment>::DoIteration(environment *env,
 										   state parent, state currState,
 										   std::vector<state> &thePath, double bound, double g,
 										   double maxH, double currStateH)
@@ -609,8 +632,8 @@ double IDAStar<state, action, verbose>::DoIteration(SearchEnvironment<state, act
 	  return h;
 }
 
-template <class state, class action, bool verbose>
-double IDAStar<state, action, verbose>::DoIteration(SearchEnvironment<state, action> *env,
+template <class state, class action, bool verbose, class environment>
+double IDAStar<state, action, verbose, environment>::DoIteration(environment *env,
 										   action forbiddenAction, state &currState,
 										   std::vector<action> &thePath, double bound, double g,
 										   double maxH, double parentH)
@@ -680,8 +703,8 @@ double IDAStar<state, action, verbose>::DoIteration(SearchEnvironment<state, act
 }
 
 
-template <class state, class action, bool verbose>
-void IDAStar<state, action, verbose>::UpdateNextBound(double currBound, double fCost)
+template <class state, class action, bool verbose, class environment>
+void IDAStar<state, action, verbose, environment>::UpdateNextBound(double currBound, double fCost)
 {
 	if (!fgreater(nextBound, currBound))
 	{
@@ -696,8 +719,8 @@ void IDAStar<state, action, verbose>::UpdateNextBound(double currBound, double f
 }
 
 
-template <class state, class action, bool verbose>
-bool IDAStar<state, action, verbose>::SFBDS(SearchEnvironment<state, action> *env, state from, state to,
+template <class state, class action, bool verbose, class environment>
+bool IDAStar<state, action, verbose, environment>::SFBDS(environment *env, state from, state to,
 							 std::vector<state> &thePath, int secondsLimit, int lookahead, bool isAlternating, bool storeLookup)
 {
 	if(verbose){
@@ -756,8 +779,8 @@ bool IDAStar<state, action, verbose>::SFBDS(SearchEnvironment<state, action> *en
 	return true;
 }
 
-template <class state, class action, bool verbose>
-bool IDAStar<state, action, verbose>::DoSFBDSIteration(SearchEnvironment<state, action> *env,
+template <class state, class action, bool verbose, class environment>
+bool IDAStar<state, action, verbose, environment>::DoSFBDSIteration(environment *env,
 										   state parentStart, state currStart, state parentGoal, state currGoal,
 										   std::vector<state> &startPath, std::vector<state> &goalPath, double bound, double g_from, double g_to, int k,uint64_t b,double h, bool isAlternating,bool storeLookup, bool isForward)
 {
@@ -858,8 +881,8 @@ bool IDAStar<state, action, verbose>::DoSFBDSIteration(SearchEnvironment<state, 
   return false;
 }
 
-template <class state, class action, bool verbose>
-double IDAStar<state, action, verbose>::computeKlook(SearchEnvironment<state, action> *env,state parent, state curr, state opposite,double bound,double g_curr,double g_opposite,double prevf,int k,std::vector<state> &thePath,bool &isSolved, uint64_t b, bool storeLookup, std::vector<state> &stateStorage, std::vector<double> &hStorage){
+template <class state, class action, bool verbose, class environment>
+double IDAStar<state, action, verbose, environment>::computeKlook(environment *env,state parent, state curr, state opposite,double bound,double g_curr,double g_opposite,double prevf,int k,std::vector<state> &thePath,bool &isSolved, uint64_t b, bool storeLookup, std::vector<state> &stateStorage, std::vector<double> &hStorage){
   
   if (curr == opposite && !fgreater(g_curr + g_opposite,bound)){
 		isSolved = true;

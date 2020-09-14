@@ -291,7 +291,7 @@ void StevenTest(int gap, int problems_num, bool randomPancake, vector<int> skipV
 					   nodesExpanded % necessaryNodesExpanded  % t4.GetElapsedTime();
 				}
 				else{
-					IDBiHS<PancakePuzzleState<pancakes_num>, PancakePuzzleAction, false> idbihs(F2Fheuristics, isConsistent, isUpdateByWorkload);
+					IDBiHS<PancakePuzzle<pancakes_num>, PancakePuzzleState<pancakes_num>, PancakePuzzleAction, false> idbihs(F2Fheuristics, isConsistent, isUpdateByWorkload);
 					PancakePuzzleState<pancakes_num> midState;
 					bool solved = idbihs.GetMidStateFromLists(&pancake, start, goal, midState, secondsLimit-t1.GetElapsedTime(), mm.getLastBound(), mm.GetForwardItems(), mm.GetBackwardItems());
 					nodesExpanded += idbihs.GetNodesExpanded();
@@ -325,7 +325,7 @@ void StevenTest(int gap, int problems_num, bool randomPancake, vector<int> skipV
 					   nodesExpanded % necessaryNodesExpanded  % t1.GetElapsedTime();
 				}
 				else{
-					IDBiHS<PancakePuzzleState<pancakes_num>, PancakePuzzleAction, false> idbihs(F2Fheuristics, isConsistent, isUpdateByWorkload);
+					IDBiHS<PancakePuzzle<pancakes_num>, PancakePuzzleState<pancakes_num>, PancakePuzzleAction, false> idbihs(F2Fheuristics, isConsistent, isUpdateByWorkload);
 					PancakePuzzleState<pancakes_num> midState;
 					bool solved = idbihs.GetMidStateFromForwardList(&pancake, start, goal, midState, secondsLimit-t1.GetElapsedTime(), astar.getStatesList(), detectDuplicate);
 					nodesExpanded += idbihs.GetNodesExpanded();
@@ -606,7 +606,7 @@ void StevenTest(int gap, int problems_num, bool randomPancake, vector<int> skipV
 								myfile << boost::format("\t\t\tMBBDS(k=1,ThreePhase=%d) MBBDS using memory for %1.0llu states(state size: %d bits, Memory_Percentage=%1.2f) found path length %1.0f; %llu expanded; %llu necessary; %d iterations; %1.4fs elapsed;\n") % int(doThree) % statesQuantityBoundforMBBDS % stateSize % percentage % mbbds.getPathLength() % nodesExpanded % mbbds.GetNecessaryExpansions() % mbbds.getIterationNum() % timer.GetElapsedTime();
 							}
 							else{
-								IDBiHS<PancakePuzzleState<pancakes_num>, PancakePuzzleAction, false> idbihs(F2Fheuristics, isConsistent, isUpdateByWorkload);
+								IDBiHS<PancakePuzzle<pancakes_num>, PancakePuzzleState<pancakes_num>, PancakePuzzleAction, false> idbihs(F2Fheuristics, isConsistent, isUpdateByWorkload);
 								goal.Reset();
 								start = original;
 								solved = idbihs.GetMidState(&pancake, start, goal, midState, secondsLimit-timer.GetElapsedTime(), int(lastBound));
@@ -629,7 +629,7 @@ void StevenTest(int gap, int problems_num, bool randomPancake, vector<int> skipV
 		//IDBiHS
 		if(IDBiHSRun){
 			myfile << "\t\t_IDBiHS_\n";
-			IDBiHS<PancakePuzzleState<pancakes_num>, PancakePuzzleAction, false> idbihs(F2Fheuristics, isConsistent, isUpdateByWorkload);
+			IDBiHS<PancakePuzzle<pancakes_num>, PancakePuzzleState<pancakes_num>, PancakePuzzleAction, false> idbihs(F2Fheuristics, isConsistent, isUpdateByWorkload);
 			goal.Reset();
 			start = original;
 			PancakePuzzleState<pancakes_num> midState;
