@@ -61,11 +61,9 @@ default : all
 SRC_CPP = \
 	apps/bidirectional/GUICode.cpp \
 	apps/bidirectional/Driver.cpp \
-	apps/bidirectional/BidirSTP.cpp \
 	apps/bidirectional/BidirTOH.cpp \
 	apps/bidirectional/BidirTS.cpp \
 	apps/bidirectional/BidirRubik.cpp \
-	apps/bidirectional/BidirPancake.cpp \
 	apps/bidirectional/BidirTests.cpp \
   generic/MurmurHash3.cpp \
 	apps/bidirectional/MMRubik.cpp \

@@ -39,8 +39,6 @@
 #include "MMRubik.h"
 #include "MM0Rubik.h"
 #include "ParallelIDAStar.h"
-#include "BidirSTP.h"
-#include "BidirPancake.h"
 #include "BidirTests.h"
 #include "BidirTOH.h"
 #include "BidirTS.h"
@@ -111,10 +109,7 @@ int main(int argc, char* argv[])
 	InstallCommandLineHandler(MyCLHandler, "-pida", "-pida", "Run MM");
 	InstallCommandLineHandler(MyCLHandler, "-grid", "-grid <map> <scenario> <hweight>", "MM/A* region analysis");
 	InstallCommandLineHandler(MyCLHandler, "-nbs", "-nbs <map> <scenario> <hweight>", "NBS test");
-	InstallCommandLineHandler(MyCLHandler, "-stp", "-stp <alg>", "A*/BS*/MM/NBS/MM0 test on 15 puzzle 100 korf instances");
 	InstallCommandLineHandler(MyCLHandler, "-rubik", "-rubik <alg>", "A*/BS*/MM/NBS/MM0 test on rubik's cube");
-	InstallCommandLineHandler(MyCLHandler, "-pancake", "-pancake", "NBS test on pancake");
-	InstallCommandLineHandler(MyCLHandler, "-steven", "-steven", "Steven test everything");
 	InstallCommandLineHandler(MyCLHandler, "-aaai", "-aaai", "All tests for AAAI");
 	InstallCommandLineHandler(MyCLHandler, "-ts", "-ts", "NBS test on TopSpin");
 	InstallCommandLineHandler(MyCLHandler, "-toh", "-toh", "NBS test on TOH");
@@ -320,25 +315,6 @@ int MyCLHandler(char *argument[], int maxNumArgs)
 		BFS();
 		return 1;
 	}
-	else if (strcmp(argument[0], "-steven") == 0)
-	{
-		TestPancake(argument[1]);
-		
-		TestSTP(argument[1]);
-		
-		double weight = 1.0;
-		AnalyzeMap(argument[2], argument[3], weight);
-		
-		return 1;
-	}
-	else if (strcmp(argument[0], "-pancake") == 0)
-	{
-		if(maxNumArgs==2)
-			TestPancake(argument[1]);
-		else
-			TestPancake();
-		return 1;
-	}
 	else if (strcmp(argument[0], "-aaai") == 0)
 	{
 		if(maxNumArgs==2)
@@ -408,19 +384,6 @@ int MyCLHandler(char *argument[], int maxNumArgs)
 			weight = atof(argument[3]);
 		AnalyzeMap(argument[1], argument[2], weight);
 		return 3;
-	}
-	/*else if (strcmp(argument[0], "-stp") == 0 && maxNumArgs > 1)
-	else if (strcmp(argument[0], "-stp") == 0)
-	{
-		TestSTP();
-	}*/
-	else if (strcmp(argument[0], "-stp") == 0)
-	{
-		if(maxNumArgs==2)
-			TestSTP(argument[1]);
-		else
-			TestSTP();
-		return 1;
 	}
 	else if (strcmp(argument[0], "-rubik") == 0 && maxNumArgs > 1)
 	{

@@ -6,7 +6,6 @@
 //  Copyright © 2017 University of Denver. All rights reserved.
 //
 
-#include "BidirPancake.h"
 #include "TopSpin.h"
 #include "TemplateAStar.h"
 #include "NBS.h"

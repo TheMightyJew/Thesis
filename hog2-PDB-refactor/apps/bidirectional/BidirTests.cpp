@@ -1,6 +1,5 @@
 #include "BidirTests.h"
 
-#include "BidirSTP.h"
 #include "MNPuzzle.h"
 #include "STPInstances.h"
 #include "STPHasher.h"
