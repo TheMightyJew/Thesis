@@ -49,16 +49,16 @@ void AAAI_Test(string file){
 	
 	AAAI_Pancake(file);
 	AAAI_STP(file);
-	AAAI_Grid(file);
+	AAAI_Grid(file, "brc000d");
 	
 	exit(0);
 }
 
 
 void AAAI_Pancake(string file){
-	const int pancakes_num = 8;
+	const int pancakes_num = 10;
 	bool randomPancake = true;
-	vector<int> gaps = {0, 1, 2};
+	vector<int> gaps = {0, 1, 2, 3};
 	int problems_num = 10;
 	
 	if(file == "")
@@ -130,6 +130,7 @@ void AAAI_STP(string file){
 }
 
 void AAAI_Grid(string file, const char *mapName, double weight){
+	int problems_num = 10;
 	if(file == "")
 		file = "results_" + datetime();
 	filename = "Test_Results/Grid/" + file + ".txt";
@@ -159,7 +160,6 @@ void AAAI_Grid(string file, const char *mapName, double weight){
 	cg_tmp = new CanonicalGrid::CanonicalGrid(m);
 	CanonicalGrid::CanonicalGrid cg = *cg_tmp;
 	cg.SetDiagonalCost(1.5);
-	int problems_num = 10;
 	int experiments_num = s.GetNumExperiments();
 	int counter = 0;
 	for (int count = 0; count < experiments_num && counter < problems_num; count++)
