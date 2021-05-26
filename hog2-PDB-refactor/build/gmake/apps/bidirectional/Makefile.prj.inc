@@ -65,6 +65,8 @@ SRC_CPP = \
 	apps/bidirectional/BidirTS.cpp \
 	apps/bidirectional/BidirRubik.cpp \
 	apps/bidirectional/BidirTests.cpp \
+	apps/bidirectional/TestInfo.cpp \
+	apps/bidirectional/TestResult.cpp \
   generic/MurmurHash3.cpp \
 	apps/bidirectional/MMRubik.cpp \
 	apps/bidirectional/MM0Rubik.cpp \

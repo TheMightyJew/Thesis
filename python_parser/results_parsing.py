@@ -6,18 +6,16 @@ import os
 analysis_dir = 'Analysis'
 res_dir = 'PancakeSorting'
 path = analysis_dir + '/' + res_dir + '/'
-filename = ''
-try:
-    arg = sys.argv[1]
-    path = os.path.dirname(arg) + '/'
-    filename = os.path.basename(arg)
-    filenames = [filename]
-except:
-    filenames = ['three_maps', 'one_map']
-for filename in filenames:
-    filename = str(filename)
-    fileName = filename.replace('.txt', '')
-    file = open(path + fileName + ".txt", "r")
+if len(sys.argv) == 2:
+    filename = sys.argv[1]
+else:
+    filename = "results_25-05-2021_13-58-45"
+file_path = analysis_dir + '/' + res_dir + '/' + filename
+file_paths = [file_path]
+for file_path in file_paths:
+    fileName = os.path.basename(file_path)
+    fileName = fileName.replace('.txt', '')
+    file = open(file_path, "r")
     if res_dir == 'PancakeSorting':
         cols = ['Number Of Pancakes', 'Gap']
         errorCols = ['Number Of Pancakes', 'Gap']
@@ -82,7 +80,7 @@ for filename in filenames:
             if 'necessary' in line:
                 necessary = int(splittedLine[splittedLine.index('necessary;') - 1])
             resDict['Necessary Expansions'] = necessary
-            if 'MBBDS' in resDict['Algorithm']:
+            if 'BFBDS' in resDict['Algorithm']:
                 if 'iterations;' in splittedLine:
                     resDict['Iterations'] = int(splittedLine[splittedLine.index('iterations;') - 1])
                 elif 'iterations' in splittedLine:
@@ -159,7 +157,7 @@ for filename in filenames:
                 errorsDF = errorsDF.append(errorsDict, ignore_index=True)
 
     resultsDF = resultsDF[cols]
-    resultsDF.to_csv(path + fileName + '_results.csv')
+    resultsDF.to_csv(os.path.dirname(file_path) + '/' + fileName + '_results.csv')
     if len(errorsDF) > 0:
         errorsDF.drop_duplicates(inplace=True)
         if res_dir == 'PancakeSorting':
@@ -169,7 +167,7 @@ for filename in filenames:
             errorsDF.sort_values(['Problem ID', 'Algorithm', 'Memory'], ascending=True,
                                  inplace=True)
         errorsDF = errorsDF[errorCols]
-    errorsDF.to_csv(path + fileName + '_errors.csv')
+    errorsDF.to_csv(os.path.dirname(file_path) + '/' + fileName + '_errors.csv')
     analysisDF = pd.DataFrame()
     analysisDict = dict.fromkeys(analysisCols)
     MBBDSFailSum = None
@@ -218,4 +216,4 @@ for filename in filenames:
             analysisDF = analysisDF.append(analysisDict, ignore_index=True)
             MBBDSFailSum = algo
 
-    analysisDF[analysisCols].to_csv(path + fileName + '_analysis.csv')
+    analysisDF[analysisCols].to_csv(os.path.dirname(file_path) + '/' + fileName + '_analysis.csv')
