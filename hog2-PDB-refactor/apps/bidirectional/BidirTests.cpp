@@ -27,9 +27,10 @@
 using namespace std;
 
 static ofstream myfile;
-static void AAAI_Pancake(string file, int problemsNum);
-static void AAAI_STP(string file, int problemsNum);
-static void AAAI_Grid(string file, int problemsNum, const char *mapName = "brc000d", double weight = 1.0);
+const string RESULTS_DIR_PATH = "Test_Results/";
+static void AAAI_Pancake(const string file, int problemsNum);
+static void AAAI_STP(const string file, int problemsNum);
+static void AAAI_Grid(const string file, int problemsNum, const char *mapName = "brc000d", double weight = 1.0);
 static string getCurrentTime();
 
 string getCurrentTime()
@@ -53,7 +54,7 @@ void AAAI_Test(string fileName)
 	}
 	fileName += ".csv";
 
-	const int problemsNum = 10;
+	const int problemsNum = 100;
 	AAAI_Pancake(fileName, problemsNum);
 	AAAI_STP(fileName, problemsNum);
 	AAAI_Grid(fileName, problemsNum, "brc000d");
@@ -61,12 +62,13 @@ void AAAI_Test(string fileName)
 	exit(0);
 }
 
-void AAAI_Pancake(string fileName, int problemsNum)
+void AAAI_Pancake(const string fileName, int problemsNum)
 {
 	bool randomPancake = true;
 	vector<int> gaps = {0, 1, 2, 3};
-	const int pancakesNum = 10;
-	string filePath = "Test_Results/PancakeSorting/" + fileName;
+	const int pancakesNum = 12;
+	const string PROBLEM_NAME = "PancakeSorting";
+	string filePath = RESULTS_DIR_PATH + PROBLEM_NAME + "/" + fileName;
 	myfile.open(filePath);
 
 	myfile << TestResult::csvSerializeHeaders() << std::endl;
@@ -82,6 +84,7 @@ void AAAI_Pancake(string fileName, int problemsNum)
 		testDescription << boost::format("TestPancake:(Pancakes: %d, Gap: %d, Random: %d, Hard: %d)") % pancakesNum % gap % randomPancake % (!randomPancake);
 
 		for (int count = 0; count < problemsNum; count++)
+		//for (int count = 90; count < problemsNum; count++)
 		{
 			goal.Reset();
 			original.Reset();
@@ -108,13 +111,14 @@ void AAAI_Pancake(string fileName, int problemsNum)
 	myfile.close();
 }
 
-void AAAI_STP(string fileName, int problemsNum)
+void AAAI_STP(const string fileName, int problemsNum)
 {
 	srandom(2017218);
 	int walkLength = 32;
 	bool randomSTP = true;
 
-	string filePath = "Test_Results/STP/" + fileName;
+	const string PROBLEM_NAME = "STP";
+	string filePath = RESULTS_DIR_PATH + PROBLEM_NAME + "/" + fileName;
 	myfile.open(filePath);
 	myfile << TestResult::csvSerializeHeaders() << std::endl;
 	GenericTester<MNPuzzleState<4, 4>, slideDir, MNPuzzle<4, 4>, STPHasher> gt;
@@ -149,9 +153,10 @@ void AAAI_STP(string fileName, int problemsNum)
 	myfile.close();
 }
 
-void AAAI_Grid(string fileName, int problemsNum, const char *mapName, double weight)
+void AAAI_Grid(const string fileName, int problemsNum, const char *mapName, double weight)
 {
-	string filePath = "Test_Results/Grid/" + fileName;
+	const string PROBLEM_NAME = "Grid";
+	string filePath = RESULTS_DIR_PATH + PROBLEM_NAME + "/" + fileName;
 	myfile.open(filePath);
 	myfile << TestResult::csvSerializeHeaders() << std::endl;
 	GenericTester<CanonicalGrid::xyLoc, CanonicalGrid::tDirection, CanonicalGrid::CanonicalGrid, GridHasher> gt;

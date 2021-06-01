@@ -100,8 +100,8 @@ bool BFBDS<state, action, environment, BloomFilter, verbose>::GetMidState(enviro
 			return true;
 		}
 		else{
-			IDBiHS<environment, state, action, false> idbihs(F2Fheuristics, isConsistent, isUpdateByWorkload);
-			solved = idbihs.GetMidState(env, fromState, toState, midState, secondsLimit, lastBound);
+			IDBiHS<environment, state, action, false> idbihs(env, F2Fheuristics, isConsistent, isUpdateByWorkload);
+			solved = idbihs.GetMidState(fromState, toState, midState, secondsLimit, lastBound);
 			currentNodesExapanded += idbihs.GetNodesExpanded();
 			if(solved){
 				pathLength = idbihs.getPathLength();
