@@ -84,7 +84,6 @@ void AAAI_Pancake(const string fileName, int problemsNum)
 		testDescription << boost::format("TestPancake:(Pancakes: %d, Gap: %d, Random: %d, Hard: %d)") % pancakesNum % gap % randomPancake % (!randomPancake);
 
 		for (int count = 0; count < problemsNum; count++)
-		//for (int count = 90; count < problemsNum; count++)
 		{
 			goal.Reset();
 			original.Reset();

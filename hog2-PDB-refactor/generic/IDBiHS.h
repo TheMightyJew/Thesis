@@ -266,7 +266,7 @@ template <class environment, class state, class action, bool verbose>
 bool IDBiHS<environment, state, action, verbose>::shouldSearchNeighbor(state &neighbor, double neighborG, state &parent, aStarStatesList &statesList)
 {
 	uint64_t neighborID;
-	return !(neighbor == parent && (detectDuplicates && statesList.getElements().size() > 1 && statesList.Lookup(this->env->GetStateHash(neighbor), neighborID) != kNotFound && (statesList.Lookup(neighborID).where == kClosedList || (statesList.Lookup(neighborID).where == kOpenList && statesList.Lookup(neighborID).g <= neighborG))));
+	return !(neighbor == parent || (detectDuplicates && statesList.getElements().size() > 1 && statesList.Lookup(this->env->GetStateHash(neighbor), neighborID) != kNotFound && (statesList.Lookup(neighborID).where == kClosedList || (statesList.Lookup(neighborID).where == kOpenList && statesList.Lookup(neighborID).g <= neighborG))));
 }
 
 template <class environment, class state, class action, bool verbose>
