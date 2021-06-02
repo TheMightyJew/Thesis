@@ -80,8 +80,10 @@ void GenericTester<state, action, environment, hasher>::genericTest(state origin
 	vector<TestResult> umaResults = testUMA(original, goal, env, testInfo);
 	// Determine states quantity bound
 	unsigned long statesQuantityBound = ULONG_MAX;
-	for(TestResult testResult : umaResults){
-		if(0 < testResult.m_maxStatesInMemory && testResult.m_maxStatesInMemory < statesQuantityBound){
+	for (TestResult testResult : umaResults)
+	{
+		if (0 < testResult.m_maxStatesInMemory && testResult.m_maxStatesInMemory < statesQuantityBound)
+		{
 			statesQuantityBound = testResult.m_maxStatesInMemory;
 		}
 	}
@@ -92,15 +94,18 @@ void GenericTester<state, action, environment, hasher>::genericTest(state origin
 	vector<TestResult> fmaResults = testFMA(original, goal, env, testInfo, statesQuantityBound, RMA_STATES_PERCENTAGES);
 
 	vector<vector<TestResult>> testResultsVectorts{lmaResults, umaResults, fmaResults};
-	for(vector<TestResult> testResultsVector : testResultsVectorts){
-		for(TestResult testResult : testResultsVector){
+	for (vector<TestResult> testResultsVector : testResultsVectorts)
+	{
+		for (TestResult testResult : testResultsVector)
+		{
 			myfile << testResult.csvSerialize() << std::endl;
 		}
 	}
 }
 
 template <class state, class action, class environment, class hasher>
-vector<TestResult> GenericTester<state, action, environment, hasher>::testUMA(state original, state goal, environment env, TestInfo testInfo){
+vector<TestResult> GenericTester<state, action, environment, hasher>::testUMA(state original, state goal, environment env, TestInfo testInfo)
+{
 	double initialHeuristic = env.HCost(original, goal);
 	Timer timer;
 	vector<state> astarPath;
@@ -195,7 +200,8 @@ vector<TestResult> GenericTester<state, action, environment, hasher>::testUMA(st
 }
 
 template <class state, class action, class environment, class hasher>
-vector<TestResult> GenericTester<state, action, environment, hasher>::testLMA(state original, state goal, environment env, TestInfo testInfo){
+vector<TestResult> GenericTester<state, action, environment, hasher>::testLMA(state original, state goal, environment env, TestInfo testInfo)
+{
 	double initialHeuristic = env.HCost(original, goal);
 	Timer timer;
 	vector<state> idaPath;
@@ -251,8 +257,9 @@ vector<TestResult> GenericTester<state, action, environment, hasher>::testLMA(st
 		}
 		testResult.m_timeElapsed = timer.GetElapsedTime();
 		testResults.push_back(testResult);
-		
-		if (printAbstractAlgos){
+
+		if (printAbstractAlgos)
+		{
 			TestResult dMmtestResult = TestResult(testInfo);
 			dMmtestResult.m_initialHeuristic = initialHeuristic;
 			dMmtestResult.m_algorithmInfo = "D-MM";
@@ -266,10 +273,11 @@ vector<TestResult> GenericTester<state, action, environment, hasher>::testLMA(st
 }
 
 template <class state, class action, class environment, class hasher>
-vector<TestResult> GenericTester<state, action, environment, hasher>::testFMA(state original, state goal, environment env, TestInfo testInfo, unsigned long statesQuantityBound, vector<double> quantityPercentages){
+vector<TestResult> GenericTester<state, action, environment, hasher>::testFMA(state original, state goal, environment env, TestInfo testInfo, unsigned long statesQuantityBound, vector<double> quantityPercentages)
+{
 	double initialHeuristic = env.HCost(original, goal);
 	Timer timer;
-	
+
 	vector<state> astarPath;
 	vector<state> idaPath;
 	vector<TestResult> testResults;
@@ -444,7 +452,8 @@ vector<TestResult> GenericTester<state, action, environment, hasher>::testFMA(st
 					testResult.m_statesExpanded = nodesExpanded;
 					testResult.m_neccessaryStatesExpanded = necessaryNodesExpanded;
 				}
-				else{
+				else
+				{
 					break;
 				}
 			}
