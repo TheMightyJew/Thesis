@@ -37,7 +37,7 @@ public:
 		this->useHash = useHash;
 	}
 	virtual ~IDTHSwTrans() {}
-	bool GetPath(SearchEnvironment<state, action> *env, state fromState, state toState, /*std::vector<state> &thePath,*/ int secondsLimit = 600, unsigned long availableStorage = 0);
+	bool GetPath(SearchEnvironment<state, action> *env, state fromState, state toState, int secondsLimit = 600, unsigned long availableStorage = 0);
 	double getPathLength() { return pathLength; }
 	uint64_t GetNodesExpanded() { return nodesExpanded; }
 	uint64_t GetNecessaryExpansions() { return necessaryExpansions; }
@@ -54,10 +54,10 @@ private:
 	bool detectDuplicates;
 	bool useHash;
 	bool DoIterationForward(SearchEnvironment<state, action> *env,
-							state parent, state currState, uint64_t hashValue, double g, uint64_t &midState);					  //, std::vector<uint64_t> &currPath, std::vector<state> &backwardPath);
-	bool DoIterationBackward(SearchEnvironment<state, action> *env, state parent, state currState, double g, uint64_t &midState); //, std::vector<state>& backwardPath);
+							state parent, state currState, uint64_t hashValue, double g, uint64_t &midState);
+	bool DoIterationBackward(SearchEnvironment<state, action> *env, state parent, state currState, double g, uint64_t &midState);
 	double updateBoundByFraction(double boundToSplit, double p = 0.5, bool isInteger = true);
-	double updateBoundByWorkload(double newbound, double prevBound, double oldForwardBound, uint64_t forwardLoad, uint64_t backwardLoad);
+	double calculateBoundByWorkload(double newbound, double prevBound, double oldForwardBound, uint64_t forwardLoad, uint64_t backwardLoad);
 	double nextBound;
 	void UpdateNextBound(double fCost);
 	state originGoal;
@@ -84,7 +84,7 @@ private:
 };
 
 template <class state, class action, bool verbose, class table>
-double IDTHSwTrans<state, action, verbose, table>::updateBoundByWorkload(double newbound, double prevBound, double oldForwardBound, uint64_t forwardLoad, uint64_t backwardLoad)
+double IDTHSwTrans<state, action, verbose, table>::calculateBoundByWorkload(double newbound, double prevBound, double oldForwardBound, uint64_t forwardLoad, uint64_t backwardLoad)
 {
 	if (forwardLoad <= backwardLoad)
 	{
@@ -98,9 +98,8 @@ double IDTHSwTrans<state, action, verbose, table>::updateBoundByWorkload(double 
 
 template <class state, class action, bool verbose, class table>
 bool IDTHSwTrans<state, action, verbose, table>::GetPath(SearchEnvironment<state, action> *env,
-														 state fromState, state toState, /*std::vector<state> &thePath,*/ int secondsLimit, unsigned long availableStorage)
+														 state fromState, state toState, int secondsLimit, unsigned long availableStorage)
 {
-	//thePath.clear();
 	this->availableStorage = availableStorage;
 	auto startTime = std::chrono::steady_clock::now();
 	nodesExpanded = nodesTouched = 0;
@@ -112,7 +111,6 @@ bool IDTHSwTrans<state, action, verbose, table>::GetPath(SearchEnvironment<state
 	unsigned long nodesExpandedSoFar = 0;
 	unsigned long previousIterationExpansions = 0;
 	uint64_t midState;
-	//std::vector<uint64_t> currPath;
 	while (true)
 	{
 		dMMLastIterExpansions = 0;
@@ -131,7 +129,7 @@ bool IDTHSwTrans<state, action, verbose, table>::GetPath(SearchEnvironment<state
 		{
 			hash = env->GetStateHash(originStart);
 		}
-		bool solved = DoIterationForward(env, originStart, originStart, hash, 0, midState); //, currPath, thePath);
+		bool solved = DoIterationForward(env, originStart, originStart, hash, 0, midState);
 		if (verbose)
 		{
 			printf("Nodes expanded: %d(%d)\n", nodesExpanded - nodesExpandedSoFar, nodesExpanded);
@@ -139,21 +137,12 @@ bool IDTHSwTrans<state, action, verbose, table>::GetPath(SearchEnvironment<state
 
 		if (!solved && transTable.size() > 0)
 		{
-			solved = DoIterationBackward(env, originGoal, originGoal, 0, midState); //, thePath);
+			solved = DoIterationBackward(env, originGoal, originGoal, 0, midState);
 		}
 		if (solved)
 		{
 			dMMExpansions = previousIterationExpansions + dMMLastIterExpansions;
 			necessaryExpansions += nodesExpandedSoFar;
-			/*
-      uint64_t oldMidState =  std::numeric_limits<uint64_t>::max();
-      while (midState != oldMidState){
-        oldMidState = midState;
-        thePath.push_back(transTable.Lookup(midState).data);
-        midState = transTable.Lookup(midState).parentID;
-      }
-			std::reverse(thePath.begin(),thePath.end());
-      */
 			return true;
 		}
 		else
@@ -167,7 +156,7 @@ bool IDTHSwTrans<state, action, verbose, table>::GetPath(SearchEnvironment<state
 			}
 			else
 			{
-				forwardBound = updateBoundByWorkload(nextBound, fBound, forwardBound, forwardExpandedInLastIter, backwardExpandedInLastIter);
+				forwardBound = calculateBoundByWorkload(nextBound, fBound, forwardBound, forwardExpandedInLastIter, backwardExpandedInLastIter);
 			}
 			fBound = nextBound;
 			forwardExpandedInLastIter = 0;
@@ -181,7 +170,7 @@ bool IDTHSwTrans<state, action, verbose, table>::GetPath(SearchEnvironment<state
 
 template <class state, class action, bool verbose, class table>
 bool IDTHSwTrans<state, action, verbose, table>::DoIterationForward(SearchEnvironment<state, action> *env,
-																	state parent, state currState, uint64_t hashValue, double g, uint64_t &midState) //, std::vector<uint64_t> &currPath, std::vector<state> &backwardPath)
+																	state parent, state currState, uint64_t hashValue, double g, uint64_t &midState)
 {
 	double h = env->HCost(currState, originGoal);
 	if (fgreater(g + h, fBound))
@@ -204,7 +193,7 @@ bool IDTHSwTrans<state, action, verbose, table>::DoIterationForward(SearchEnviro
 		}
 		if (transTable.size() > availableStorage)
 		{
-			bool isSolutionFound = DoIterationBackward(env, originGoal, originGoal, 0, midState); //,backwardPath);
+			bool isSolutionFound = DoIterationBackward(env, originGoal, originGoal, 0, midState);
 			if (isSolutionFound)
 			{
 				return true;
@@ -255,17 +244,16 @@ bool IDTHSwTrans<state, action, verbose, table>::DoIterationForward(SearchEnviro
 			}
 		}
 		if (DoIterationForward(env, currState, neighbors[x], hash, g + edgeCost, midState))
-		{ //, currPath, backwardPath)) {
+		{
 			return true;
 		}
 	}
-	//currPath.pop_back();
 	return false;
 }
 
 template <class state, class action, bool verbose, class table>
 bool IDTHSwTrans<state, action, verbose, table>::DoIterationBackward(SearchEnvironment<state, action> *env,
-																	 state parent, state currState, double g, uint64_t &midState) //, std::vector<state>& backwardPath)
+																	 state parent, state currState, double g, uint64_t &midState)
 {
 
 	double fPossibleBound = 0;
@@ -331,7 +319,7 @@ bool IDTHSwTrans<state, action, verbose, table>::DoIterationBackward(SearchEnvir
 			continue;
 		}
 		if (DoIterationBackward(env, currState, neighbors[x], g + edgeCost, midState))
-		{ //, backwardPath)) {
+		{
 			return true;
 		}
 	}

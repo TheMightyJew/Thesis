@@ -48,8 +48,8 @@ private:
 	bool DoIterationForward(state parent, state currState, double g, state &midState);
 	bool DoIterationBackward(state parent, state currState, double g, state &midState, state possibleMidState, double possibleMidStateG, double otherH = 0, double otherError = 0);
 	double updateBoundByFraction(double boundToSplit, double p = 0.5, bool isInteger = true);
-	double updateBoundByWorkload(double newbound, double prevBound, double oldForwardBound, uint64_t forwardLoad, uint64_t backwardLoad);
-	double getNextForwardBound();
+	double calculateBoundByWorkload(double newbound, double prevBound, double oldForwardBound, uint64_t forwardLoad, uint64_t backwardLoad);
+	double calculateNextForwardBound();
 	bool shouldSearchNeighbor(state &neighbor, double neighborG, state &parent, aStarStatesList &statesList);
 	void UpdateNextBound(double fCost);
 
@@ -215,7 +215,7 @@ bool IDBiHS<environment, state, action, verbose>::GetMidStateFromLists(state fro
 		}
 		else
 		{
-			forwardBound = getNextForwardBound();
+			forwardBound = calculateNextForwardBound();
 			fBound = nextBound;
 			forwardBound = std::max(minOpenG, forwardBound);
 		}
@@ -224,7 +224,7 @@ bool IDBiHS<environment, state, action, verbose>::GetMidStateFromLists(state fro
 }
 
 template <class environment, class state, class action, bool verbose>
-double IDBiHS<environment, state, action, verbose>::getNextForwardBound()
+double IDBiHS<environment, state, action, verbose>::calculateNextForwardBound()
 {
 	if (!isUpdateByWorkload)
 	{
@@ -232,7 +232,7 @@ double IDBiHS<environment, state, action, verbose>::getNextForwardBound()
 	}
 	else
 	{
-		return updateBoundByWorkload(nextBound, fBound, forwardBound, forwardExpandedInLastIter, backwardExpandedInLastIter);
+		return calculateBoundByWorkload(nextBound, fBound, forwardBound, forwardExpandedInLastIter, backwardExpandedInLastIter);
 	}
 }
 
@@ -250,7 +250,7 @@ double IDBiHS<environment, state, action, verbose>::updateBoundByFraction(double
 }
 
 template <class environment, class state, class action, bool verbose>
-double IDBiHS<environment, state, action, verbose>::updateBoundByWorkload(double newbound, double prevBound, double oldForwardBound, uint64_t forwardLoad, uint64_t backwardLoad)
+double IDBiHS<environment, state, action, verbose>::calculateBoundByWorkload(double newbound, double prevBound, double oldForwardBound, uint64_t forwardLoad, uint64_t backwardLoad)
 {
 	if (forwardLoad <= backwardLoad)
 	{
@@ -310,7 +310,7 @@ bool IDBiHS<environment, state, action, verbose>::GetMidState(state fromState, s
 		}
 		else
 		{
-			forwardBound = getNextForwardBound();
+			forwardBound = calculateNextForwardBound();
 			fBound = nextBound;
 			forwardExpandedInLastIter = 0;
 			backwardExpandedInLastIter = 0;

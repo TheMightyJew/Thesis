@@ -139,8 +139,12 @@ void AAAI_STP(const string fileName, int problemsNum)
 		{
 			original = STP::GetKorfInstance(count);
 		}
-		cout << "Running STP: ProblemID=" << count + 1 << endl;
 
+		if (original == goal)
+		{
+			continue;
+		}
+		cout << "Running STP: ProblemID=" << count + 1 << endl;
 		std::stringstream startState;
 		startState << original;
 		std::stringstream goalState;

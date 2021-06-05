@@ -285,7 +285,6 @@ vector<TestResult> GenericTester<state, action, environment, hasher>::testFMA(st
 	//FullBFBDS
 	if (BFBDSRUN)
 	{
-		bool threePhase = false;
 		vector<state> fullBfbdsPath;
 		state midState;
 		bool solved;
@@ -298,9 +297,8 @@ vector<TestResult> GenericTester<state, action, environment, hasher>::testFMA(st
 			unsigned long statesQuantityBoundforBFBDS = std::max(statesQuantityBound * quantityPercentage, MINIMUM_STATES_QUANTITY_BOUND);
 			state start = original;
 			timer.StartTimer();
-			BFBDS<state, action, environment, MbbdsBloomFilter<state, hasher>, false> bfbds(statesQuantityBoundforBFBDS, isUpdateByWorkload, isConsistent, revAlgo, F2Fheuristics);
-			bool threePhase = true;
-			solved = bfbds.GetMidState(&env, start, goal, midState, fullBfbdsPath, SECONDS_LIMIT, threePhase);
+			BFBDS<state, action, environment, MbbdsBloomFilter<state, hasher>, false> bfbds(&env, statesQuantityBoundforBFBDS, isUpdateByWorkload, isConsistent, revAlgo, F2Fheuristics);
+			solved = bfbds.GetMidState(start, goal, midState, fullBfbdsPath, SECONDS_LIMIT, threePhase);
 			timer.EndTimer();
 
 			bfbdsTestResult.m_maxStatesInMemory = statesQuantityBoundforBFBDS;
@@ -363,7 +361,7 @@ vector<TestResult> GenericTester<state, action, environment, hasher>::testFMA(st
 				unsigned long necessaryNodesExpanded = 0;
 				IDTHSwTrans<state, action, false> idbihs(F2Fheuristics, isConsistent, isUpdateByWorkload, 1, true);
 				state midState;
-				bool solved = idbihs.GetPath(&env, start, goal, /*astarPath, */ SECONDS_LIMIT, statesQuantityBoundforASPIDBiHS);
+				bool solved = idbihs.GetPath(&env, start, goal, SECONDS_LIMIT, statesQuantityBoundforASPIDBiHS);
 				nodesExpanded += idbihs.GetNodesExpanded();
 				necessaryNodesExpanded += idbihs.GetNecessaryExpansions();
 				timer.EndTimer();
@@ -395,7 +393,7 @@ vector<TestResult> GenericTester<state, action, environment, hasher>::testFMA(st
 				unsigned long necessaryNodesExpanded = 0;
 				IDTHSwTrans<state, action, false> idbihs(F2Fheuristics, isConsistent, isUpdateByWorkload, 1, false);
 				state midState;
-				bool solved = idbihs.GetPath(&env, start, goal, /*astarPath, */ SECONDS_LIMIT, statesQuantityBoundforASPIDBiHS);
+				bool solved = idbihs.GetPath(&env, start, goal, SECONDS_LIMIT, statesQuantityBoundforASPIDBiHS);
 				nodesExpanded += idbihs.GetNodesExpanded();
 				necessaryNodesExpanded += idbihs.GetNecessaryExpansions();
 				timer.EndTimer();
