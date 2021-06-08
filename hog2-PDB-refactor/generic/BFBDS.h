@@ -72,7 +72,6 @@ private:
 	unsigned long lastIterBoundExpansions;
 	unsigned long forwardExpandedInLastIter;
 	unsigned long backwardExpandedInLastIter;
-	unsigned long lastBLinsertions;
 	int saturationMaxIncreasements = 10;
 	double minCurrentError = std::numeric_limits<double>::max();
 	double minPreviousError = 0;
@@ -88,7 +87,7 @@ bool BFBDS<state, action, environment, BloomFilter, verbose>::GetMidState(state 
 	if (threePhase)
 	{
 		MM<state, action, environment> mm;
-		elapsed_seconds =  std::chrono::duration<double>(std::chrono::steady_clock::now() - startTime).count();
+		elapsed_seconds = std::chrono::duration<double>(std::chrono::steady_clock::now() - startTime).count();
 		bool solved = mm.GetPath(this->env, originState, goalState, this->env, this->env, thePath, secondsLimit - elapsed_seconds, statesQuantityBound);
 		this->nodesExpanded = mm.GetNodesExpanded();
 		this->necessaryExpansions = mm.GetNecessaryExpansions();
@@ -99,7 +98,7 @@ bool BFBDS<state, action, environment, BloomFilter, verbose>::GetMidState(state 
 			return true;
 		}
 	}
-	elapsed_seconds =  std::chrono::duration<double>(std::chrono::steady_clock::now() - startTime).count();
+	elapsed_seconds = std::chrono::duration<double>(std::chrono::steady_clock::now() - startTime).count();
 	bool solved = GetMidState(originState, goalState, midState, secondsLimit - elapsed_seconds, lastBound);
 	lastBound = this->backwardBound + this->forwardBound;
 	if (solved)
@@ -109,7 +108,7 @@ bool BFBDS<state, action, environment, BloomFilter, verbose>::GetMidState(state 
 	else
 	{
 		IDBiHS<environment, state, action, false> idbihs(this->env, this->F2Fheuristics, this->isConsistent, this->isUpdateByWorkload);
-		elapsed_seconds =  std::chrono::duration<double>(std::chrono::steady_clock::now() - startTime).count();
+		elapsed_seconds = std::chrono::duration<double>(std::chrono::steady_clock::now() - startTime).count();
 		solved = idbihs.GetMidState(originState, goalState, midState, secondsLimit - elapsed_seconds, lastBound);
 		unsigned long test = this->nodesExpanded;
 		this->nodesExpanded += idbihs.GetNodesExpanded();
@@ -175,7 +174,7 @@ bool BFBDS<state, action, environment, BloomFilter, verbose>::GetMidState(state 
 				printf("start firstRun = %d\n", this->firstRun);
 				printf("start forwardSearch = %d\n", this->forwardSearch);
 			}
-			
+
 			//Initializing iteration variables
 			this->outOfSpace = false;
 			unsigned long nodesExpandedBeforeIteration = this->nodesExpanded;
@@ -192,7 +191,7 @@ bool BFBDS<state, action, environment, BloomFilter, verbose>::GetMidState(state 
 				currentGoalState = originState;
 				currentDirectionBound = this->backwardBound;
 			}
-			
+
 			if (this->revAlgo && this->listReady)
 			{
 				for (uint64_t i = this->middleStates.size() - 1; i != static_cast<uint64_t>(-1); i--)
@@ -223,7 +222,7 @@ bool BFBDS<state, action, environment, BloomFilter, verbose>::GetMidState(state 
 			{
 				this->backwardExpandedInLastIter = std::max(this->backwardExpandedInLastIter, nodesExpandedThisIter);
 			}
-			
+
 			if (solved)
 			{
 				this->pathLength = this->fBound;
@@ -384,27 +383,26 @@ bool BFBDS<state, action, environment, BloomFilter, verbose>::checkState(state &
 		if (this->outOfSpace)
 		{
 			this->currentBloomfilter.insert(midState);
-			this->lastBLinsertions += 1;
 		}
 		else
 		{
 			if (this->middleStates.size() >= (int)(this->statesQuantityBound / 2))
 			{
 				this->outOfSpace = true;
-				if (this->lastBLinsertions > 0)
+				if (this->previousBloomfilter.getCount() > 0)
 				{
-					this->currentBloomfilter = BloomFilter(this->memoryBound / 2, round(0.693 * (this->memoryBound / 2) / (this->lastBLinsertions)), this->previousBloomfilter.hashOffset + this->previousBloomfilter.getK());
+					unsigned int nextK = std::max(1, std::min(10, int(0.693 * (this->memoryBound / 2) / (this->previousBloomfilter.getCount()*this->previousBloomfilter.getSaturation()))));
+					this->currentBloomfilter = BloomFilter(this->memoryBound / 2, nextK, this->previousBloomfilter.getNextOffset());
 				}
 				else
 				{
-					this->currentBloomfilter = BloomFilter(this->memoryBound / 2, 5, this->previousBloomfilter.hashOffset + this->previousBloomfilter.getK());
+					this->currentBloomfilter = BloomFilter(this->memoryBound / 2, 5, this->previousBloomfilter.getNextOffset());
 				}
 				for (state possibleMidState : this->middleStates)
 				{
 					this->currentBloomfilter.insert(possibleMidState);
 				}
 				this->currentBloomfilter.insert(midState);
-				this->lastBLinsertions = this->middleStates.size() + 1;
 				this->middleStates.clear();
 			}
 			else
@@ -450,7 +448,6 @@ void BFBDS<state, action, environment, BloomFilter, verbose>::updateBounds()
 template <class state, class action, class environment, class BloomFilter, bool verbose>
 void BFBDS<state, action, environment, BloomFilter, verbose>::resetBfSearchValues()
 {
-	this->lastBLinsertions = 0;
 	this->previousBloomfilter.clear();
 	this->currentBloomfilter.clear();
 	this->middleStates.clear();

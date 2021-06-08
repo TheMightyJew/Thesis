@@ -8,14 +8,14 @@ public:
 
 	long long unsigned int M;
 	unsigned int K;
-	unsigned hashOffset;
+	unsigned int hashOffset;
 	std::vector<bool> filter;
 	std::uint64_t onesCount;
 	std::uint64_t count;
 	
-	MbbdsBloomFilter(unsigned hashOffset = 0) : hashOffset(hashOffset), K(1), onesCount(0), count(0) {
+	MbbdsBloomFilter(unsigned int hashOffset = 0) : hashOffset(hashOffset), K(1), onesCount(0), count(0) {
 	}
-	MbbdsBloomFilter(long long unsigned int M, unsigned int K, unsigned hashOffset = 0) : M(M), K(K), hashOffset(hashOffset), onesCount(0), count(0) {
+	MbbdsBloomFilter(long long unsigned int M, unsigned int K, unsigned int hashOffset = 0) : M(M), K(K), hashOffset(hashOffset), onesCount(0), count(0) {
 		this->filter.resize(M, false);
 	}
 
@@ -49,10 +49,13 @@ public:
 	}
 	
 	void clear() {
-		this->hashOffset++;
 		std::fill(this->filter.begin(), this->filter.end(), false);
 		this->onesCount = 0;
 		this->count = 0;
+	}
+
+	unsigned int getNextOffset(){
+		return this->hashOffset + this->K;
 	}
 
 	double getSaturation() const {
