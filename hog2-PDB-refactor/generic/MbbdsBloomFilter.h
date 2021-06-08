@@ -7,35 +7,41 @@ class MbbdsBloomFilter {
 public:
 
 	long long unsigned int M;
-	int K;
+	unsigned int K;
 	unsigned hashOffset;
 	std::vector<bool> filter;
 	std::uint64_t onesCount;
 	std::uint64_t count;
 	
-	MbbdsBloomFilter(unsigned hashOffset = 0) : onesCount(0), count(0) {
-		this->hashOffset = hashOffset;
+	MbbdsBloomFilter(unsigned hashOffset = 0) : hashOffset(hashOffset), K(1), onesCount(0), count(0) {
 	}
-	MbbdsBloomFilter(long long unsigned int M, int K, unsigned hashOffset = 0) : onesCount(0), count(0) {
-		this->hashOffset = hashOffset;
-		this->M = M;
-		this->K = K;
-		filter.resize(M, false);
+	MbbdsBloomFilter(long long unsigned int M, unsigned int K, unsigned hashOffset = 0) : M(M), K(K), hashOffset(hashOffset), onesCount(0), count(0) {
+		this->filter.resize(M, false);
+	}
+
+	std::vector<std::uint64_t> getCellsIDs(const T& object) const{
+		std::vector<std::uint64_t> cellsIDs;
+		for (unsigned i = this->hashOffset; i < this->hashOffset + this->K; i++) {
+			cellsIDs.push_back(H::get(object, i*2) % this->M);
+		}
+		return cellsIDs;
 	}
 
 	void insert(const T& object) {
-		for (unsigned i = hashOffset; i < hashOffset + K; ++i) {
-			const std::uint64_t b = H::get(object, i*2) % M;
-			onesCount += 1 - filter[b];
-			filter[b] = true;
+		std::vector<std::uint64_t> cellsIDs = getCellsIDs(object);
+		for (std::uint64_t cellID : cellsIDs) {
+			if(!this->filter[cellID]){
+				filter[cellID] = true;
+				this->onesCount++;
+			}
 		}
-		++count;
+		++this->count;
 	}
 
 	bool contains(const T& object) const {
-		for (unsigned i = hashOffset; i < hashOffset + K; ++i) {
-			const std::uint64_t b = H::get(object, i*2) % M;
-			if (!filter[b]) {
+		std::vector<std::uint64_t> cellsIDs = getCellsIDs(object);
+		for (std::uint64_t cellID : cellsIDs) {
+			if (!this->filter[cellID]) {
 				return false;
 			}
 		}
@@ -43,34 +49,34 @@ public:
 	}
 	
 	void clear() {
-		++hashOffset;
-		std::fill(filter.begin(), filter.end(), false);
-		onesCount = 0;
-		count = 0;
+		this->hashOffset++;
+		std::fill(this->filter.begin(), this->filter.end(), false);
+		this->onesCount = 0;
+		this->count = 0;
 	}
 
 	double getSaturation() const {
-		return double(onesCount) / double(M);
+		return double(this->onesCount) / double(this->M);
 	}
 
 	bool isSetEmpty() const {
-		return count == 0;
+		return this->count == 0;
 	}
 
 	std::uint64_t getCount() const {
-		return count;
+		return this->count;
 	}
 	
 	std::uint64_t getOnesCount() const {
-		return onesCount;
+		return this->onesCount;
 	}
 	
 	long long unsigned int getM() const {
-		return M;
+		return this->M;
 	}
 	
-	int getK() const {
-		return K;
+	unsigned int getK() const {
+		return this->K;
 	}
 };
 
