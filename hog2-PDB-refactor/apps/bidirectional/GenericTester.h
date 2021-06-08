@@ -19,7 +19,7 @@
 #include "BFBDS.h"
 #include "IDBiHS.h"
 #include "IDTHSwTrans.h"
-#include "MbbdsBloomFilter.h"
+#include "GenericBloomFilter.h"
 #include "TestInfo.h"
 #include "TestResult.h"
 #include <fstream>
@@ -297,7 +297,7 @@ vector<TestResult> GenericTester<state, action, environment, hasher>::testFMA(st
 			unsigned long statesQuantityBoundforBFBDS = std::max(statesQuantityBound * quantityPercentage, MINIMUM_STATES_QUANTITY_BOUND);
 			state start = original;
 			timer.StartTimer();
-			BFBDS<state, action, environment, MbbdsBloomFilter<state, hasher>, false> bfbds(&env, statesQuantityBoundforBFBDS, isUpdateByWorkload, isConsistent, revAlgo, F2Fheuristics);
+			BFBDS<state, action, environment, GenericBloomFilter<state, hasher>, false> bfbds(&env, statesQuantityBoundforBFBDS, isUpdateByWorkload, isConsistent, revAlgo, F2Fheuristics);
 			solved = bfbds.GetMidState(start, goal, midState, fullBfbdsPath, SECONDS_LIMIT, threePhase);
 			timer.EndTimer();
 

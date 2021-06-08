@@ -33,7 +33,7 @@
 #include "MM.h"
 #include "MBBDS.h"
 #include "IDBiHS.h"
-#include "MbbdsBloomFilter.h"
+#include "GenericBloomFilter.h"
 #include <fstream>
 #include <iostream>
 #include <boost/format.hpp>

@@ -1,9 +1,9 @@
 #pragma once
-#ifndef MbbdsBloomFilter_H
-#define MbbdsBloomFilter_H
+#ifndef BloomFilter_H
+#define BloomFilter_H
 
-template<typename T, class H>
-class MbbdsBloomFilter {
+template<typename T, class Hasher>
+class GenericBloomFilter {
 public:
 
 	long long unsigned int M;
@@ -13,16 +13,16 @@ public:
 	std::uint64_t onesCount;
 	std::uint64_t count;
 	
-	MbbdsBloomFilter(unsigned int hashOffset = 0) : hashOffset(hashOffset), K(1), onesCount(0), count(0) {
+	GenericBloomFilter(unsigned int hashOffset = 0) : hashOffset(hashOffset), K(1), onesCount(0), count(0) {
 	}
-	MbbdsBloomFilter(long long unsigned int M, unsigned int K, unsigned int hashOffset = 0) : M(M), K(K), hashOffset(hashOffset), onesCount(0), count(0) {
+	GenericBloomFilter(long long unsigned int M, unsigned int K, unsigned int hashOffset = 0) : M(M), K(K), hashOffset(hashOffset), onesCount(0), count(0) {
 		this->filter.resize(M, false);
 	}
 
 	std::vector<std::uint64_t> getCellsIDs(const T& object) const{
 		std::vector<std::uint64_t> cellsIDs;
 		for (unsigned i = this->hashOffset; i < this->hashOffset + this->K; i++) {
-			cellsIDs.push_back(H::get(object, i*2) % this->M);
+			cellsIDs.push_back(Hasher::get(object, i*2) % this->M);
 		}
 		return cellsIDs;
 	}
