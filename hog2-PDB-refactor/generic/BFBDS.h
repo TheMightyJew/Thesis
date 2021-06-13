@@ -9,6 +9,7 @@
 #define BFBDS_H
 
 #include <iostream>
+#include <vector>
 #include <algorithm>
 #include <unordered_set>
 #include <math.h>
@@ -72,7 +73,7 @@ private:
 	unsigned long lastIterBoundExpansions;
 	unsigned long forwardExpandedInLastIter;
 	unsigned long backwardExpandedInLastIter;
-	int saturationMaxIncreasements = 10;
+	int saturationMaxIncreasements = 5;
 	double minCurrentError = std::numeric_limits<double>::max();
 	double minPreviousError = 0;
 };
@@ -192,21 +193,6 @@ bool BFBDS<state, action, environment, BloomFilter, verbose>::GetMidState(state 
 				currentDirectionBound = this->backwardBound;
 			}
 
-			if (this->revAlgo && this->listReady)
-			{
-				for (uint64_t i = this->middleStates.size() - 1; i != static_cast<uint64_t>(-1); i--)
-				{
-					state perimeterState = this->middleStates[i];
-					double calculatedF = this->env->HCost(currentOriginState, perimeterState) + (this->fBound - currentDirectionBound);
-					if (fgreater(calculatedF, this->fBound))
-					{
-						UpdateNextBound(calculatedF);
-						this->middleStates[i] = this->middleStates.back();
-						this->middleStates.pop_back();
-					}
-				}
-			}
-
 			bool solved = DoIteration(currentOriginState, currentGoalState, currentOriginState, currentOriginState, currentDirectionBound, 0, midState);
 			this->iteration_num++;
 			unsigned long nodesExpandedThisIter = this->nodesExpanded - nodesExpandedBeforeIteration;
@@ -318,19 +304,18 @@ bool BFBDS<state, action, environment, BloomFilter, verbose>::DoIteration(state 
 
 	if (this->revAlgo && this->listReady)
 	{
-		for (uint64_t i = this->middleStates.size() - 1; i != static_cast<uint64_t>(-1); i--)
+		for (auto it = this->middleStates.rbegin(); it != this->middleStates.rend(); ++it)
 		{
-			state perimeterState = middleStates[i];
+			state perimeterState = *it;
 			double calculatedF = g + this->env->HCost(currState, perimeterState) + (this->fBound - currentDirectionBound);
 			if (fgreater(calculatedF, this->fBound))
 			{
 				UpdateNextBound(calculatedF);
 				ignoreList.push_back(perimeterState);
-				this->middleStates[i] = this->middleStates.back();
-				this->middleStates.pop_back();
+				this->middleStates.erase(std::next(it).base()); //The correct way to erase with rev-iterator
 			}
 		}
-		if (this->middleStates.size() == 0)
+		if (this->middleStates.empty())
 		{
 			this->middleStates.insert(this->middleStates.end(), ignoreList.begin(), ignoreList.end());
 			ignoreList.clear();
@@ -391,7 +376,7 @@ bool BFBDS<state, action, environment, BloomFilter, verbose>::checkState(state &
 				this->outOfSpace = true;
 				if (this->previousBloomfilter.getCount() > 0)
 				{
-					unsigned int nextK = std::max(1, std::min(10, int(0.693 * (this->memoryBound / 2) / (this->previousBloomfilter.getCount()*this->previousBloomfilter.getSaturation()))));
+					unsigned int nextK = std::max(1, std::min(10, int(0.693 * (this->memoryBound / 2) / (this->previousBloomfilter.getCount() * this->previousBloomfilter.getSaturation()))));
 					this->currentBloomfilter = BloomFilter(this->memoryBound / 2, nextK, this->previousBloomfilter.getNextOffset());
 				}
 				else
