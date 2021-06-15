@@ -4,18 +4,15 @@
 
 #include "MNPuzzle.h"
 #include "STPInstances.h"
-#include "STPHasher.h"
 
 #include "PancakePuzzle.h"
 #include "PancakeInstances.h"
-#include "PancakeHasher.h"
 
 #include "CanonicalGrid.h"
 #include "ScenarioLoader.h"
 #include "Map2DEnvironment.h"
 #include "MapGenerators.h"
 #include "MapOverlay.h"
-#include "GridHasher.h"
 
 #include "GenericTester.h"
 #include <algorithm>
@@ -72,7 +69,7 @@ void AAAI_Pancake(const string fileName, int problemsNum)
 	myfile.open(filePath);
 
 	myfile << TestResult::csvSerializeHeaders() << std::endl;
-	GenericTester<PancakePuzzleState<pancakesNum>, PancakePuzzleAction, PancakePuzzle<pancakesNum>, PancakeHasher<pancakesNum>> gt;
+	GenericTester<PancakePuzzleState<pancakesNum>, PancakePuzzleAction, PancakePuzzle<pancakesNum>> gt;
 	for (int gap : gaps)
 	{
 		srandom(2017218);
@@ -120,7 +117,7 @@ void AAAI_STP(const string fileName, int problemsNum)
 	string filePath = RESULTS_DIR_PATH + PROBLEM_NAME + "/" + fileName;
 	myfile.open(filePath);
 	myfile << TestResult::csvSerializeHeaders() << std::endl;
-	GenericTester<MNPuzzleState<4, 4>, slideDir, MNPuzzle<4, 4>, STPHasher> gt;
+	GenericTester<MNPuzzleState<4, 4>, slideDir, MNPuzzle<4, 4>> gt;
 	MNPuzzleState<4, 4> original, goal;
 	MNPuzzle<4, 4> mnp;
 
@@ -162,7 +159,7 @@ void AAAI_Grid(const string fileName, int problemsNum, const char *mapName, doub
 	string filePath = RESULTS_DIR_PATH + PROBLEM_NAME + "/" + fileName;
 	myfile.open(filePath);
 	myfile << TestResult::csvSerializeHeaders() << std::endl;
-	GenericTester<CanonicalGrid::xyLoc, CanonicalGrid::tDirection, CanonicalGrid::CanonicalGrid, GridHasher> gt;
+	GenericTester<CanonicalGrid::xyLoc, CanonicalGrid::tDirection, CanonicalGrid::CanonicalGrid> gt;
 	CanonicalGrid::xyLoc original, goal;
 	CanonicalGrid::CanonicalGrid *cg_tmp = 0;
 

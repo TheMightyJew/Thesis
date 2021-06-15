@@ -29,7 +29,7 @@
 #include <ctime>
 using namespace std;
 
-template <class state, class action, class environment, class hasher>
+template <class state, class action, class environment>
 class GenericTester
 {
 private:
@@ -55,7 +55,7 @@ private:
 	bool ASTARpIDBiHS = true;
 
 	bool BFBDSRUN = true;
-	bool revAlgo = false;
+	bool revAlgo = true;
 	bool threePhase = true;
 
 	bool detectDuplicate = true;
@@ -72,8 +72,8 @@ public:
 	vector<TestResult> testFMA(state original, state goal, environment env, TestInfo testInfo, unsigned long statesQuantityBound, vector<double> quantityPercentages);
 };
 
-template <class state, class action, class environment, class hasher>
-void GenericTester<state, action, environment, hasher>::genericTest(state original, state goal, environment env, ofstream &myfile, TestInfo testInfo)
+template <class state, class action, class environment>
+void GenericTester<state, action, environment>::genericTest(state original, state goal, environment env, ofstream &myfile, TestInfo testInfo)
 {
 	vector<TestResult> lmaResults = testLMA(original, goal, env, testInfo);
 
@@ -103,8 +103,8 @@ void GenericTester<state, action, environment, hasher>::genericTest(state origin
 	}
 }
 
-template <class state, class action, class environment, class hasher>
-vector<TestResult> GenericTester<state, action, environment, hasher>::testUMA(state original, state goal, environment env, TestInfo testInfo)
+template <class state, class action, class environment>
+vector<TestResult> GenericTester<state, action, environment>::testUMA(state original, state goal, environment env, TestInfo testInfo)
 {
 	double initialHeuristic = env.HCost(original, goal);
 	Timer timer;
@@ -199,8 +199,8 @@ vector<TestResult> GenericTester<state, action, environment, hasher>::testUMA(st
 	return testResults;
 }
 
-template <class state, class action, class environment, class hasher>
-vector<TestResult> GenericTester<state, action, environment, hasher>::testLMA(state original, state goal, environment env, TestInfo testInfo)
+template <class state, class action, class environment>
+vector<TestResult> GenericTester<state, action, environment>::testLMA(state original, state goal, environment env, TestInfo testInfo)
 {
 	double initialHeuristic = env.HCost(original, goal);
 	Timer timer;
@@ -272,8 +272,8 @@ vector<TestResult> GenericTester<state, action, environment, hasher>::testLMA(st
 	return testResults;
 }
 
-template <class state, class action, class environment, class hasher>
-vector<TestResult> GenericTester<state, action, environment, hasher>::testFMA(state original, state goal, environment env, TestInfo testInfo, unsigned long statesQuantityBound, vector<double> quantityPercentages)
+template <class state, class action, class environment>
+vector<TestResult> GenericTester<state, action, environment>::testFMA(state original, state goal, environment env, TestInfo testInfo, unsigned long statesQuantityBound, vector<double> quantityPercentages)
 {
 	double initialHeuristic = env.HCost(original, goal);
 	Timer timer;
@@ -297,7 +297,7 @@ vector<TestResult> GenericTester<state, action, environment, hasher>::testFMA(st
 			unsigned long statesQuantityBoundforBFBDS = std::max(statesQuantityBound * quantityPercentage, MINIMUM_STATES_QUANTITY_BOUND);
 			state start = original;
 			timer.StartTimer();
-			BFBDS<state, action, environment, GenericBloomFilter<state, hasher>, false> bfbds(&env, statesQuantityBoundforBFBDS, isUpdateByWorkload, isConsistent, revAlgo, F2Fheuristics);
+			BFBDS<state, action, environment> bfbds(&env, statesQuantityBoundforBFBDS, isUpdateByWorkload, isConsistent, revAlgo, F2Fheuristics, false);
 			solved = bfbds.GetMidState(start, goal, midState, fullBfbdsPath, SECONDS_LIMIT, threePhase);
 			timer.EndTimer();
 
