@@ -17,12 +17,27 @@
 #include "IDBiHS.h"
 #include "Bloom.h"
 
+const bool DEFAULT_UPDATE_BY_WORKLOAD = true;
+const bool DEFAULT_IS_CONSISTENT = false;
+const bool DEFAULT_REV_ALGO = false;
+const bool DEFAULT_F2F_HEURISTICS = false;
+const bool DEFAULT_F2F_VERBOSE = false;
+const bool DEFAULT_SECONDS_LIMIT = 60 * 10;
+const double DEFAULT_SMALLEST_EDGE = 1;
+const int SATURATION_MAX_INC = 1;
+const int DEFAULT_HASH_NUM = 5;
+const int MIN_HASH_NUM = 1;
+const int MAX_HASH_NUM = 10;
+const double LN2 = 0.693;
+
 template <class state, class action, class environment>
 class BFBDS
 {
+	typedef std::function<bool(const state &, const state &)> StatesComparator;
+
 public:
-	BFBDS(environment *env, unsigned long statesQuantityBound, bool isUpdateByWorkload = true, bool isConsistent = true, bool revAlgo = false, bool F2Fheuristics = true, bool verbose = false, double smallestEdge = 1);
-	virtual ~BFBDS() {}
+	BFBDS(environment *env, unsigned long statesQuantityBound, bool isUpdateByWorkload = DEFAULT_UPDATE_BY_WORKLOAD, bool isConsistent = DEFAULT_IS_CONSISTENT, bool revAlgo = DEFAULT_REV_ALGO, bool F2Fheuristics = DEFAULT_F2F_HEURISTICS, bool DEFAULT_F2F_VERBOSE = false, double smallestEdge = DEFAULT_SMALLEST_EDGE);
+	virtual ~BFBDS() { deleteBloomFilters(); }
 	bool GetMidState(state originState, state goalState, state &midState, std::vector<state> &thePath, int secondsLimit = 600, bool threePhase = true);
 	double getPathLength() { return pathLength; }
 	uint64_t getNodesExpanded() { return nodesExpanded; }
@@ -30,7 +45,7 @@ public:
 	int getIterationsNum() { return iteration_num; }
 
 private:
-	bool GetMidState(state originState, state goalState, state &midState, int secondsLimit = 600, double startingFBound = 0);
+	bool GetMidState(state originState, state goalState, state &midState, int secondsLimit = DEFAULT_SECONDS_LIMIT, double startingFBound = 0);
 	bool DoIteration(state &originState, state &goalState, state &parent, state &currState, double currentDirectionBound, double g, state &midState);
 	bool checkState(state &midState, double g);
 	void updateBounds();
@@ -41,6 +56,8 @@ private:
 	int calculateOptimalHashNum(uint64_t bloomfilterSize, uint64_t expectedEntries);
 	void resetBfSearchValues();
 	void deleteBloomFilters();
+	void printIterationInfo();
+	BloomFilter *getNextBloomfilter();
 
 	//Constructor variables
 	environment *env;
@@ -62,8 +79,8 @@ private:
 	unsigned long memoryBound;
 	BloomFilter *previousBloomfilter = nullptr;
 	BloomFilter *currentBloomfilter = nullptr;
-	std::vector<state> middleStates;
-	std::vector<double> middleStatesG;
+	std::map<state, double, StatesComparator> middleStates;
+	StatesComparator statesComparator;
 	bool forwardSearch;
 	bool listReady;
 	bool outOfSpace;
@@ -79,27 +96,33 @@ private:
 
 	//Next Run Variables
 	double nextBound;
-
-	//consts
-	const int SATURATION_MAX_INC = 5;
-	const int DEFAULT_HASH_NUM = 5;
-	const int MIN_HASH_NUM = 1;
-	const int MAX_HASH_NUM = 10;
-	const double LN2 = 0.693;
 };
 
 template <class state, class action, class environment>
-BFBDS<state, action, environment>::BFBDS(environment *env, unsigned long statesQuantityBound, bool isUpdateByWorkload, bool isConsistent, bool revAlgo, bool F2Fheuristics, bool verbose, double smallestEdge) : env(env), statesQuantityBound(statesQuantityBound), isUpdateByWorkload(isUpdateByWorkload), isConsistent(isConsistent), revAlgo(revAlgo), F2Fheuristics(F2Fheuristics), verbose(verbose), smallestEdge(smallestEdge) {}
+BFBDS<state, action, environment>::BFBDS(environment *env, unsigned long statesQuantityBound, bool isUpdateByWorkload, bool isConsistent, bool revAlgo, bool F2Fheuristics, bool verbose, double smallestEdge) : env(env), statesQuantityBound(statesQuantityBound), isUpdateByWorkload(isUpdateByWorkload), isConsistent(isConsistent), revAlgo(revAlgo), F2Fheuristics(F2Fheuristics), verbose(verbose), smallestEdge(smallestEdge)
+{
+	this->statesComparator = [&](const state &firstState, const state &secondState)
+	{ return env->GetStateHash(firstState) < env->GetStateHash(secondState); };
+	this->middleStates = std::map<state, double, StatesComparator>(this->statesComparator);
+}
 
 template <class state, class action, class environment>
 bool BFBDS<state, action, environment>::GetMidState(state originState, state goalState, state &midState, std::vector<state> &thePath, int secondsLimit, bool threePhase)
 {
+	if (this->verbose)
+	{
+		printf("Starting to solve with BFBDS, memory limit= %1.1llu\n", this->memoryBound);
+	}
 	this->nodesExpanded = this->nodesTouched = this->necessaryExpansions = 0;
 	double lastBound;
 	auto startTime = std::chrono::steady_clock::now();
 	double elapsed_seconds;
 	if (threePhase)
 	{
+		if (this->verbose)
+		{
+			printf("Starting BFBDS: MM phase\n");
+		}
 		MM<state, action, environment> mm;
 		elapsed_seconds = std::chrono::duration<double>(std::chrono::steady_clock::now() - startTime).count();
 		bool solved = mm.GetPath(this->env, originState, goalState, this->env, this->env, thePath, secondsLimit - elapsed_seconds, statesQuantityBound);
@@ -112,12 +135,20 @@ bool BFBDS<state, action, environment>::GetMidState(state originState, state goa
 			return true;
 		}
 	}
+	if (this->verbose)
+	{
+		printf("Starting BFBDS: BF phase\n");
+	}
 	elapsed_seconds = std::chrono::duration<double>(std::chrono::steady_clock::now() - startTime).count();
 	bool solved = GetMidState(originState, goalState, midState, secondsLimit - elapsed_seconds, lastBound);
 	deleteBloomFilters();
 	lastBound = this->fBound;
 	if (!solved)
 	{
+		if (this->verbose)
+		{
+			printf("Starting BFBDS: IDBiHS phase\n");
+		}
 		IDBiHS<environment, state, action, false> idbihs(this->env, this->F2Fheuristics, this->isConsistent, this->isUpdateByWorkload, this->smallestEdge);
 		elapsed_seconds = std::chrono::duration<double>(std::chrono::steady_clock::now() - startTime).count();
 		solved = idbihs.GetMidState(originState, goalState, midState, secondsLimit - elapsed_seconds, lastBound);
@@ -150,11 +181,6 @@ bool BFBDS<state, action, environment>::GetMidState(state originState, state goa
 {
 	state currentOriginState, currentGoalState;
 	this->memoryBound = sizeof(originState) * statesQuantityBound;
-	if (this->verbose)
-	{
-		printf("\nmemory is %1.1llu\n", this->memoryBound);
-		printf("\nStarting to solve with BFBDS\n");
-	}
 	double initialHeuristic = this->env->HCost(originState, goalState);
 	this->nextBound = this->fBound = std::max(smallestEdge, std::max(initialHeuristic, startingFBound));
 	this->forwardSearch = true;
@@ -174,24 +200,17 @@ bool BFBDS<state, action, environment>::GetMidState(state originState, state goa
 			this->currentBloomfilter = nullptr;
 			this->previousMaxG = this->currentMaxG;
 			this->currentMaxG = 0;
+
 			auto currentTime = std::chrono::steady_clock::now();
 			std::chrono::duration<double> elapsed_seconds = currentTime - startTime;
 			if (elapsed_seconds.count() >= secondsLimit)
 			{
 				return false;
 			}
+
 			if (this->verbose)
 			{
-				printf("Bounds: %f and %f\n", this->forwardBound, this->backwardBound);
-				printf("Starting iteration number: %d.\n", this->iteration_num);
-				printf("start middleStates.size() = %d\n", this->middleStates.size());
-				if (this->previousBloomfilter != nullptr)
-				{
-					printf("start previousBloomfilter->GetSaturation() = %f\n", this->previousBloomfilter->GetSaturation());
-				}
-				printf("start listReady = %d\n", this->listReady);
-				printf("start firstRun = %d\n", this->firstRun);
-				printf("start forwardSearch = %d\n", this->forwardSearch);
+				printIterationInfo();
 			}
 
 			//Initializing iteration variables
@@ -237,7 +256,7 @@ bool BFBDS<state, action, environment>::GetMidState(state originState, state goa
 			{ // no solution found
 				break;
 			}
-			if (!this->outOfSpace)
+			if (!this->outOfSpace) // Memory is not exhausted
 			{
 				if (this->middleStates.size() == 0)
 				{
@@ -257,14 +276,13 @@ bool BFBDS<state, action, environment>::GetMidState(state originState, state goa
 				{
 					saturationIncreasedCount += 1;
 				}
-				if (saturation == 1 || saturationIncreasedCount >= this->SATURATION_MAX_INC)
+				if (saturation == 1 || saturationIncreasedCount >= SATURATION_MAX_INC)
 				{
 					return false; //bloomfilter is fluded.
 				}
 				last_saturation = saturation;
 				delete this->previousBloomfilter;
 				this->previousBloomfilter = nullptr;
-
 				this->listReady = false;
 			}
 			this->firstRun = false;
@@ -290,9 +308,9 @@ bool BFBDS<state, action, environment>::GetMidState(state originState, state goa
 template <class state, class action, class environment>
 bool BFBDS<state, action, environment>::DoIteration(state &originState, state &goalState, state &parent, state &currState, double currentDirectionBound, double g, state &midState)
 {
+	this->nodesTouched++;
 	double h = this->env->HCost(currState, goalState);
-	std::vector<state> ignoreList;
-	if (this->isConsistent && g < currentDirectionBound)
+	if (this->isConsistent)
 	{
 		h += this->minPreviousError;
 	}
@@ -320,22 +338,29 @@ bool BFBDS<state, action, environment>::DoIteration(state &originState, state &g
 		}
 	}
 
+	std::map<state, double, StatesComparator> ignoreList;
 	if (this->revAlgo && this->listReady)
 	{
-		for (auto it = this->middleStates.rbegin(); it != this->middleStates.rend(); ++it)
+		ignoreList = std::map<state, double, StatesComparator>(this->statesComparator);
+		for (auto it = this->middleStates.cbegin(); it != this->middleStates.cend();)
 		{
-			state perimeterState = *it;
-			double calculatedF = g + this->env->HCost(currState, perimeterState) + (this->fBound - currentDirectionBound);
+			state perimeterState = it->first;
+			double perimeterStateG = it->second;
+			double calculatedF = g + this->env->HCost(currState, perimeterState) + perimeterStateG;
 			if (fgreater(calculatedF, this->fBound))
 			{
 				UpdateNextBound(calculatedF);
-				ignoreList.push_back(perimeterState);
-				this->middleStates.erase(std::next(it).base()); //The correct way to erase with rev-iterator
+				ignoreList[perimeterState] = perimeterStateG;
+				it = this->middleStates.erase(it);
+			}
+			else
+			{
+				++it;
 			}
 		}
 		if (this->middleStates.empty())
 		{
-			this->middleStates.insert(this->middleStates.end(), ignoreList.begin(), ignoreList.end());
+			this->middleStates.insert(ignoreList.begin(), ignoreList.end());
 			ignoreList.clear();
 			return false;
 		}
@@ -343,7 +368,6 @@ bool BFBDS<state, action, environment>::DoIteration(state &originState, state &g
 
 	std::vector<state> neighbors;
 	this->env->GetSuccessors(currState, neighbors);
-	this->nodesTouched += neighbors.size();
 	this->nodesExpanded++;
 	if (g + h == this->fBound)
 	{
@@ -364,7 +388,7 @@ bool BFBDS<state, action, environment>::DoIteration(state &originState, state &g
 
 	if (this->revAlgo && this->listReady)
 	{
-		this->middleStates.insert(this->middleStates.end(), ignoreList.begin(), ignoreList.end());
+		this->middleStates.insert(ignoreList.begin(), ignoreList.end());
 		ignoreList.clear();
 	}
 
@@ -376,10 +400,10 @@ bool BFBDS<state, action, environment>::checkState(state &midState, double g)
 {
 	if (this->listReady)
 	{
-		auto it = std::find(this->middleStates.begin(), this->middleStates.end(), midState);
+		auto it = this->middleStates.find(midState);
 		if (it != this->middleStates.end())
 		{
-			if (g + this->middleStatesG.at(it - this->middleStates.begin()) <= this->fBound)
+			if (g + it->second <= this->fBound)
 			{
 				return true;
 			}
@@ -397,34 +421,17 @@ bool BFBDS<state, action, environment>::checkState(state &midState, double g)
 			if (this->middleStates.size() >= (int)(this->statesQuantityBound / 2))
 			{
 				this->outOfSpace = true;
-				int nextStartingHash = 0;
-				int hashNum = DEFAULT_HASH_NUM;
-				uint64_t bloomfilterSize = 0.5 * this->memoryBound;
-				if (this->previousBloomfilter != nullptr)
-				{
-					uint64_t expectedEntries = this->previousBloomfilter->GetEntries() * pow(this->previousBloomfilter->GetSaturation(), this->previousBloomfilter->GetNumHash());
-					int optimalHashNum = calculateOptimalHashNum(bloomfilterSize, expectedEntries);
-					hashNum = std::max(MIN_HASH_NUM, std::min(MAX_HASH_NUM, optimalHashNum));
-					nextStartingHash = this->previousBloomfilter->GetNextStartingHash();
-				}
-				delete this->currentBloomfilter;
-				this->currentBloomfilter = nullptr;
-
-				this->currentBloomfilter = new BloomFilter(bloomfilterSize, hashNum, false, false, nextStartingHash);
-
+				this->currentBloomfilter = getNextBloomfilter();
 				this->currentBloomfilter->Insert(this->env->GetStateHash(midState));
-				for (state possibleMidState : this->middleStates)
+				for (const auto &possibleMidStatePair : this->middleStates)
 				{
-					this->currentBloomfilter->Insert(this->env->GetStateHash(possibleMidState));
+					this->currentBloomfilter->Insert(this->env->GetStateHash(possibleMidStatePair.first));
 				}
-
 				this->middleStates.clear();
-				this->middleStatesG.clear();
 			}
 			else
 			{
-				this->middleStates.push_back(midState);
-				this->middleStatesG.push_back(g);
+				this->middleStates[midState] = g;
 			}
 		}
 	}
@@ -476,7 +483,6 @@ void BFBDS<state, action, environment>::resetBfSearchValues()
 	this->forwardSearch = isNextForwardSearch();
 	this->listReady = false;
 	this->middleStates.clear();
-	this->middleStatesG.clear();
 	this->previousMaxG = 0;
 	this->forwardExpandedInLastIter = 0;
 	this->backwardExpandedInLastIter = 0;
@@ -498,9 +504,40 @@ void BFBDS<state, action, environment>::deleteBloomFilters()
 }
 
 template <class state, class action, class environment>
+void BFBDS<state, action, environment>::printIterationInfo()
+{
+	printf("Starting iteration number: %d.\n", this->iteration_num);
+	printf("Bounds: %f and %f\n", this->forwardBound, this->backwardBound);
+	printf("start middleStates.size() = %d\n", this->middleStates.size());
+	if (this->previousBloomfilter != nullptr)
+	{
+		printf("start previousBloomfilter->GetSaturation() = %f\n", this->previousBloomfilter->GetSaturation());
+	}
+	printf("start listReady = %d\n", this->listReady);
+	printf("start firstRun = %d\n", this->firstRun);
+	printf("start forwardSearch = %d\n", this->forwardSearch);
+}
+
+template <class state, class action, class environment>
 int BFBDS<state, action, environment>::calculateOptimalHashNum(uint64_t bloomfilterSize, uint64_t expectedEntries)
 {
-	return (this->LN2 * bloomfilterSize) / expectedEntries;
+	return (LN2 * bloomfilterSize) / expectedEntries;
+}
+
+template <class state, class action, class environment>
+BloomFilter *BFBDS<state, action, environment>::getNextBloomfilter()
+{
+	int nextStartingHash = 0;
+	int hashNum = DEFAULT_HASH_NUM;
+	uint64_t bloomfilterSize = 0.5 * this->memoryBound;
+	if (this->previousBloomfilter != nullptr)
+	{
+		uint64_t expectedEntries = this->previousBloomfilter->GetEntries() * pow(this->previousBloomfilter->GetSaturation(), this->previousBloomfilter->GetNumHash());
+		int optimalHashNum = calculateOptimalHashNum(bloomfilterSize, expectedEntries);
+		hashNum = std::max(MIN_HASH_NUM, std::min(MAX_HASH_NUM, optimalHashNum));
+		nextStartingHash = this->previousBloomfilter->GetNextStartingHash();
+	}
+	return new BloomFilter(bloomfilterSize, hashNum, false, false, nextStartingHash);
 }
 
 #endif
