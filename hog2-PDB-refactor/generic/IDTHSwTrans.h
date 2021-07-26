@@ -107,10 +107,14 @@ bool IDTHSwTrans<state, action, verbose, table>::GetPath(SearchEnvironment<state
 	originGoal = toState;
 	double initialHeuristic = env->HCost(fromState, toState);
 	fBound = nextBound = std::max(smallestEdge, initialHeuristic);
-	forwardBound = ceil(fBound / 2) - smallestEdge;
+	forwardBound = fBound / 2 - smallestEdge;
 	unsigned long nodesExpandedSoFar = 0;
 	unsigned long previousIterationExpansions = 0;
 	uint64_t midState;
+	if (verbose)
+	{
+		printf("Starting solving with IDTHwTrans with %1.1llu memory\n", this->availableStorage);
+	}
 	while (true)
 	{
 		dMMLastIterExpansions = 0;
@@ -122,7 +126,7 @@ bool IDTHSwTrans<state, action, verbose, table>::GetPath(SearchEnvironment<state
 		}
 		if (verbose)
 		{
-			printf("\t\tBounds: %1.1f and %1.1f: ", forwardBound, backwardBound);
+			printf("\tBounds: %1.1f(%1.1f, %1.1f): ", fBound, forwardBound, backwardBound);
 		}
 		uint64_t hash;
 		if (useHash)
@@ -152,7 +156,7 @@ bool IDTHSwTrans<state, action, verbose, table>::GetPath(SearchEnvironment<state
 
 			if (!isUpdateByWorkload)
 			{
-				forwardBound = ceil(nextBound / 2) - smallestEdge;
+				forwardBound = nextBound / 2 - smallestEdge;
 			}
 			else
 			{
@@ -255,7 +259,7 @@ template <class state, class action, bool verbose, class table>
 bool IDTHSwTrans<state, action, verbose, table>::DoIterationBackward(SearchEnvironment<state, action> *env,
 																	 state parent, state currState, double g, uint64_t &midState)
 {
-
+	nodesTouched++;
 	double fPossibleBound = 0;
 	std::vector<transpostionNode<state>> ignoreList;
 	for (uint64_t i = transTable.size() - 1; i != static_cast<uint64_t>(-1); i--)
@@ -291,38 +295,30 @@ bool IDTHSwTrans<state, action, verbose, table>::DoIterationBackward(SearchEnvir
 			transTable[i] = transTable.back();
 			transTable.pop_back();
 			UpdateNextBound(computedF);
-			continue;
 		}
-	}
-	if (transTable.size() == 0)
-	{
-		transTable.insert(transTable.end(), ignoreList.begin(), ignoreList.end());
-		ignoreList.clear();
-		return false;
 	}
 
-	std::vector<state> neighbors;
-	env->GetSuccessors(currState, neighbors);
-	nodesTouched += neighbors.size();
-	nodesExpanded++;
-	backwardExpandedInLastIter++;
-	if (fPossibleBound == fBound)
+	if (transTable.size() > 0)
 	{
-		dMMLastIterExpansions++;
-	}
-	for (unsigned int x = 0; x < neighbors.size(); x++)
-	{
-		uint64_t childID;
-		double edgeCost = env->GCost(currState, neighbors[x]);
-		if (neighbors[x] == parent)
+		std::vector<state> neighbors;
+		env->GetSuccessors(currState, neighbors);
+		nodesExpanded++;
+		backwardExpandedInLastIter++;
+		if (fPossibleBound == fBound)
 		{
-			continue;
+			dMMLastIterExpansions++;
 		}
-		if (DoIterationBackward(env, currState, neighbors[x], g + edgeCost, midState))
+		for (unsigned int x = 0; x < neighbors.size(); x++)
 		{
-			return true;
+			uint64_t childID;
+			double edgeCost = env->GCost(currState, neighbors[x]);
+			if (neighbors[x] != parent && DoIterationBackward(env, currState, neighbors[x], g + edgeCost, midState))
+			{
+				return true;
+			}
 		}
 	}
+
 	transTable.insert(transTable.end(), ignoreList.begin(), ignoreList.end());
 	ignoreList.clear();
 	return false;
