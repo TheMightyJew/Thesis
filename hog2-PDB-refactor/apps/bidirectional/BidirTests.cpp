@@ -93,6 +93,11 @@ void AAAI_Pancake(const string fileName, int problemsNum)
 			{
 				GetPancakeInstance(original, count);
 			}
+			if (count == 7 || count == 39)
+			{
+				cout << "Skipped Pancake: Gap=" << gap << ", ProblemID=" << count + 1 << endl;
+				continue;
+			}
 			cout << "Running Pancake: Gap=" << gap << ", ProblemID=" << count + 1 << endl;
 
 			std::stringstream startState;
@@ -101,7 +106,7 @@ void AAAI_Pancake(const string fileName, int problemsNum)
 			goalState << goal;
 			TestInfo testInfo = TestInfo(testDescription.str(), count, startState.str(), goalState.str());
 
-			gt.genericTest(original, goal, pancake, myfile, testInfo);
+			gt.genericTest(original, goal, pancake, myfile, testInfo, 1);
 		}
 	}
 	myfile.close();
@@ -148,7 +153,7 @@ void AAAI_STP(const string fileName, int problemsNum)
 		goalState << goal;
 		TestInfo testInfo = TestInfo(testDescription.str(), count, startState.str(), goalState.str());
 
-		gt.genericTest(original, goal, mnp, myfile, testInfo);
+		gt.genericTest(original, goal, mnp, myfile, testInfo, 1);
 	}
 	myfile.close();
 }
@@ -207,7 +212,7 @@ void AAAI_Grid(const string fileName, int problemsNum, const char *mapName, doub
 		goalState << goal;
 		TestInfo testInfo = TestInfo(testDescription.str(), count, startState.str(), goalState.str());
 
-		gt.genericTest(original, goal, cg, myfile, testInfo);
+		gt.genericTest(original, goal, cg, myfile, testInfo, 0.5);
 		counter++;
 	}
 	myfile.close();

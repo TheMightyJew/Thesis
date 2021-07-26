@@ -39,11 +39,11 @@ private:
 	const vector<double> RMA_STATES_PERCENTAGES{0.5, 0.1, 0.01};
 
 	bool AstarRun = true;
-	bool RevAstarRun = true;
+	bool RevAstarRun = false;
 	bool IDAstarRun = true;
-	bool AstarPIDAstarRun = true;
-	bool AstarPIDAstarReverseRun = true;
-	bool AstarPIDAstarReverseMinHRun = true;
+	bool AstarPIDAstarRun = false;
+	bool AstarPIDAstarReverseRun = false;
+	bool AstarPIDAstarReverseMinHRun = false;
 	bool IDTHSpTrans = true;
 	bool BAI = true;
 	bool Max_BAI = true;
@@ -55,8 +55,9 @@ private:
 	bool ASTARpIDBiHS = true;
 
 	bool BFBDSRUN = true;
-	bool revAlgo = true;
-	bool threePhase = true;
+	bool BFBDSVerbose = false;
+	bool revAlgo = false;
+	bool threePhase = false;
 
 	bool detectDuplicate = true;
 	bool isConsistent = true;
@@ -66,14 +67,14 @@ private:
 public:
 	GenericTester() {}
 	virtual ~GenericTester() {}
-	void genericTest(state original, state goal, environment env, ofstream &myfile, TestInfo testInfo);
+	void genericTest(state original, state goal, environment env, ofstream &myfile, TestInfo testInfo, double smallestEdge);
 	vector<TestResult> testUMA(state original, state goal, environment env, TestInfo testInfo);
 	vector<TestResult> testLMA(state original, state goal, environment env, TestInfo testInfo);
-	vector<TestResult> testFMA(state original, state goal, environment env, TestInfo testInfo, unsigned long statesQuantityBound, vector<double> quantityPercentages);
+	vector<TestResult> testFMA(state original, state goal, environment env, TestInfo testInfo, unsigned long statesQuantityBound, vector<double> quantityPercentages, double smallestEdge);
 };
 
 template <class state, class action, class environment>
-void GenericTester<state, action, environment>::genericTest(state original, state goal, environment env, ofstream &myfile, TestInfo testInfo)
+void GenericTester<state, action, environment>::genericTest(state original, state goal, environment env, ofstream &myfile, TestInfo testInfo, double smallestEdge)
 {
 	vector<TestResult> lmaResults = testLMA(original, goal, env, testInfo);
 
@@ -91,7 +92,7 @@ void GenericTester<state, action, environment>::genericTest(state original, stat
 	{
 		statesQuantityBound = STATES_QUANTITY_BOUND_DEFAULT;
 	}
-	vector<TestResult> fmaResults = testFMA(original, goal, env, testInfo, statesQuantityBound, RMA_STATES_PERCENTAGES);
+	vector<TestResult> fmaResults = testFMA(original, goal, env, testInfo, statesQuantityBound, RMA_STATES_PERCENTAGES, smallestEdge);
 
 	vector<vector<TestResult>> testResultsVectorts{lmaResults, umaResults, fmaResults};
 	for (vector<TestResult> testResultsVector : testResultsVectorts)
@@ -273,7 +274,7 @@ vector<TestResult> GenericTester<state, action, environment>::testLMA(state orig
 }
 
 template <class state, class action, class environment>
-vector<TestResult> GenericTester<state, action, environment>::testFMA(state original, state goal, environment env, TestInfo testInfo, unsigned long statesQuantityBound, vector<double> quantityPercentages)
+vector<TestResult> GenericTester<state, action, environment>::testFMA(state original, state goal, environment env, TestInfo testInfo, unsigned long statesQuantityBound, vector<double> quantityPercentages, double smallestEdge)
 {
 	double initialHeuristic = env.HCost(original, goal);
 	Timer timer;
@@ -297,7 +298,7 @@ vector<TestResult> GenericTester<state, action, environment>::testFMA(state orig
 			unsigned long statesQuantityBoundforBFBDS = std::max(statesQuantityBound * quantityPercentage, MINIMUM_STATES_QUANTITY_BOUND);
 			state start = original;
 			timer.StartTimer();
-			BFBDS<state, action, environment> bfbds(&env, statesQuantityBoundforBFBDS, isUpdateByWorkload, isConsistent, revAlgo, F2Fheuristics, false);
+			BFBDS<state, action, environment> bfbds(&env, statesQuantityBoundforBFBDS, isUpdateByWorkload, isConsistent, revAlgo, F2Fheuristics, BFBDSVerbose, smallestEdge);
 			solved = bfbds.GetMidState(start, goal, midState, fullBfbdsPath, SECONDS_LIMIT, threePhase);
 			timer.EndTimer();
 
@@ -359,7 +360,7 @@ vector<TestResult> GenericTester<state, action, environment>::testFMA(state orig
 				timer.StartTimer();
 				unsigned long nodesExpanded = 0;
 				unsigned long necessaryNodesExpanded = 0;
-				IDTHSwTrans<state, action, false> idbihs(F2Fheuristics, isConsistent, isUpdateByWorkload, 1, true);
+				IDTHSwTrans<state, action, false> idbihs(F2Fheuristics, isConsistent, isUpdateByWorkload, 1, false);
 				state midState;
 				bool solved = idbihs.GetPath(&env, start, goal, SECONDS_LIMIT, statesQuantityBoundforASPIDBiHS);
 				nodesExpanded += idbihs.GetNodesExpanded();
@@ -510,7 +511,7 @@ vector<TestResult> GenericTester<state, action, environment>::testFMA(state orig
 		{
 			TestResult testResult = TestResult(testInfo);
 			testResult.m_initialHeuristic = initialHeuristic;
-			testResult.m_algorithmInfo = "Astar+IDAstar+Reverse-" + to_string(quantityPercentage) + "%";
+			testResult.m_algorithmInfo = "Astar+IDAstar+ReverseMinH-" + to_string(quantityPercentage) + "%";
 			unsigned long statesQuantityBoundforASPIDARS = std::max(statesQuantityBound * quantityPercentage, MINIMUM_STATES_QUANTITY_BOUND);
 			TemplateAStar<state, action, environment> astar;
 			state start = original;
