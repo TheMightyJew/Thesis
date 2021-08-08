@@ -18,10 +18,10 @@
 #include "Bloom.h"
 
 const bool DEFAULT_UPDATE_BY_WORKLOAD = true;
-const bool DEFAULT_IS_CONSISTENT = false;
+const bool DEFAULT_IS_CONSISTENT = true;
 const bool DEFAULT_REV_ALGO = false;
-const bool DEFAULT_F2F_HEURISTICS = false;
-const bool DEFAULT_F2F_VERBOSE = false;
+const bool DEFAULT_F2F_HEURISTICS = true;
+const bool DEFAULT_VERBOSE = false;
 const bool DEFAULT_SECONDS_LIMIT = 60 * 10;
 const double DEFAULT_SMALLEST_EDGE = 1;
 const int SATURATION_MAX_INC = 1;
@@ -36,7 +36,7 @@ class BFBDS
 	typedef std::function<bool(const state &, const state &)> StatesComparator;
 
 public:
-	BFBDS(environment *env, unsigned long statesQuantityBound, bool isUpdateByWorkload = DEFAULT_UPDATE_BY_WORKLOAD, bool isConsistent = DEFAULT_IS_CONSISTENT, bool revAlgo = DEFAULT_REV_ALGO, bool F2Fheuristics = DEFAULT_F2F_HEURISTICS, bool DEFAULT_F2F_VERBOSE = false, double smallestEdge = DEFAULT_SMALLEST_EDGE);
+	BFBDS(environment *env, unsigned long statesQuantityBound, bool isUpdateByWorkload = DEFAULT_UPDATE_BY_WORKLOAD, bool isConsistent = DEFAULT_IS_CONSISTENT, bool revAlgo = DEFAULT_REV_ALGO, bool F2Fheuristics = DEFAULT_F2F_HEURISTICS, bool verbose = DEFAULT_VERBOSE, double smallestEdge = DEFAULT_SMALLEST_EDGE);
 	virtual ~BFBDS() { deleteBloomFilters(); }
 	bool GetMidState(state originState, state goalState, state &midState, std::vector<state> &thePath, int secondsLimit = 600, bool threePhase = true);
 	double getPathLength() { return pathLength; }
@@ -82,7 +82,7 @@ private:
 	StatesComparator statesComparator;
 	bool forwardSearch, listReady, outOfSpace, firstRun;
 	double backwardBound, forwardBound, fBound, nextBound;
-	double previousMaxG, currentMaxG;
+	double previousMaxG, currentMaxG, previousMinG, currentMinG;
 	unsigned long lastIterBoundExpansions, forwardMaxExpansions, backwardMaxExpansions;
 	double minCurrentError, minPreviousError;
 };
@@ -187,7 +187,19 @@ bool BFBDS<state, action, environment>::GetMidState(state originState, state goa
 			this->previousBloomfilter = this->currentBloomfilter;
 			this->currentBloomfilter = nullptr;
 			this->previousMaxG = this->currentMaxG;
-
+			this->previousMinG = this->currentMinG;
+			if (this->isConsistent)
+			{
+				if (this->minCurrentError != std::numeric_limits<double>::max())
+				{
+					this->minPreviousError = this->minCurrentError;
+				}
+				else
+				{
+					this->minPreviousError = 0;
+				}
+				this->minCurrentError = std::numeric_limits<double>::max();
+			}
 			auto currentTime = std::chrono::steady_clock::now();
 			std::chrono::duration<double> elapsed_seconds = currentTime - startTime;
 			if (elapsed_seconds.count() >= secondsLimit)
@@ -203,6 +215,7 @@ bool BFBDS<state, action, environment>::GetMidState(state originState, state goa
 			//Initializing iteration variables
 			this->outOfSpace = false;
 			this->currentMaxG = 0;
+			this->currentMinG = std::numeric_limits<double>::max();
 			unsigned long expansionsBeforeIter = this->expansionsCount;
 			double currentDirectionBound;
 			state currentOriginState, currentGoalState;
@@ -276,18 +289,6 @@ bool BFBDS<state, action, environment>::GetMidState(state originState, state goa
 			}
 			this->firstRun = false;
 			this->forwardSearch = !this->forwardSearch;
-			if (this->isConsistent)
-			{
-				if (this->minCurrentError != std::numeric_limits<double>::max())
-				{
-					this->minPreviousError = this->minCurrentError;
-				}
-				else
-				{
-					this->minPreviousError = 0;
-				}
-				this->minCurrentError = std::numeric_limits<double>::max();
-			}
 		}
 		updateBounds();
 	}
@@ -317,11 +318,11 @@ bool BFBDS<state, action, environment>::DoIteration(state &originState, state &g
 			midState = currState;
 			return true;
 		}
-		else if (g >= currentDirectionBound)
+		else if ((!this->firstRun && g + this->previousMinG >= fBound) || g >= currentDirectionBound)
 		{
 			if (this->isConsistent)
 			{
-				this->minCurrentError = std::min(this->minCurrentError, g - this->env->HCost(originState, currState));
+				this->minCurrentError = std::min(this->minCurrentError, g - this->env->HCost(currState, originState));
 			}
 			return false;
 		}
@@ -401,6 +402,7 @@ bool BFBDS<state, action, environment>::checkState(state &midState, double g)
 	else if (this->firstRun || this->previousBloomfilter->Contains(this->env->GetStateHash(midState)))
 	{
 		this->currentMaxG = std::max(this->currentMaxG, g);
+		this->currentMinG = std::min(this->currentMinG, g);
 		if (this->outOfSpace)
 		{
 			this->currentBloomfilter->Insert(this->env->GetStateHash(midState));
@@ -459,7 +461,7 @@ double BFBDS<state, action, environment>::isNextForwardSearch()
 template <class state, class action, class environment>
 void BFBDS<state, action, environment>::updateBounds()
 {
-	this->forwardBound = ceil(calculateNextForwardBound() / this->smallestEdge) * this->smallestEdge;
+	this->forwardBound = floor(calculateNextForwardBound() / this->smallestEdge) * this->smallestEdge;
 	this->backwardBound = this->nextBound - this->forwardBound;
 	this->fBound = this->nextBound;
 }
@@ -474,6 +476,7 @@ void BFBDS<state, action, environment>::resetBfSearchValues()
 	this->middleStates.clear();
 	this->previousMaxG = 0;
 	this->currentMaxG = 0;
+	this->currentMinG = std::numeric_limits<double>::max();
 	this->forwardMaxExpansions = 0;
 	this->backwardMaxExpansions = 0;
 	if (this->isConsistent)
