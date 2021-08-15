@@ -22,63 +22,34 @@
 #include "GenericBloomFilter.h"
 #include "TestInfo.h"
 #include "TestResult.h"
+#include "json.h"
 #include <fstream>
 #include <iostream>
 #include <boost/format.hpp>
 #include <math.h>
 #include <ctime>
+
 using namespace std;
+using json = nlohmann::json;
 
 template <class state, class action, class environment>
 class GenericTester
 {
-private:
-	const unsigned long STATES_QUANTITY_BOUND_DEFAULT = 1000000;
-	const double MINIMUM_STATES_QUANTITY_BOUND = 2;
-	const int SECONDS_LIMIT = 60 * 30;
-	const vector<double> RMA_STATES_PERCENTAGES{0.5, 0.1, 0.01};
-
-	bool AstarRun = true;
-	bool RevAstarRun = false;
-	bool IDAstarRun = true;
-	bool AstarPIDAstarRun = false;
-	bool AstarPIDAstarReverseRun = false;
-	bool AstarPIDAstarReverseMinHRun = false;
-	bool IDTHSpTrans = true;
-	bool BAI = true;
-	bool Max_BAI = true;
-	bool MMRun = true;
-
-	bool IDBiHSRun = true;
-	bool F2Fheuristics = true;
-
-	bool ASTARpIDBiHS = true;
-
-	bool BFBDSRUN = true;
-	bool BFBDSVerbose = false;
-	bool revAlgo = false;
-	bool threePhase = false;
-
-	bool detectDuplicate = true;
-	bool isConsistent = true;
-	bool isUpdateByWorkload = true;
-	bool printAbstractAlgos = false;
-
 public:
 	GenericTester() {}
 	virtual ~GenericTester() {}
-	void genericTest(state original, state goal, environment env, ofstream &myfile, TestInfo testInfo, double smallestEdge);
-	vector<TestResult> testUMA(state original, state goal, environment env, TestInfo testInfo);
-	vector<TestResult> testLMA(state original, state goal, environment env, TestInfo testInfo);
-	vector<TestResult> testFMA(state original, state goal, environment env, TestInfo testInfo, unsigned long statesQuantityBound, vector<double> quantityPercentages, double smallestEdge);
+	void genericTest(state original, state goal, environment env, ofstream &myfile, TestInfo testInfo, double smallestEdge, json configurations);
+	vector<TestResult> testUMA(state original, state goal, environment env, TestInfo testInfo, json configurations);
+	vector<TestResult> testLMA(state original, state goal, environment env, TestInfo testInfo, json configurations);
+	vector<TestResult> testFMA(state original, state goal, environment env, TestInfo testInfo, unsigned long statesQuantityBound, double smallestEdge, json configurations);
 };
 
 template <class state, class action, class environment>
-void GenericTester<state, action, environment>::genericTest(state original, state goal, environment env, ofstream &myfile, TestInfo testInfo, double smallestEdge)
+void GenericTester<state, action, environment>::genericTest(state original, state goal, environment env, ofstream &myfile, TestInfo testInfo, double smallestEdge, json configurations)
 {
-	vector<TestResult> lmaResults = testLMA(original, goal, env, testInfo);
+	vector<TestResult> lmaResults = testLMA(original, goal, env, testInfo, configurations);
 
-	vector<TestResult> umaResults = testUMA(original, goal, env, testInfo);
+	vector<TestResult> umaResults = testUMA(original, goal, env, testInfo, configurations);
 	// Determine states quantity bound
 	unsigned long statesQuantityBound = ULONG_MAX;
 	for (TestResult testResult : umaResults)
@@ -90,9 +61,9 @@ void GenericTester<state, action, environment>::genericTest(state original, stat
 	}
 	if (statesQuantityBound == ULONG_MAX)
 	{
-		statesQuantityBound = STATES_QUANTITY_BOUND_DEFAULT;
+		statesQuantityBound = configurations["properties"]["defaultStatesQuantityBound"].get<unsigned long>();
 	}
-	vector<TestResult> fmaResults = testFMA(original, goal, env, testInfo, statesQuantityBound, RMA_STATES_PERCENTAGES, smallestEdge);
+	vector<TestResult> fmaResults = testFMA(original, goal, env, testInfo, statesQuantityBound, smallestEdge, configurations);
 
 	vector<vector<TestResult>> testResultsVectorts{lmaResults, umaResults, fmaResults};
 	for (vector<TestResult> testResultsVector : testResultsVectorts)
@@ -105,7 +76,7 @@ void GenericTester<state, action, environment>::genericTest(state original, stat
 }
 
 template <class state, class action, class environment>
-vector<TestResult> GenericTester<state, action, environment>::testUMA(state original, state goal, environment env, TestInfo testInfo)
+vector<TestResult> GenericTester<state, action, environment>::testUMA(state original, state goal, environment env, TestInfo testInfo, json configurations)
 {
 	double initialHeuristic = env.HCost(original, goal);
 	Timer timer;
@@ -114,7 +85,7 @@ vector<TestResult> GenericTester<state, action, environment>::testUMA(state orig
 	vector<TestResult> testResults;
 	// A*
 	vector<AStarOpenClosedDataWithF<state>> astarOpenList;
-	if (AstarRun)
+	if (configurations["algorithms"]["astar"].get<bool>())
 	{
 		TestResult astarTestResult = TestResult(testInfo);
 		astarTestResult.m_initialHeuristic = initialHeuristic;
@@ -123,7 +94,7 @@ vector<TestResult> GenericTester<state, action, environment>::testUMA(state orig
 		TemplateAStar<state, action, environment> astar;
 		state start = original;
 		timer.StartTimer();
-		bool solved = astar.GetPathTime(&env, start, goal, astarPath, SECONDS_LIMIT);
+		bool solved = astar.GetPathTime(&env, start, goal, astarPath, configurations["properties"]["secondsLimit"].get<int>());
 		timer.EndTimer();
 		if (solved)
 		{
@@ -134,7 +105,7 @@ vector<TestResult> GenericTester<state, action, environment>::testUMA(state orig
 		}
 		astarTestResult.m_timeElapsed = timer.GetElapsedTime();
 		testResults.push_back(astarTestResult);
-		if (printAbstractAlgos)
+		if (configurations["properties"]["printAbstractAlgos"].get<bool>())
 		{
 			TestResult iastarTestResult = TestResult(testInfo);
 			iastarTestResult.m_initialHeuristic = astarTestResult.m_initialHeuristic;
@@ -145,7 +116,7 @@ vector<TestResult> GenericTester<state, action, environment>::testUMA(state orig
 			testResults.push_back(iastarTestResult);
 		}
 	}
-	if (RevAstarRun)
+	if (configurations["algorithms"]["reversedAstar"].get<bool>())
 	{
 		TestResult revAstarTestResult = TestResult(testInfo);
 		revAstarTestResult.m_initialHeuristic = initialHeuristic;
@@ -153,7 +124,7 @@ vector<TestResult> GenericTester<state, action, environment>::testUMA(state orig
 		TemplateAStar<state, action, environment> revAstar;
 		state start = original;
 		timer.StartTimer();
-		bool solved = revAstar.GetPathTime(&env, goal, start, astarPath, SECONDS_LIMIT);
+		bool solved = revAstar.GetPathTime(&env, goal, start, astarPath, configurations["properties"]["secondsLimit"].get<int>());
 		timer.EndTimer();
 		if (solved)
 		{
@@ -166,7 +137,7 @@ vector<TestResult> GenericTester<state, action, environment>::testUMA(state orig
 		testResults.push_back(revAstarTestResult);
 	}
 	// MM
-	if (MMRun)
+	if (configurations["algorithms"]["mm"].get<bool>())
 	{
 		TestResult mmTestResult = TestResult(testInfo);
 		mmTestResult.m_initialHeuristic = initialHeuristic;
@@ -175,7 +146,7 @@ vector<TestResult> GenericTester<state, action, environment>::testUMA(state orig
 		vector<state> mmPath;
 		state start = original;
 		timer.StartTimer();
-		bool solved = mm.GetPath(&env, start, goal, &env, &env, mmPath, SECONDS_LIMIT);
+		bool solved = mm.GetPath(&env, start, goal, &env, &env, mmPath, configurations["properties"]["secondsLimit"].get<int>());
 		timer.EndTimer();
 		if (solved)
 		{
@@ -186,7 +157,7 @@ vector<TestResult> GenericTester<state, action, environment>::testUMA(state orig
 		}
 		mmTestResult.m_timeElapsed = timer.GetElapsedTime();
 		testResults.push_back(mmTestResult);
-		if (printAbstractAlgos)
+		if (configurations["properties"]["printAbstractAlgos"].get<bool>())
 		{
 			TestResult immTestResult = TestResult(testInfo);
 			immTestResult.m_initialHeuristic = mmTestResult.m_initialHeuristic;
@@ -201,14 +172,14 @@ vector<TestResult> GenericTester<state, action, environment>::testUMA(state orig
 }
 
 template <class state, class action, class environment>
-vector<TestResult> GenericTester<state, action, environment>::testLMA(state original, state goal, environment env, TestInfo testInfo)
+vector<TestResult> GenericTester<state, action, environment>::testLMA(state original, state goal, environment env, TestInfo testInfo, json configurations)
 {
 	double initialHeuristic = env.HCost(original, goal);
 	Timer timer;
 	vector<state> idaPath;
 	vector<TestResult> testResults;
 	// IDA*
-	if (IDAstarRun)
+	if (configurations["algorithms"]["idastar"].get<bool>())
 	{
 		TestResult idaTestResult = TestResult(testInfo);
 		idaTestResult.m_initialHeuristic = initialHeuristic;
@@ -216,7 +187,7 @@ vector<TestResult> GenericTester<state, action, environment>::testLMA(state orig
 		IDAStar<state, action, false> idastar;
 		state start = original;
 		timer.StartTimer();
-		bool solved = idastar.GetPath(&env, start, goal, idaPath, SECONDS_LIMIT);
+		bool solved = idastar.GetPath(&env, start, goal, idaPath, configurations["properties"]["secondsLimit"].get<int>());
 		timer.EndTimer();
 		if (solved)
 		{
@@ -226,7 +197,7 @@ vector<TestResult> GenericTester<state, action, environment>::testLMA(state orig
 		}
 		idaTestResult.m_timeElapsed = timer.GetElapsedTime();
 		testResults.push_back(idaTestResult);
-		if (printAbstractAlgos)
+		if (configurations["properties"]["printAbstractAlgos"].get<bool>())
 		{
 			TestResult dAstarTestResult = TestResult(testInfo);
 			dAstarTestResult.m_initialHeuristic = idaTestResult.m_initialHeuristic;
@@ -239,16 +210,16 @@ vector<TestResult> GenericTester<state, action, environment>::testLMA(state orig
 	}
 
 	//IDBiHS
-	if (IDBiHSRun)
+	if (configurations["algorithms"]["idbihs"].get<bool>())
 	{
 		TestResult testResult = TestResult(testInfo);
 		testResult.m_initialHeuristic = initialHeuristic;
 		testResult.m_algorithmInfo = "IDBiHS";
-		IDBiHS<environment, state, action, false> idbihs(&env, F2Fheuristics, isConsistent, isUpdateByWorkload);
+		IDBiHS<environment, state, action, false> idbihs(&env, configurations["properties"]["f2fHeuristics"].get<bool>(), configurations["properties"]["consistent"].get<bool>(), configurations["properties"]["UpdateByWorkload"].get<bool>());
 		state start = original;
 		state midState;
 		timer.StartTimer();
-		bool solved = idbihs.GetMidState(start, goal, midState, SECONDS_LIMIT);
+		bool solved = idbihs.GetMidState(start, goal, midState, configurations["properties"]["secondsLimit"].get<int>());
 		timer.EndTimer();
 		if (solved)
 		{
@@ -259,7 +230,7 @@ vector<TestResult> GenericTester<state, action, environment>::testLMA(state orig
 		testResult.m_timeElapsed = timer.GetElapsedTime();
 		testResults.push_back(testResult);
 
-		if (printAbstractAlgos)
+		if (configurations["properties"]["printAbstractAlgos"].get<bool>())
 		{
 			TestResult dMmtestResult = TestResult(testInfo);
 			dMmtestResult.m_initialHeuristic = initialHeuristic;
@@ -274,8 +245,9 @@ vector<TestResult> GenericTester<state, action, environment>::testLMA(state orig
 }
 
 template <class state, class action, class environment>
-vector<TestResult> GenericTester<state, action, environment>::testFMA(state original, state goal, environment env, TestInfo testInfo, unsigned long statesQuantityBound, vector<double> quantityPercentages, double smallestEdge)
+vector<TestResult> GenericTester<state, action, environment>::testFMA(state original, state goal, environment env, TestInfo testInfo, unsigned long statesQuantityBound, double smallestEdge, json configurations)
 {
+	vector<double> quantityPercentages = configurations["properties"]["rmaStatesPercentages"].get<vector<double>>();
 	double initialHeuristic = env.HCost(original, goal);
 	Timer timer;
 
@@ -284,7 +256,7 @@ vector<TestResult> GenericTester<state, action, environment>::testFMA(state orig
 	vector<TestResult> testResults;
 
 	//FullBFBDS
-	if (BFBDSRUN)
+	if (configurations["algorithms"]["bfbds"].get<bool>())
 	{
 		vector<state> fullBfbdsPath;
 		state midState;
@@ -295,11 +267,11 @@ vector<TestResult> GenericTester<state, action, environment>::testFMA(state orig
 			TestResult bfbdsTestResult = TestResult(testInfo);
 			bfbdsTestResult.m_initialHeuristic = initialHeuristic;
 			bfbdsTestResult.m_algorithmInfo = "BFBDS-" + to_string(quantityPercentage) + "%";
-			unsigned long statesQuantityBoundforBFBDS = std::max(statesQuantityBound * quantityPercentage, MINIMUM_STATES_QUANTITY_BOUND);
+			unsigned long statesQuantityBoundforBFBDS = std::max(statesQuantityBound * quantityPercentage, configurations["properties"]["minStatesQuantityBound"].get<double>());
 			state start = original;
 			timer.StartTimer();
-			BFBDS<state, action, environment> bfbds(&env, statesQuantityBoundforBFBDS, isUpdateByWorkload, isConsistent, revAlgo, F2Fheuristics, BFBDSVerbose, smallestEdge);
-			solved = bfbds.GetMidState(start, goal, midState, fullBfbdsPath, SECONDS_LIMIT, threePhase);
+			BFBDS<state, action, environment> bfbds(&env, statesQuantityBoundforBFBDS, configurations["properties"]["UpdateByWorkload"].get<bool>(), configurations["properties"]["consistent"].get<bool>(), configurations["properties"]["bfbdsReverse"].get<bool>(), configurations["properties"]["f2fHeuristics"].get<bool>(), configurations["properties"]["bfbdsVerbose"].get<bool>(), smallestEdge);
+			solved = bfbds.GetMidState(start, goal, midState, fullBfbdsPath, configurations["properties"]["secondsLimit"].get<int>(), configurations["properties"]["bfbfsThreePhase"].get<bool>());
 			timer.EndTimer();
 
 			bfbdsTestResult.m_maxStatesInMemory = statesQuantityBoundforBFBDS;
@@ -318,20 +290,20 @@ vector<TestResult> GenericTester<state, action, environment>::testFMA(state orig
 			testResults.push_back(bfbdsTestResult);
 		}
 	}
-	if (ASTARpIDBiHS)
+	if (configurations["algorithms"]["astarNidbihs"].get<bool>())
 	{
 		for (double quantityPercentage : quantityPercentages)
 		{
 			TestResult testResult = TestResult(testInfo);
 			testResult.m_initialHeuristic = initialHeuristic;
 			testResult.m_algorithmInfo = "A*+IDBiHS-" + to_string(quantityPercentage) + "%";
-			unsigned long statesQuantityBoundforASPIDBiHS = std::max(statesQuantityBound * quantityPercentage, MINIMUM_STATES_QUANTITY_BOUND);
+			unsigned long statesQuantityBoundforASPIDBiHS = std::max(statesQuantityBound * quantityPercentage, configurations["properties"]["minStatesQuantityBound"].get<double>());
 
-			IDBiHS<environment, state, action, false> idbihs(&env, F2Fheuristics, isConsistent, isUpdateByWorkload);
+			IDBiHS<environment, state, action, false> idbihs(&env, configurations["properties"]["f2fHeuristics"].get<bool>(), configurations["properties"]["consistent"].get<bool>(), configurations["properties"]["UpdateByWorkload"].get<bool>());
 			state midState;
 			timer.StartTimer();
 			state start = original;
-			bool solved = idbihs.Astar_plus_IDBiHS(start, goal, midState, statesQuantityBoundforASPIDBiHS, SECONDS_LIMIT - timer.GetElapsedTime(), detectDuplicate);
+			bool solved = idbihs.Astar_plus_IDBiHS(start, goal, midState, statesQuantityBoundforASPIDBiHS, configurations["properties"]["secondsLimit"].get<int>() - timer.GetElapsedTime(), configurations["properties"]["detectDuplicates"].get<bool>());
 			timer.EndTimer();
 			testResult.m_maxStatesInMemory = statesQuantityBoundforASPIDBiHS;
 			if (solved)
@@ -347,22 +319,22 @@ vector<TestResult> GenericTester<state, action, environment>::testFMA(state orig
 			testResults.push_back(testResult);
 		}
 	}
-	if (IDTHSpTrans)
+	if (configurations["algorithms"]["idthsTrans"].get<bool>())
 	{
 		{
 			for (double quantityPercentage : quantityPercentages)
 			{
 				TestResult testResult = TestResult(testInfo);
 				testResult.m_initialHeuristic = initialHeuristic;
-				testResult.m_algorithmInfo = "IDTHSpTrans-" + to_string(quantityPercentage) + "%";
-				unsigned long statesQuantityBoundforASPIDBiHS = std::max(statesQuantityBound * quantityPercentage, MINIMUM_STATES_QUANTITY_BOUND);
+				testResult.m_algorithmInfo = "idthsTrans-" + to_string(quantityPercentage) + "%";
+				unsigned long statesQuantityBoundforASPIDBiHS = std::max(statesQuantityBound * quantityPercentage, configurations["properties"]["minStatesQuantityBound"].get<double>());
 				state start = original;
 				timer.StartTimer();
 				unsigned long nodesExpanded = 0;
 				unsigned long necessaryNodesExpanded = 0;
-				IDTHSwTrans<state, action, false> idbihs(F2Fheuristics, isConsistent, isUpdateByWorkload, 1, false);
+				IDTHSwTrans<state, action, false> idbihs(configurations["properties"]["f2fHeuristics"].get<bool>(), configurations["properties"]["consistent"].get<bool>(), configurations["properties"]["UpdateByWorkload"].get<bool>(), 1, false);
 				state midState;
-				bool solved = idbihs.GetPath(&env, start, goal, SECONDS_LIMIT, statesQuantityBoundforASPIDBiHS);
+				bool solved = idbihs.GetPath(&env, start, goal, configurations["properties"]["secondsLimit"].get<int>(), statesQuantityBoundforASPIDBiHS);
 				nodesExpanded += idbihs.GetNodesExpanded();
 				necessaryNodesExpanded += idbihs.GetNecessaryExpansions();
 				timer.EndTimer();
@@ -387,14 +359,14 @@ vector<TestResult> GenericTester<state, action, environment>::testFMA(state orig
 				TestResult testResult = TestResult(testInfo);
 				testResult.m_initialHeuristic = initialHeuristic;
 				testResult.m_algorithmInfo = "IDTHSpTrans_NDD-" + to_string(quantityPercentage) + "%";
-				unsigned long statesQuantityBoundforASPIDBiHS = std::max(statesQuantityBound * quantityPercentage, MINIMUM_STATES_QUANTITY_BOUND);
+				unsigned long statesQuantityBoundforASPIDBiHS = std::max(statesQuantityBound * quantityPercentage, configurations["properties"]["minStatesQuantityBound"].get<double>());
 				state start = original;
 				timer.StartTimer();
 				unsigned long nodesExpanded = 0;
 				unsigned long necessaryNodesExpanded = 0;
-				IDTHSwTrans<state, action, false> idbihs(F2Fheuristics, isConsistent, isUpdateByWorkload, 1, false);
+				IDTHSwTrans<state, action, false> idbihs(configurations["properties"]["f2fHeuristics"].get<bool>(), configurations["properties"]["consistent"].get<bool>(), configurations["properties"]["UpdateByWorkload"].get<bool>(), 1, false);
 				state midState;
-				bool solved = idbihs.GetPath(&env, start, goal, SECONDS_LIMIT, statesQuantityBoundforASPIDBiHS);
+				bool solved = idbihs.GetPath(&env, start, goal, configurations["properties"]["secondsLimit"].get<int>(), statesQuantityBoundforASPIDBiHS);
 				nodesExpanded += idbihs.GetNodesExpanded();
 				necessaryNodesExpanded += idbihs.GetNecessaryExpansions();
 				timer.EndTimer();
@@ -414,18 +386,18 @@ vector<TestResult> GenericTester<state, action, environment>::testFMA(state orig
 			}
 		}
 	}
-	if (AstarPIDAstarRun)
+	if (configurations["algorithms"]["astarNidastar"].get<bool>())
 	{
 		for (double quantityPercentage : quantityPercentages)
 		{
 			TestResult testResult = TestResult(testInfo);
 			testResult.m_initialHeuristic = initialHeuristic;
 			testResult.m_algorithmInfo = "Astar+IDAstar-" + to_string(quantityPercentage) + "%";
-			unsigned long statesQuantityBoundforASPIDAS = std::max(statesQuantityBound * quantityPercentage, MINIMUM_STATES_QUANTITY_BOUND);
+			unsigned long statesQuantityBoundforASPIDAS = std::max(statesQuantityBound * quantityPercentage, configurations["properties"]["minStatesQuantityBound"].get<double>());
 			TemplateAStar<state, action, environment> astar;
 			state start = original;
 			timer.StartTimer();
-			bool solved = astar.GetPathTime(&env, start, goal, astarPath, SECONDS_LIMIT, true, statesQuantityBoundforASPIDAS);
+			bool solved = astar.GetPathTime(&env, start, goal, astarPath, configurations["properties"]["secondsLimit"].get<int>(), true, statesQuantityBoundforASPIDAS);
 			unsigned long nodesExpanded = astar.GetNodesExpanded();
 			unsigned long necessaryNodesExpanded = 0;
 			testResult.m_maxStatesInMemory = statesQuantityBoundforASPIDAS;
@@ -440,7 +412,7 @@ vector<TestResult> GenericTester<state, action, environment>::testFMA(state orig
 			else
 			{
 				IDAStar<state, action, false> idastar;
-				solved = idastar.ASpIDA(&env, start, goal, idaPath, astar.getStatesList(), SECONDS_LIMIT - timer.GetElapsedTime(), detectDuplicate);
+				solved = idastar.ASpIDA(&env, start, goal, idaPath, astar.getStatesList(), configurations["properties"]["secondsLimit"].get<int>() - timer.GetElapsedTime(), configurations["properties"]["detectDuplicates"].get<bool>());
 				nodesExpanded += idastar.GetNodesExpanded();
 				necessaryNodesExpanded += idastar.GetNecessaryExpansions();
 				timer.EndTimer();
@@ -460,18 +432,18 @@ vector<TestResult> GenericTester<state, action, environment>::testFMA(state orig
 			testResults.push_back(testResult);
 		}
 	}
-	if (AstarPIDAstarReverseRun)
+	if (configurations["algorithms"]["reversedAstarNidastar"].get<bool>())
 	{
 		for (double quantityPercentage : quantityPercentages)
 		{
 			TestResult testResult = TestResult(testInfo);
 			testResult.m_initialHeuristic = initialHeuristic;
 			testResult.m_algorithmInfo = "Astar+IDAstar+Reverse-" + to_string(quantityPercentage) + "%";
-			unsigned long statesQuantityBoundforASPIDARS = std::max(statesQuantityBound * quantityPercentage, MINIMUM_STATES_QUANTITY_BOUND);
+			unsigned long statesQuantityBoundforASPIDARS = std::max(statesQuantityBound * quantityPercentage, configurations["properties"]["minStatesQuantityBound"].get<double>());
 			TemplateAStar<state, action, environment> astar;
 			state start = original;
 			timer.StartTimer();
-			bool solved = astar.GetPathTime(&env, goal, start, astarPath, SECONDS_LIMIT, true, statesQuantityBoundforASPIDARS, false);
+			bool solved = astar.GetPathTime(&env, goal, start, astarPath, configurations["properties"]["secondsLimit"].get<int>(), true, statesQuantityBoundforASPIDARS, false);
 			unsigned long nodesExpanded = astar.GetNodesExpanded();
 			unsigned long necessaryNodesExpanded = 0;
 			testResult.m_maxStatesInMemory = statesQuantityBoundforASPIDARS;
@@ -486,7 +458,7 @@ vector<TestResult> GenericTester<state, action, environment>::testFMA(state orig
 			else
 			{
 				IDAStar<state, action, false> idastar;
-				solved = idastar.ASpIDArev(&env, start, goal, idaPath, astar.getStatesList(), astar.getPrevF(), SECONDS_LIMIT - timer.GetElapsedTime());
+				solved = idastar.ASpIDArev(&env, start, goal, idaPath, astar.getStatesList(), astar.getPrevF(), configurations["properties"]["secondsLimit"].get<int>() - timer.GetElapsedTime());
 				nodesExpanded += idastar.GetNodesExpanded();
 				necessaryNodesExpanded += idastar.GetNecessaryExpansions();
 				timer.EndTimer();
@@ -505,18 +477,18 @@ vector<TestResult> GenericTester<state, action, environment>::testFMA(state orig
 			testResults.push_back(testResult);
 		}
 	}
-	if (AstarPIDAstarReverseMinHRun)
+	if (configurations["algorithms"]["reversedAstarNidastarMinHRun"].get<bool>())
 	{
 		for (double quantityPercentage : quantityPercentages)
 		{
 			TestResult testResult = TestResult(testInfo);
 			testResult.m_initialHeuristic = initialHeuristic;
 			testResult.m_algorithmInfo = "Astar+IDAstar+ReverseMinH-" + to_string(quantityPercentage) + "%";
-			unsigned long statesQuantityBoundforASPIDARS = std::max(statesQuantityBound * quantityPercentage, MINIMUM_STATES_QUANTITY_BOUND);
+			unsigned long statesQuantityBoundforASPIDARS = std::max(statesQuantityBound * quantityPercentage, configurations["properties"]["minStatesQuantityBound"].get<double>());
 			TemplateAStar<state, action, environment> astar;
 			state start = original;
 			timer.StartTimer();
-			bool solved = astar.GetPathTime(&env, goal, start, astarPath, SECONDS_LIMIT, true, statesQuantityBoundforASPIDARS, false);
+			bool solved = astar.GetPathTime(&env, goal, start, astarPath, configurations["properties"]["secondsLimit"].get<int>(), true, statesQuantityBoundforASPIDARS, false);
 			unsigned long nodesExpanded = astar.GetNodesExpanded();
 			unsigned long necessaryNodesExpanded = 0;
 			testResult.m_maxStatesInMemory = statesQuantityBoundforASPIDARS;
@@ -531,7 +503,7 @@ vector<TestResult> GenericTester<state, action, environment>::testFMA(state orig
 			else
 			{
 				IDAStar<state, action, false> idastar;
-				solved = idastar.ASpIDArev(&env, start, goal, idaPath, astar.getStatesList(), astar.getPrevF(), SECONDS_LIMIT - timer.GetElapsedTime(), isConsistent, true);
+				solved = idastar.ASpIDArev(&env, start, goal, idaPath, astar.getStatesList(), astar.getPrevF(), configurations["properties"]["secondsLimit"].get<int>() - timer.GetElapsedTime(), configurations["properties"]["consistent"].get<bool>(), true);
 				nodesExpanded += idastar.GetNodesExpanded();
 				necessaryNodesExpanded += idastar.GetNecessaryExpansions();
 				timer.EndTimer();
@@ -550,18 +522,18 @@ vector<TestResult> GenericTester<state, action, environment>::testFMA(state orig
 			testResults.push_back(testResult);
 		}
 	}
-	if (BAI)
+	if (configurations["algorithms"]["bai"].get<bool>())
 	{
 		for (double quantityPercentage : quantityPercentages)
 		{
 			TestResult testResult = TestResult(testInfo);
 			testResult.m_initialHeuristic = initialHeuristic;
 			testResult.m_algorithmInfo = "BAI-" + to_string(quantityPercentage) + "%";
-			unsigned long statesQuantityBoundforASPIDARS = std::max(statesQuantityBound * quantityPercentage, MINIMUM_STATES_QUANTITY_BOUND);
+			unsigned long statesQuantityBoundforASPIDARS = std::max(statesQuantityBound * quantityPercentage, configurations["properties"]["minStatesQuantityBound"].get<double>());
 			TemplateAStar<state, action, environment> astar;
 			state start = original;
 			timer.StartTimer();
-			bool solved = astar.GetPathTime(&env, goal, start, astarPath, SECONDS_LIMIT, true, statesQuantityBoundforASPIDARS);
+			bool solved = astar.GetPathTime(&env, goal, start, astarPath, configurations["properties"]["secondsLimit"].get<int>(), true, statesQuantityBoundforASPIDARS);
 			unsigned long nodesExpanded = astar.GetNodesExpanded();
 			unsigned long necessaryNodesExpanded = 0;
 			testResult.m_maxStatesInMemory = statesQuantityBoundforASPIDARS;
@@ -576,7 +548,7 @@ vector<TestResult> GenericTester<state, action, environment>::testFMA(state orig
 			else
 			{
 				IDAStar<state, action, false> idastar;
-				solved = idastar.BAI(&env, start, goal, idaPath, astar.getStatesList(), SECONDS_LIMIT - timer.GetElapsedTime(), false);
+				solved = idastar.BAI(&env, start, goal, idaPath, astar.getStatesList(), configurations["properties"]["secondsLimit"].get<int>() - timer.GetElapsedTime(), false);
 				nodesExpanded += idastar.GetNodesExpanded();
 				necessaryNodesExpanded += idastar.GetNecessaryExpansions();
 				timer.EndTimer();
@@ -595,18 +567,18 @@ vector<TestResult> GenericTester<state, action, environment>::testFMA(state orig
 			testResults.push_back(testResult);
 		}
 	}
-	if (Max_BAI)
+	if (configurations["algorithms"]["maxBai"].get<bool>())
 	{
 		for (double quantityPercentage : quantityPercentages)
 		{
 			TestResult testResult = TestResult(testInfo);
 			testResult.m_initialHeuristic = initialHeuristic;
 			testResult.m_algorithmInfo = "MaxBAI-" + to_string(quantityPercentage) + "%";
-			unsigned long statesQuantityBoundforASPIDARS = std::max(statesQuantityBound * quantityPercentage, MINIMUM_STATES_QUANTITY_BOUND);
+			unsigned long statesQuantityBoundforASPIDARS = std::max(statesQuantityBound * quantityPercentage, configurations["properties"]["minStatesQuantityBound"].get<double>());
 			TemplateAStar<state, action, environment> astar;
 			state start = original;
 			timer.StartTimer();
-			bool solved = astar.GetPathTime(&env, goal, start, astarPath, SECONDS_LIMIT, true, statesQuantityBoundforASPIDARS);
+			bool solved = astar.GetPathTime(&env, goal, start, astarPath, configurations["properties"]["secondsLimit"].get<int>(), true, statesQuantityBoundforASPIDARS);
 			unsigned long nodesExpanded = astar.GetNodesExpanded();
 			unsigned long necessaryNodesExpanded = 0;
 			testResult.m_maxStatesInMemory = statesQuantityBoundforASPIDARS;
@@ -621,7 +593,7 @@ vector<TestResult> GenericTester<state, action, environment>::testFMA(state orig
 			else
 			{
 				IDAStar<state, action, false> idastar;
-				solved = idastar.BAI(&env, start, goal, idaPath, astar.getStatesList(), SECONDS_LIMIT - timer.GetElapsedTime(), true);
+				solved = idastar.BAI(&env, start, goal, idaPath, astar.getStatesList(), configurations["properties"]["secondsLimit"].get<int>() - timer.GetElapsedTime(), true);
 				nodesExpanded += idastar.GetNodesExpanded();
 				necessaryNodesExpanded += idastar.GetNecessaryExpansions();
 				timer.EndTimer();

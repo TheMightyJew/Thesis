@@ -1,0 +1,1 @@
+This folder should exist to contain results output.

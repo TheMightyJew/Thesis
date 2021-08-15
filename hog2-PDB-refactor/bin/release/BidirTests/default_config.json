@@ -1,0 +1,48 @@
+{
+    "problems": {
+        "quantity": 100,
+        "pancake": {
+            "shouldRun": true,
+            "size": 10,
+            "hard": false,
+            "gaps": [0, 1, 2, 3]
+        },
+        "stp": {
+            "shouldRun": true,
+            "hard": false
+        },
+        "grid": {
+            "shouldRun": true,
+            "map": "brc000d"
+        } 
+    },
+    "algorithms": {
+        "astar": true,
+		"mm": true,
+        "reversedAstar": false,
+        "idastar": true,
+        "astarNidastar": false,
+        "reversedAstarNidastar": false,
+        "reversedAstarNidastarMinHRun": false,
+        "idthsTrans": true,
+        "bai": true,
+        "maxBai": true,
+        "idbihs": true,
+        "astarNidbihs": true,
+        "bfbds": true
+    },
+    "properties": {
+		"defaultStatesQuantityBound": 1000000,
+		"minStatesQuantityBound": 2,
+		"secondsLimit": 1800,
+		"rmaStatesPercentages": [0.5, 0.1, 0.01],
+        "consistent": true,
+		"f2fHeuristics": true,
+		"detectDuplicates" : true,
+		"UpdateByWorkload" : true,
+		"printAbstractAlgos" : false,
+		"bfbdsVerbose": false,
+		"bfbdsReverse": false,
+		"bfbfsThreePhase": false
+    }
+}

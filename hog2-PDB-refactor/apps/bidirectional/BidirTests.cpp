@@ -13,6 +13,7 @@
 #include "Map2DEnvironment.h"
 #include "MapGenerators.h"
 #include "MapOverlay.h"
+#include "json.h"
 
 #include "GenericTester.h"
 #include <algorithm>
@@ -20,52 +21,90 @@
 #include <iostream>
 #include <sstream>
 #include <boost/format.hpp>
+#include <sys/stat.h>
+#include <sys/types.h>
 #include <ctime>
+
 using namespace std;
+using json = nlohmann::json;
 
 static ofstream myfile;
-const string RESULTS_DIR_PATH = "Test_Results/";
-static void AAAI_Pancake(const string file, int problemsNum);
-static void AAAI_STP(const string file, int problemsNum);
-static void AAAI_Grid(const string file, int problemsNum, const char *mapName = "brc000d", double weight = 1.0);
+const string OUTPUT_DIR_PATH = "BidirTests/";
+const string RESULTS_DIR_PATH = OUTPUT_DIR_PATH + "Results/";
+const string CONFIG_FILENAME = "config.json";
+const string CONFIG_PATH = OUTPUT_DIR_PATH + CONFIG_FILENAME;
+const string DEFAULT_CONFIG_PATH = OUTPUT_DIR_PATH + "default_config.json";
+static void AAAI_Pancake(const string test_directory_path, json configurations);
+static void AAAI_STP(const string test_directory_path, json configurations);
+static void AAAI_Grid(const string test_directory_path, json configurations);
 static string getCurrentTime();
 
 string getCurrentTime()
 {
+	const int bufferSize = 80;
+	const char* timeFormat = "%d-%m-%Y_%H-%M-%S";
 	time_t rawtime;
 	struct tm *timeinfo;
-	char buffer[80];
+	char buffer[bufferSize];
 
 	time(&rawtime);
 	timeinfo = localtime(&rawtime);
 
-	strftime(buffer, 80, "%d-%m-%Y_%H-%M-%S", timeinfo);
+	strftime(buffer, bufferSize, timeFormat, timeinfo);
 	return string(buffer);
 }
 
-void AAAI_Test(string fileName)
+void AAAI_Test(string test_name)
 {
-	if (fileName.empty())
+	if (test_name.empty())
 	{
-		fileName = "results_" + getCurrentTime();
+		test_name = "test_" + getCurrentTime();
 	}
-	fileName += ".csv";
+	string test_directory_path = RESULTS_DIR_PATH + test_name;
+	mkdir(test_directory_path.c_str(), 0777);
 
-	const int problemsNum = 100;
-	AAAI_Pancake(fileName, problemsNum);
-	AAAI_STP(fileName, problemsNum);
-	AAAI_Grid(fileName, problemsNum, "brc000d");
+	json configurations;
+	ifstream config_file(CONFIG_PATH);
+	ofstream copied_config_file(test_directory_path + "/" + CONFIG_FILENAME);
+	if (!config_file.is_open())
+	{
+		config_file = ifstream(DEFAULT_CONFIG_PATH);
+	}
+	config_file >> configurations;
+	string line;
+	config_file.clear();
+	config_file.seekg(0);
+	while (getline(config_file, line))
+	{
+		copied_config_file << line << "\n";
+	}
+	config_file.close();
+	copied_config_file.close();
+
+	if (configurations["problems"]["pancake"]["shouldRun"].get<bool>())
+	{
+		AAAI_Pancake(test_directory_path, configurations);
+	}
+	if (configurations["problems"]["stp"]["shouldRun"].get<bool>())
+	{
+		AAAI_STP(test_directory_path, configurations);
+	}
+	if (configurations["problems"]["grid"]["shouldRun"].get<bool>())
+	{
+		AAAI_Grid(test_directory_path, configurations);
+	}
 
 	exit(0);
 }
 
-void AAAI_Pancake(const string fileName, int problemsNum)
+void AAAI_Pancake(const string test_directory_path, json configurations)
 {
-	bool randomPancake = true;
-	vector<int> gaps = {0, 1, 2, 3};
-	const int pancakesNum = 12;
+	bool randomPancake = !configurations["problems"]["pancake"]["hard"].get<bool>();
+	vector<int> gaps = configurations["problems"]["pancake"]["gaps"];
+	const int pancakesNum = 10;
+	//int pancakesNum =  configurations["problems"]["pancake"]["size"].get<int>();
 	const string PROBLEM_NAME = "PancakeSorting";
-	string filePath = RESULTS_DIR_PATH + PROBLEM_NAME + "/" + fileName;
+	string filePath = test_directory_path + "/" + PROBLEM_NAME + ".csv";
 	myfile.open(filePath);
 
 	myfile << TestResult::csvSerializeHeaders() << std::endl;
@@ -78,9 +117,9 @@ void AAAI_Pancake(const string fileName, int problemsNum)
 		pancake.SetUseRealValueEdges(false);
 
 		std::stringstream testDescription;
-		testDescription << boost::format("TestPancake:(Pancakes: %d, Gap: %d, Random: %d, Hard: %d)") % pancakesNum % gap % randomPancake % (!randomPancake);
+		testDescription << boost::format("TestPancake:(Pancakes: %d, Gap: %d, Hard: %d)") % pancakesNum % gap % (!randomPancake);
 
-		for (int count = 0; count < problemsNum; count++)
+		for (int count = 0; count < configurations["problems"]["quantity"].get<int>(); count++)
 		{
 			goal.Reset();
 			original.Reset();
@@ -106,36 +145,37 @@ void AAAI_Pancake(const string fileName, int problemsNum)
 			goalState << goal;
 			TestInfo testInfo = TestInfo(testDescription.str(), count, startState.str(), goalState.str());
 
-			gt.genericTest(original, goal, pancake, myfile, testInfo, 1);
+			gt.genericTest(original, goal, pancake, myfile, testInfo, 1, configurations);
 		}
 	}
 	myfile.close();
 }
 
-void AAAI_STP(const string fileName, int problemsNum)
+void AAAI_STP(const string test_directory_path, json configurations)
 {
 	srandom(2017218);
-	int walkLength = 32;
-	bool randomSTP = true;
+	const int WALK_LENGTH = 32;
+	const int SIZE = 4;
+	bool randomSTP = !configurations["problems"]["stp"]["hard"].get<bool>();
 
 	const string PROBLEM_NAME = "STP";
-	string filePath = RESULTS_DIR_PATH + PROBLEM_NAME + "/" + fileName;
+	string filePath = test_directory_path + "/" + PROBLEM_NAME + ".csv";
 	myfile.open(filePath);
 	myfile << TestResult::csvSerializeHeaders() << std::endl;
-	GenericTester<MNPuzzleState<4, 4>, slideDir, MNPuzzle<4, 4>> gt;
-	MNPuzzleState<4, 4> original, goal;
-	MNPuzzle<4, 4> mnp;
+	GenericTester<MNPuzzleState<SIZE, SIZE>, slideDir, MNPuzzle<SIZE, SIZE>> gt;
+	MNPuzzleState<SIZE, SIZE> original, goal;
+	MNPuzzle<SIZE, SIZE> mnp;
 
 	std::stringstream testDescription;
-	testDescription << boost::format("TestSTP:(Random: %d, Hard: %d)") % randomSTP % (!randomSTP);
+	testDescription << boost::format("TestSTP:(Hard: %d)") % (!randomSTP);
 
-	for (int count = 0; count < problemsNum; count++)
+	for (int count = 0; count < configurations["problems"]["quantity"].get<int>(); count++)
 	{
 		goal.Reset();
 		original.Reset();
 		if (randomSTP)
 		{
-			original = STP::GetRandomInstance(walkLength);
+			original = STP::GetRandomInstance(WALK_LENGTH);
 		}
 		else
 		{
@@ -153,24 +193,25 @@ void AAAI_STP(const string fileName, int problemsNum)
 		goalState << goal;
 		TestInfo testInfo = TestInfo(testDescription.str(), count, startState.str(), goalState.str());
 
-		gt.genericTest(original, goal, mnp, myfile, testInfo, 1);
+		gt.genericTest(original, goal, mnp, myfile, testInfo, 1, configurations);
 	}
 	myfile.close();
 }
 
-void AAAI_Grid(const string fileName, int problemsNum, const char *mapName, double weight)
+void AAAI_Grid(const string test_directory_path, json configurations)
 {
 	const string PROBLEM_NAME = "Grid";
-	string filePath = RESULTS_DIR_PATH + PROBLEM_NAME + "/" + fileName;
+	string filePath = test_directory_path + "/" + PROBLEM_NAME + ".csv";
 	myfile.open(filePath);
 	myfile << TestResult::csvSerializeHeaders() << std::endl;
 	GenericTester<CanonicalGrid::xyLoc, CanonicalGrid::tDirection, CanonicalGrid::CanonicalGrid> gt;
 	CanonicalGrid::xyLoc original, goal;
 	CanonicalGrid::CanonicalGrid *cg_tmp = 0;
-
+	string mapName = configurations["problems"]["grid"]["map"].get<string>();
+	cout << mapName << endl;
 	std::stringstream testDescription;
 	testDescription << boost::format("TestGrid:( Map_Name: %s)") % mapName;
-
+	cout << mapName << endl;
 	srandom(2017218);
 	MapEnvironment *me = 0;
 
@@ -193,12 +234,13 @@ void AAAI_Grid(const string fileName, int problemsNum, const char *mapName, doub
 	cg.SetDiagonalCost(1.5);
 	int experiments_num = s.GetNumExperiments();
 	int counter = 0;
-	for (int count = 0; count < experiments_num && counter < problemsNum; count++)
+	for (int count = 0; count < experiments_num && counter < configurations["problems"]["quantity"].get<int>(); count++)
 	{
 		Experiment e = s.GetNthExperiment(count);
 		if (e.GetDistance() <= 0)
+		{
 			continue;
-
+		}
 		original.x = e.GetStartX();
 		original.y = e.GetStartY();
 		goal.x = e.GetGoalX();
@@ -210,9 +252,9 @@ void AAAI_Grid(const string fileName, int problemsNum, const char *mapName, doub
 		startState << original;
 		std::stringstream goalState;
 		goalState << goal;
-		TestInfo testInfo = TestInfo(testDescription.str(), count, startState.str(), goalState.str());
+		TestInfo testInfo = TestInfo(testDescription.str(), counter, startState.str(), goalState.str());
 
-		gt.genericTest(original, goal, cg, myfile, testInfo, 0.5);
+		gt.genericTest(original, goal, cg, myfile, testInfo, 0.5, configurations);
 		counter++;
 	}
 	myfile.close();

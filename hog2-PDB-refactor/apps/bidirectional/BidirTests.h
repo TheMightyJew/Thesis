@@ -11,7 +11,7 @@
 #include <string>
 using namespace std;
 
-void AAAI_Test(string file = "");
+void AAAI_Test(string test_name = "");
 
 
 #endif /* BidirTests_hpp */
